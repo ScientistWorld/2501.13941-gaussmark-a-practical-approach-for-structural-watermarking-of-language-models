@@ -1,13 +1,8 @@
 # End-of-turn action file.
 # Edit this file before your turn ends to signal what the system should do next.
-#
-# Signal that you are done:
-#   action: done
-#   milestone: core_claim
-#   notes: "Reproduced the core claim. Environment packaged."
 
 action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark GPU job (v3): fixed dtype mismatch - cast watermark key tensor to model dtype (bfloat16) before weight perturbation. Model: Mistral-7B-Instruct-v0.3, layer 20 up_proj, sigma=1e-5."
+notes: "GaussMark GPU job (v4): 50 prompts x 3 seeds (150 samples). Fixed dtype mismatch for bfloat16 model. Model: Mistral-7B-Instruct-v0.3, layer 20 up_proj, sigma=1e-5. Generates watermarked + unwatermarked text, runs detection, evaluates."
