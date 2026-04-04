@@ -33,7 +33,7 @@ echo "Step 1: Generating watermarked text..."
 python3 method/run_watermark.py \
     --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
     --data_path /home/user/data/c4_realnewslike \
-    --num_prompts 100 \
+    --num_prompts 50 \
     --num_tokens 200 \
     --num_seeds 3 \
     --layer_idx 20 \
