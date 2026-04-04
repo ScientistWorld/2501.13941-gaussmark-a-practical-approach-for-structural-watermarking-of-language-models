@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark GPU job (v4): 50 prompts x 3 seeds (150 samples). Fixed dtype mismatch for bfloat16 model. Model: Mistral-7B-Instruct-v0.3, layer 20 up_proj, sigma=1e-5. Generates watermarked + unwatermarked text, runs detection, evaluates."
+notes: "GaussMark GPU job (v5): 20 prompts x 1 seed. Fixed dtype mismatch (bfloat16) and Linear.weight parameter access. Tests end-to-end: generation + detection + evaluation."
