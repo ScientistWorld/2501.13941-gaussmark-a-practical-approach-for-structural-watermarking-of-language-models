@@ -67,7 +67,7 @@ for i, prompt in enumerate(prompts):
 
     results['samples'].append({
         'prompt_idx': i,
-        'seed': 10000 + i,  # Fixed seed for reproducible key regeneration
+        'seed': 42 + i,  # Same scheme as watermarked: seed = 42 + prompt_idx
         'prompt_text': prompt[:500],
         'generated_text': gen_text,
         'generated_ids': gen_ids.cpu().tolist(),
