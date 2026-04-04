@@ -31,4 +31,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark end-to-end: generate watermarked text (100 prompts x 3 seeds, 200 tokens) + detection + unwatermarked baseline + evaluation. Model: Mistral-7B-Instruct-v0.3, layer 20 up_proj, sigma=1e-5. C4 data: /home/user/data/c4_realnewslike. Expected: detection rate >50% at FPR=0.05 for watermarked text."
+notes: "GaussMark end-to-end (fixed): generate watermarked text (100 prompts x 3 seeds, 200 tokens) + detection + unwatermarked baseline + evaluation. Fixed: Linear.weight parameter access. Model: Mistral-7B-Instruct-v0.3, layer 20 up_proj, sigma=1e-5."
