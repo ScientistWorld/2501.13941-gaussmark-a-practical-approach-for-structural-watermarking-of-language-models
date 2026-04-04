@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: method_runs (GPU job submitted for core_claim)**
 
 <!-- Milestone levels (update "Current" above as you progress):
   none             — just started, no meaningful progress yet
@@ -27,6 +27,11 @@
 - Scoring reference: scoring/reference.json with paper's numbers
 - GPU job submitted for end-to-end validation
 - Fixed seed tracking bug and filename format bug
+- Fixed C4 data loading (JSON format instead of arrow format)
+- Added scikit-learn to environment dependencies
+- Created detect_unwatermarked.py for baseline FPR measurement
+- Updated evaluate.sh to output correct scores.json format matching reference.json
+- Fixed baseline.sh to use JSON loading and assign seeds for key regeneration
 
 ## Stop Justification
 

@@ -127,11 +127,11 @@ def load_watermark_key(sample: dict, config: dict) -> np.ndarray:
         return np.load(key_path)
 
     # Fallback: regenerate from seed
-    seed = sample.get("sample_seed")
+    seed = sample.get("seed")
     if seed is not None:
         rng = np.random.RandomState(int(seed))
     else:
-        rng = np.random.RandomState(int(sample.get("seed", 42)))
+        rng = np.random.RandomState(42)
 
     shape = tuple(sample.get("watermark_key_shape", config.get("watermark_key_shape", [])))
     sigma = config.get("sigma", 1e-5)

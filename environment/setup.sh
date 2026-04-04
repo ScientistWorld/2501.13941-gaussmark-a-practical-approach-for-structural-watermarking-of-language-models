@@ -24,4 +24,5 @@ uv pip install --system \
     numpy \
     tqdm \
     datasets \
-    huggingface_hub
+    huggingface_hub \
+    scikit-learn

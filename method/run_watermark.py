@@ -16,7 +16,6 @@ import sys
 import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
-from datasets import load_from_disk
 import numpy as np
 from tqdm import tqdm
 
@@ -46,17 +45,24 @@ def load_model_and_tokenizer(model_path: str, device: str = "cuda"):
 
 def load_c4_prompts(data_path: str, num_prompts: int = 100):
     """Load C4 prompts, truncating to 200 tokens as in the paper."""
+    import json
+
     print(f"Loading C4 dataset from {data_path}...")
-    ds = load_from_disk(data_path)
-    prompts = []
-    for i, example in enumerate(ds):
-        if i >= num_prompts:
-            break
-        text = example["text"]
-        # Truncate to ~200 tokens (paper uses first 200 tokens as prompt)
-        # Approximate: 200 tokens * ~4 chars/token = 800 chars
-        truncated = " ".join(text.split()[:200])
-        prompts.append(truncated)
+    # Try examples.json first (list of text strings)
+    examples_path = os.path.join(data_path, "examples.json")
+    if os.path.exists(examples_path):
+        with open(examples_path, "r") as f:
+            texts = json.load(f)
+        prompts = []
+        for i, text in enumerate(texts):
+            if i >= num_prompts:
+                break
+            # Truncate to first 200 words (paper uses first 200 tokens as prompt)
+            truncated = " ".join(str(text).split()[:200])
+            prompts.append(truncated)
+    else:
+        raise FileNotFoundError(f"No examples.json found in {data_path}")
+
     print(f"Loaded {len(prompts)} prompts")
     return prompts
 

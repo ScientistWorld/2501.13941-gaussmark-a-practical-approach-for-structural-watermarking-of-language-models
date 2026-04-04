@@ -21,14 +21,11 @@ echo "=== Baseline (Unwatermarked) ==="
 echo "Generating unwatermarked text..."
 python3 -c "
 import sys
-sys.path.insert(0, 'method')
-from gaussmark import GaussMark
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
-from datasets import load_from_disk
 import json
+import os
 import time
-import numpy as np
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load model
 print('Loading model...')
@@ -43,35 +40,41 @@ if tokenizer.pad_token is None:
 model.eval()
 model.tokenizer = tokenizer
 
-# Load prompts
-print('Loading C4 prompts...')
-ds = load_from_disk('$DATA_PATH')
-prompts = [' '.join(ex['text'].split()[:200]) for ex in ds[:100]]
+# Load C4 prompts from JSON
+examples_path = os.path.join('$DATA_PATH', 'examples.json')
+with open(examples_path, 'r') as f:
+    texts = json.load(f)
+prompts = [' '.join(str(t).split()[:200]) for t in texts[:100]]
+print(f'Loaded {len(prompts)} prompts')
 
 # Generate WITHOUT watermark (just use the original model)
 results = {'config': {'watermarked': False, 'num_prompts': len(prompts)}, 'samples': []}
 
-for i, prompt in enumerate(prompts[:100]):
+for i, prompt in enumerate(prompts):
     enc = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
     with torch.no_grad():
         out = model.generate(
             enc['input_ids'].to(model.device),
-            attention_mask=enc.get('attention_mask', None),
+            attention_mask=enc.get('attention_mask'),
             max_new_tokens=200,
             do_sample=True,
             temperature=1.0,
             top_p=0.9,
+            pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
         )
     gen_ids = out[0][enc['input_ids'].shape[1]:]
     gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
 
     results['samples'].append({
         'prompt_idx': i,
+        'seed': 10000 + i,  # Fixed seed for reproducible key regeneration
         'prompt_text': prompt[:500],
         'generated_text': gen_text,
         'generated_ids': gen_ids.cpu().tolist(),
         'watermarked': False,
     })
+    if (i + 1) % 10 == 0:
+        print(f'Generated {i+1}/{len(prompts)}')
 
 # Save
 output_file = '$OUTPUT_DIR/unwatermarked_baseline.json'
@@ -81,4 +84,3 @@ print(f'Saved {len(results[\"samples\"])} unwatermarked samples to {output_file}
 "
 
 echo "Baseline generation complete."
-echo "Now run detection to verify false positive rate is ~5%."
