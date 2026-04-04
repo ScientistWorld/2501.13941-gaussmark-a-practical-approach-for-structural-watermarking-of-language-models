@@ -1,0 +1,96 @@
+{
+  "experiments": {
+    "watermark_detection_mistral": {
+      "description": "GaussMark detection on Mistral-7B — fraction of watermarked text detected at p=0.05 (Figure 2a). Detection rate increases with more generated tokens.",
+      "weight": 0.35,
+      "primary_metric": "detection_rate_fpr_0.05",
+      "metrics": {
+        "detection_rate_fpr_0.05": {"higher_is_better": true, "coefficient": 1.0},
+        "detection_rate_fpr_0.01": {"higher_is_better": true, "coefficient": 0.7},
+        "median_p_value": {"higher_is_better": false, "coefficient": 1.0},
+        "auc": {"higher_is_better": true, "coefficient": 0.5}
+      },
+      "results": {
+        "gaussmark_100_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.28, "detection_rate_fpr_0.01": 0.10, "median_p_value": 0.35, "auc": null},
+        "gaussmark_200_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.62, "detection_rate_fpr_0.01": 0.40, "median_p_value": 0.09, "auc": null},
+        "gaussmark_400_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.88, "detection_rate_fpr_0.01": 0.72, "median_p_value": 0.015, "auc": null},
+        "gaussmark_800_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.97, "detection_rate_fpr_0.01": 0.90, "median_p_value": 0.002, "auc": null},
+        "unwatermarked":         {"type": "baseline",  "detection_rate_fpr_0.05": 0.05, "detection_rate_fpr_0.01": 0.01, "median_p_value": 0.50, "auc": 0.50}
+      }
+    },
+    "watermark_detection_llama": {
+      "description": "GaussMark detection on Llama3.1-8B — detection rate at p=0.05 (Figure 2a). Paper uses layer 28, up_proj, sigma^2=3e-4.",
+      "weight": 0.20,
+      "primary_metric": "detection_rate_fpr_0.05",
+      "metrics": {
+        "detection_rate_fpr_0.05": {"higher_is_better": true, "coefficient": 1.0},
+        "detection_rate_fpr_0.01": {"higher_is_better": true, "coefficient": 0.7},
+        "median_p_value": {"higher_is_better": false, "coefficient": 1.0}
+      },
+      "results": {
+        "gaussmark_200_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.95, "detection_rate_fpr_0.01": 0.82, "median_p_value": 0.008},
+        "gaussmark_400_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 1.00, "detection_rate_fpr_0.01": 0.99, "median_p_value": 0.0005}
+      }
+    },
+    "watermark_detection_phi": {
+      "description": "GaussMark detection on Phi3.5-Mini — more challenging model (lower entropy sequences). Uses layer 20, down_proj, sigma^2=1e-3.",
+      "weight": 0.15,
+      "primary_metric": "detection_rate_fpr_0.05",
+      "metrics": {
+        "detection_rate_fpr_0.05": {"higher_is_better": true, "coefficient": 1.0},
+        "detection_rate_fpr_0.01": {"higher_is_better": true, "coefficient": 0.7},
+        "median_p_value": {"higher_is_better": false, "coefficient": 1.0}
+      },
+      "results": {
+        "gaussmark_200_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.65, "detection_rate_fpr_0.01": 0.40, "median_p_value": 0.08},
+        "gaussmark_400_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.90, "detection_rate_fpr_0.01": 0.75, "median_p_value": 0.02}
+      }
+    },
+    "model_quality_superglue": {
+      "description": "Model quality on SuperGLUE benchmark — watermarked vs unwatermarked (Table 1). GaussMark should have no significant impact on model quality.",
+      "weight": 0.15,
+      "primary_metric": "super_glue_avg",
+      "metrics": {
+        "super_glue_avg": {"higher_is_better": true, "coefficient": 1.0}
+      },
+      "results": {
+        "mistral_watermarked":    {"type": "proposed",  "super_glue_avg": 0.7033},
+        "mistral_unwatermarked": {"type": "baseline",   "super_glue_avg": 0.6836},
+        "llama_watermarked":      {"type": "proposed",  "super_glue_avg": 0.7094},
+        "llama_unwatermarked":    {"type": "baseline",   "super_glue_avg": 0.7012},
+        "phi_watermarked":        {"type": "proposed",  "super_glue_avg": 0.6489},
+        "phi_unwatermarked":      {"type": "baseline",   "super_glue_avg": 0.6451}
+      }
+    },
+    "model_quality_gsm8k": {
+      "description": "Model quality on GSM-8K benchmark — watermarked vs unwatermarked (Table 1).",
+      "weight": 0.10,
+      "primary_metric": "gsm8k_accuracy",
+      "metrics": {
+        "gsm8k_accuracy": {"higher_is_better": true, "coefficient": 1.0}
+      },
+      "results": {
+        "mistral_watermarked":    {"type": "proposed",  "gsm8k_accuracy": 0.4321},
+        "mistral_unwatermarked": {"type": "baseline",   "gsm8k_accuracy": 0.4291},
+        "llama_watermarked":      {"type": "proposed",  "gsm8k_accuracy": 0.6111},
+        "llama_unwatermarked":    {"type": "baseline",   "gsm8k_accuracy": 0.6300},
+        "phi_watermarked":        {"type": "proposed",  "gsm8k_accuracy": 0.8552},
+        "phi_unwatermarked":      {"type": "baseline",   "gsm8k_accuracy": 0.8423}
+      }
+    },
+    "robustness_corruptions": {
+      "description": "Robustness of watermark detection to token-level corruptions (Figure 4a-c). Detection rate should remain nontrivial after up to 50% of tokens are corrupted.",
+      "weight": 0.05,
+      "primary_metric": "detection_rate_fpr_0.05",
+      "metrics": {
+        "detection_rate_fpr_0.05": {"higher_is_better": true, "coefficient": 1.0}
+      },
+      "results": {
+        "mistral_no_corruption":        {"type": "proposed", "detection_rate_fpr_0.05": 0.97},
+        "mistral_10pct_insertion":       {"type": "proposed", "detection_rate_fpr_0.05": 0.80},
+        "mistral_25pct_insertion":       {"type": "proposed", "detection_rate_fpr_0.05": 0.55},
+        "mistral_50pct_insertion":       {"type": "proposed", "detection_rate_fpr_0.05": 0.30}
+      }
+    }
+  }
+}

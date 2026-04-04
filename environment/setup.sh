@@ -16,4 +16,12 @@
 
 set -e
 
-# uv pip install --system <packages>
+uv pip install --system \
+    torch \
+    transformers \
+    accelerate \
+    scipy \
+    numpy \
+    tqdm \
+    datasets \
+    huggingface_hub
