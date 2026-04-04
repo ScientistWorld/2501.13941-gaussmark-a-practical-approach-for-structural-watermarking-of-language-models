@@ -116,7 +116,11 @@ class GaussMark:
                 f"{[attr for attr in dir(mlp) if not attr.startswith('_') and not callable(getattr(mlp, attr))]}"
             )
 
-        return getattr(mlp, self.weight_name)
+        module = getattr(mlp, self.weight_name)
+        # If it's a Linear module, return its .weight parameter, not the module itself
+        if isinstance(module, nn.Linear):
+            return module.weight
+        return module
 
     def _seed_rng(self, seed: Optional[int]) -> None:
         """Set random seeds for reproducibility."""
