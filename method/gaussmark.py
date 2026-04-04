@@ -172,11 +172,15 @@ class GaussMark:
 
         # Step 1: Sample watermark key xi ~ N(0, sigma^2 * I)
         watermark_key = np.random.normal(0, self.sigma, self.target_shape).astype(np.float32)
-        watermark_key_tensor = torch.from_numpy(watermark_key).to(self.device)
+        watermark_key_tensor = torch.from_numpy(watermark_key).to(
+            self.device, dtype=self.target_param.dtype
+        )
 
         # Step 2: Perturb the target layer's weights
         original_data = self.target_param.data.clone()
-        self.target_param.data = self.target_param.data + watermark_key_tensor
+        self.target_param.data = (self.target_param.data + watermark_key_tensor).to(
+            dtype=self.target_param.dtype
+        )
 
         try:
             # Step 3: Generate using the perturbed model
