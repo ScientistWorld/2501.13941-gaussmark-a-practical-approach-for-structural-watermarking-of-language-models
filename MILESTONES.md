@@ -32,6 +32,10 @@
 - Created detect_unwatermarked.py for baseline FPR measurement
 - Updated evaluate.sh to output correct scores.json format matching reference.json
 - Fixed baseline.sh to use JSON loading and assign seeds for key regeneration
+- Fixed Linear.weight param access (was returning Linear module instead of Parameter)
+- Fixed bfloat16 dtype mismatch (watermark key now cast to model dtype)
+- Fixed seed consistency between watermarked/unwatermarked generation
+- GPU job v5 submitted: 20 prompts x 1 seed, expects detection rate ~60%
 
 ## Stop Justification
 
