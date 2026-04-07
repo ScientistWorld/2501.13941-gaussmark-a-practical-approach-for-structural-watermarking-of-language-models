@@ -17,7 +17,6 @@ import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 import numpy as np
-from tqdm import tqdm
 
 # Add method to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
@@ -110,7 +109,9 @@ def run_experiment(
         np.random.seed(seed)
         torch.manual_seed(seed)
 
-        for i, prompt in enumerate(tqdm(prompts, desc=f"Seed {seed_idx}")):
+        for i, prompt in enumerate(prompts):
+            if i % 5 == 0:
+                print(f"  Seed {seed_idx}: {i}/{len(prompts)}")
             # Tokenize prompt
             enc = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
             input_ids = enc["input_ids"]

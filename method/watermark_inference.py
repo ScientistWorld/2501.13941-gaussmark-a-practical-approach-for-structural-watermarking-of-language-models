@@ -28,7 +28,6 @@ from pathlib import Path
 
 import torch
 import numpy as np
-from tqdm import tqdm
 
 # HuggingFace datasets
 try:
@@ -249,7 +248,9 @@ def run_watermark_generation(
         print(f"\n[+] Seed {seed_idx + 1}/{num_seeds} (seed={seed})")
         rng = np.random.RandomState(seed)
 
-        for i, prompt in enumerate(tqdm(prompts, desc=f"  Seed {seed}")):
+        for i, prompt in enumerate(prompts):
+            if i % 10 == 0:
+                print(f"  Seed {seed}: {i}/{len(prompts)}")
             # Tokenize prompt
             enc = tokenizer(
                 prompt,

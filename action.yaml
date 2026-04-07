@@ -4,4 +4,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark GPU job (v6): 20 prompts x 1 seed. All fixes committed: Linear.weight param access, bfloat16 dtype, seed consistency, JSON data loading. End-to-end: generate watermarked text, run detection, unwatermarked baseline, evaluate. Model: Mistral-7B-Instruct-v0.3, layer 20 up_proj, sigma=1e-5."
+notes: "GaussMark GPU job (v7): 20 prompts x 1 seed. setup.sh reverted to exact HEAD content (no changes). Overlay should be cached. End-to-end pipeline: generate watermarked text, detect, unwatermarked baseline, evaluate."

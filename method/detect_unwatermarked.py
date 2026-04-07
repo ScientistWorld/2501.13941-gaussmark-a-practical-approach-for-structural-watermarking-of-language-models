@@ -23,7 +23,6 @@ from pathlib import Path
 
 import torch
 import numpy as np
-from tqdm import tqdm
 
 from transformers import (
     AutoModelForCausalLM,
@@ -72,7 +71,9 @@ def run_detection_unwatermarked(
     print(f"[+] Running detection on {len(samples)} unwatermarked samples...")
     total_start = time.time()
 
-    for sample in tqdm(samples, desc="  Detecting (unwatermarked)"):
+    for i, sample in enumerate(samples):
+        if i % 5 == 0:
+            print(f"  Detecting: {i}/{len(samples)}")
         prompt_text = sample["prompt_text"]
         generated_ids = sample["generated_ids"]
 

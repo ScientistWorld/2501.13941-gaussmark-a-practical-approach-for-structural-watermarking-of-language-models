@@ -27,7 +27,6 @@ from pathlib import Path
 
 import torch
 import numpy as np
-from tqdm import tqdm
 
 from transformers import (
     AutoModelForCausalLM,
@@ -185,7 +184,9 @@ def run_detection(
     print(f"[+] Running detection on {len(samples)} samples ...")
     total_start = time.time()
 
-    for sample in tqdm(samples, desc="  Detecting"):
+    for i, sample in enumerate(samples):
+        if i % 5 == 0:
+            print(f"  Detecting: {i}/{len(samples)}")
         prompt_text = sample["prompt_text"]
         generated_ids = sample["generated_ids"]
 

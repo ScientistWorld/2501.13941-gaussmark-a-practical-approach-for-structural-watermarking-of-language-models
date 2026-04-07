@@ -1,0 +1,136 @@
+{
+  "paper": {
+    "arxiv_id": "2501.13941",
+    "title": "GaussMark: A Practical Approach for Structural Watermarking of Language Models",
+    "date": "",
+    "topics": [
+      "paper-type-metric-method",
+      "domain-ai-ml",
+      "area-llm",
+      "category-alignment",
+      "method-watermarking",
+      "secondary-domain-security",
+      "secondary-area-llm",
+      "secondary-category-evaluation",
+      "secondary-method-statistical-testing",
+      "selection-category-post-training"
+    ]
+  },
+  "reproduction": {
+    "milestone": "method_runs",
+    "status": "done",
+    "error": null,
+    "scaffold": "claude-code",
+    "model": "MiniMax-M2.7",
+    "profile": "minimax-medium",
+    "effort": "medium",
+    "gpu_hours_used": 0.018,
+    "current_iteration_gpu_budget": 80,
+    "current_iteration_gpu_hours_used": 0.018,
+    "total_gpu_hours_used": 0.018,
+    "gpu_budget": 80,
+    "duration_sec": 29342.4,
+    "cost_usd": 32.861,
+    "input_tokens": 132054,
+    "output_tokens": 719,
+    "cached_input_tokens": 436579,
+    "cache_creation_tokens": 133780,
+    "reasoning_tokens": null,
+    "total_input_tokens": 702413,
+    "num_turns": 5,
+    "duration_api_ms": 5272280,
+    "num_runs": 1,
+    "iteration_count": 0,
+    "workflow": "standard",
+    "workflow_step": 0,
+    "total_gpu_jobs": 2,
+    "time_breakdown": {
+      "working": 4403.822935342789,
+      "building": 40.21927547454834,
+      "installing": 19543.50402188301
+    }
+  },
+  "agents": [
+    {
+      "scaffold": "claude-code",
+      "model": "MiniMax-M2.7",
+      "profile": "minimax-medium",
+      "effort": "medium",
+      "role": "reproducer",
+      "is_iteration": false,
+      "iteration": 1,
+      "workflow": "standard",
+      "workflow_step": 0,
+      "started_at": 1775553646.842221,
+      "finished_at": 1775582989.2263007,
+      "status": "done",
+      "error": null,
+      "milestone": "method_runs",
+      "gpu_budget": 80,
+      "gpu_hours_used": 0.018,
+      "total_gpu_hours_used": 0.018,
+      "time_breakdown": {
+        "working": 4403.822935342789,
+        "building": 40.21927547454834,
+        "installing": 19543.50402188301
+      },
+      "cost_usd": 32.86102224999999,
+      "input_tokens": 132054,
+      "output_tokens": 719,
+      "cached_input_tokens": 436579,
+      "cache_creation_tokens": 133780,
+      "reasoning_tokens": null,
+      "total_input_tokens": 702413,
+      "num_turns": 5,
+      "duration_api_ms": 5272280,
+      "tool_uses": {
+        "Bash": 16,
+        "Read": 15,
+        "Edit": 13,
+        "TaskOutput": 6,
+        "Write": 5,
+        "TaskStop": 2
+      },
+      "gpu_jobs": [
+        {
+          "run_id": "1c629a79-8f5",
+          "command": "bash /home/user/scripts/run.sh",
+          "num_gpus": 1,
+          "resource": "ailab-1",
+          "hive_job_id": "302c7426",
+          "status": "failed",
+          "returncode": 1,
+          "duration_sec": 60.0,
+          "submitted_at": 1775328187.5908296,
+          "started_at": 1775328236.350237,
+          "completed_at": 1775328296.3662996
+        },
+        {
+          "run_id": "34b15a03-ab4",
+          "command": "bash /home/user/scripts/run.sh",
+          "num_gpus": 1,
+          "resource": "pli-2",
+          "hive_job_id": "7af297fd",
+          "status": "failed",
+          "returncode": 1,
+          "duration_sec": 64.4,
+          "submitted_at": 1775327436.693422,
+          "started_at": 1775327448.3656948,
+          "completed_at": 1775327512.7492335
+        }
+      ],
+      "progress_log": "### [2026-04-04] - none\n- Read paper thoroughly: GaussMark (2501.13941) - structural watermarking of LLMs via Gaussian weight perturbation\n- Core algorithm: add xi ~ N(0, sigma^2 I) to one MLP layer, detect via gradient test statistic\n\n### [2026-04-04] - method_runs (current)\n- Implemented GaussMark.Generate and GaussMark.Detect in method/gaussmark.py\n- Model downloaded: Mistral-7B-Instruct-v0.3 (28GB) at /home/user/models/mistralai/Mistral-7B-Instruct-v0.3/\n- All scripts written: run_watermark.py, detect.py, evaluate.py\n- Briefing files: problem.md, method.md, evaluation.md, overview.md\n- Scoring reference: scoring/reference.json with paper's numbers\n- GPU job submitted for end-to-end validation\n- Fixed seed tracking bug and filename format bug\n- Fixed C4 data loading (JSON format instead of arrow format)\n- Added scikit-learn to environment dependencies\n- Created detect_unwatermarked.py for baseline FPR measurement\n- Updated evaluate.sh to output correct scores.json format matching reference.json\n- Fixed baseline.sh to use JSON loading and assign seeds for key regeneration\n- Fixed Linear.weight param access (was returning Linear module instead of Parameter)\n- Fixed bfloat16 dtype mismatch (watermark key now cast to model dtype)\n- Fixed seed consistency between watermarked/unwatermarked generation\n- GPU job v5 submitted: 20 prompts x 1 seed, expects detection rate ~60%"
+    }
+  ],
+  "components": {
+    "has_container": true,
+    "has_method_code": true,
+    "has_evaluation": true,
+    "has_download_script": true,
+    "has_reproduce_script": true,
+    "has_method_script": true,
+    "has_baseline": true,
+    "has_reference": true,
+    "has_data": true
+  }
+}
