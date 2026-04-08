@@ -27,7 +27,10 @@ fi
 
 mkdir -p /home/user/checkpoints
 
-# Step 1: Generate watermarked text
+RESULTS_FILE="/home/user/checkpoints/watermarked_layer20_up_proj_sigma1e-05.json"
+UWM_FILE="/home/user/checkpoints/unwatermarked_baseline.json"
+
+# Step 1: Generate watermarked text (skips if already done - checkpointing)
 echo ""
 echo "Step 1: Generating watermarked text..."
 python3 method/run_watermark.py \
@@ -42,10 +45,9 @@ python3 method/run_watermark.py \
     --output_dir /home/user/checkpoints \
     --device cuda
 
-# Step 2: Run detection on watermarked text
+# Step 2: Run detection on watermarked text (FIXED: key regeneration uses outer seed)
 echo ""
 echo "Step 2: Running watermark detection on watermarked text..."
-RESULTS_FILE="/home/user/checkpoints/watermarked_layer20_up_proj_sigma1e-05.json"
 if [ -f "$RESULTS_FILE" ]; then
     python3 method/detect.py \
         --results_path "$RESULTS_FILE" \
@@ -59,15 +61,18 @@ else
     exit 1
 fi
 
-# Step 3: Generate unwatermarked (baseline) text
+# Step 3: Generate unwatermarked (baseline) text (skip if exists)
 echo ""
 echo "Step 3: Generating unwatermarked (baseline) text..."
-bash scripts/baseline.sh
+if [ ! -f "$UWM_FILE" ]; then
+    bash scripts/baseline.sh
+else
+    echo "    Unwatermarked baseline already exists, skipping..."
+fi
 
-# Step 4: Run detection on unwatermarked text
+# Step 4: Run detection on unwatermarked text (FIXED: key regeneration uses outer seed)
 echo ""
 echo "Step 4: Running detection on unwatermarked text..."
-UWM_FILE="/home/user/checkpoints/unwatermarked_baseline.json"
 if [ -f "$UWM_FILE" ]; then
     python3 method/detect_unwatermarked.py \
         --results_path "$UWM_FILE" \

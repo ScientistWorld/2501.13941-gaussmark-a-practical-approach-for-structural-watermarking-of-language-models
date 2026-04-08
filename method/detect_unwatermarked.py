@@ -82,9 +82,12 @@ def run_detection_unwatermarked(
         attention_mask = prompt_enc.get("attention_mask")
         gen_tensor = torch.tensor([generated_ids]).long()
 
-        # Regenerate watermark key from seed
+        # Regenerate watermark key from seed.
+        # The key is generated with the OUTER seed (42 + seed_idx), not the per-prompt seed.
+        prompt_idx = sample.get("prompt_idx", 0)
         seed = sample.get("seed", 42)
-        watermark_key = wm.regenerate_watermark_key(int(seed))
+        outer_seed = int(seed) - int(prompt_idx)  # key uses outer seed
+        watermark_key = wm.regenerate_watermark_key(outer_seed)
 
         det_start = time.time()
         result = wm.detect(

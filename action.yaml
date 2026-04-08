@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark GPU job (v8): 20 prompts x 1 seed. Added checkpointing (save after each seed) and resumable generation. Removed generated_text storage to save memory. Generation completed in previous run but was killed before save - now checkpoints after each seed."
+notes: "GaussMark v9: Fixed watermark key regeneration bug. Key was regenerated with per-prompt seed (42+i) but should use outer seed (42). Detection now re-run on existing 20 samples, plus unwatermarked baseline generation and detection."

@@ -125,10 +125,23 @@ def load_watermark_key(sample: dict, config: dict) -> np.ndarray:
     if key_path and os.path.exists(key_path):
         return np.load(key_path)
 
-    # Fallback: regenerate from seed
+    # Fallback: regenerate from seed.
+    #
+    # IMPORTANT: The watermark key is generated with the OUTER seed (42 + seed_idx),
+    # NOT the per-prompt seed (42 + seed_idx + prompt_idx).
+    # In generate():
+    #   1. np.random.seed(42 + seed_idx)     # outer seed
+    #   2. watermark_key = np.random.normal(...)  # uses outer seed
+    #   3. _seed_rng(seed + i)                # advances RNG but key already generated
+    # In detect():
+    #   sample["seed"] = 42 + seed_idx + i   # per-prompt seed (WRONG for key)
+    #   sample["prompt_idx"] = i
+    #   outer_seed = seed - prompt_idx = 42 + seed_idx  # CORRECT
+    prompt_idx = sample.get("prompt_idx", 0)
     seed = sample.get("seed")
     if seed is not None:
-        rng = np.random.RandomState(int(seed))
+        outer_seed = int(seed) - int(prompt_idx)
+        rng = np.random.RandomState(outer_seed)
     else:
         rng = np.random.RandomState(42)
 

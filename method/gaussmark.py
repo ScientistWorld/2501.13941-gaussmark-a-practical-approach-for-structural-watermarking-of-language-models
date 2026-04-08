@@ -466,8 +466,13 @@ class GaussMark:
         This is useful for detection when the key is not directly stored.
         The same seed + sigma produces the same key.
 
+        IMPORTANT: Pass the OUTER seed (42 + seed_idx), NOT the per-prompt seed.
+        The outer seed is what was used during generation before the per-prompt
+        RNG advancement. The per-prompt seed (42 + seed_idx + prompt_idx) produces
+        a DIFFERENT key because the RNG state was advanced by prompt_idx steps.
+
         Args:
-            seed: Random seed.
+            seed: The outer random seed (42 + seed_idx). NOT the per-prompt seed.
 
         Returns:
             Watermark key as numpy array (same shape as target parameter).
