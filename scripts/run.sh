@@ -30,20 +30,24 @@ mkdir -p /home/user/checkpoints
 RESULTS_FILE="/home/user/checkpoints/watermarked_layer20_up_proj_sigma1e-05.json"
 UWM_FILE="/home/user/checkpoints/unwatermarked_baseline.json"
 
-# Step 1: Generate watermarked text (skips if already done - checkpointing)
+# Step 1: Generate watermarked text (skip if already complete with 20 samples)
 echo ""
 echo "Step 1: Generating watermarked text..."
-python3 method/run_watermark.py \
-    --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
-    --data_path /home/user/data/c4_realnewslike \
-    --num_prompts 20 \
-    --num_tokens 200 \
-    --num_seeds 1 \
-    --layer_idx 20 \
-    --weight_name up_proj \
-    --sigma 1e-5 \
-    --output_dir /home/user/checkpoints \
-    --device cuda
+if [ -f "$RESULTS_FILE" ] && python3 -c "import json; d=json.load(open('$RESULTS_FILE')); exit(0 if len(d['samples'])>=20 else 1)" 2>/dev/null; then
+    echo "    All 20 watermarked samples already exist, skipping generation..."
+else
+    python3 method/run_watermark.py \
+        --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
+        --data_path /home/user/data/c4_realnewslike \
+        --num_prompts 20 \
+        --num_tokens 200 \
+        --num_seeds 1 \
+        --layer_idx 20 \
+        --weight_name up_proj \
+        --sigma 1e-5 \
+        --output_dir /home/user/checkpoints \
+        --device cuda
+fi
 
 # Step 2: Run detection on watermarked text (FIXED: key regeneration uses outer seed)
 echo ""
