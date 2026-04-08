@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark v9: Fixed watermark key regeneration bug. Key was regenerated with per-prompt seed (42+i) but should use outer seed (42). Detection now re-run on existing 20 samples, plus unwatermarked baseline generation and detection."
+notes: "GaussMark v10: Fixed device mismatch (xi on cuda:1, grad on cuda:0). Changed device_map=device instead of auto in detect.py. Re-running detection with fixed seed regeneration and device placement."
