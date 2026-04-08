@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: pending
+action: submit
 gpus: 1
 test: false
-milestone: none
-notes: ""
+milestone: method_runs
+notes: "GaussMark GPU job (v7): 20 prompts x 1 seed. Retry after transient setup timeout. Setup.sh restored with all packages. Full pipeline: watermarked generation + detection + unwatermarked baseline + eval. Model: Mistral-7B-Instruct-v0.3."
