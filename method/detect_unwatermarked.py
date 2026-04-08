@@ -43,7 +43,7 @@ def load_model_and_tokenizer(model_path: str, device: str = "cuda", torch_dtype=
         config=config,
         trust_remote_code=True,
         torch_dtype=torch_dtype,
-        device_map="auto",
+        device_map=device,
     )
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:
