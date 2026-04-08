@@ -1,7 +1,8 @@
-# End-of-turn action file.
-
-action: submit
+# IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
+# Do NOT sleep, poll, or wait for jobs. The system reads this file
+# only after your turn ends. Sleeping blocks the entire pipeline.
+action: pending
 gpus: 1
 test: false
-milestone: method_runs
-notes: "GaussMark GPU job (v7): 20 prompts x 1 seed. setup.sh reverted to exact HEAD content (no changes). Overlay should be cached. End-to-end pipeline: generate watermarked text, detect, unwatermarked baseline, evaluate."
+milestone: none
+notes: ""
