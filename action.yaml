@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark GPU job (v7): 20 prompts x 1 seed. Retry after transient setup timeout. Setup.sh restored with all packages. Full pipeline: watermarked generation + detection + unwatermarked baseline + eval. Model: Mistral-7B-Instruct-v0.3."
+notes: "GaussMark GPU job (v8): 20 prompts x 1 seed. Added checkpointing (save after each seed) and resumable generation. Removed generated_text storage to save memory. Generation completed in previous run but was killed before save - now checkpoints after each seed."

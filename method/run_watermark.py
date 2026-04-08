@@ -78,7 +78,7 @@ def run_experiment(
     device: str = "cuda",
     output_dir: str = "/home/user/checkpoints",
 ):
-    """Run watermarking experiments."""
+    """Run watermarking experiments with checkpointing (save after each seed)."""
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize GaussMark
@@ -90,18 +90,27 @@ def run_experiment(
         device=device,
     )
 
-    all_results = {
-        "config": {
-            "layer_idx": layer_idx,
-            "weight_name": weight_name,
-            "sigma": sigma,
-            "num_tokens": num_tokens,
-            "num_seeds": num_seeds,
-            "num_prompts": len(prompts),
-        },
-        "samples": [],
-        "generation_times": [],
-    }
+    output_path = os.path.join(output_dir, f"watermarked_layer{layer_idx}_{weight_name}_sigma{sigma:.0e}.json")
+
+    # Load existing checkpoint if available (for resumability)
+    if os.path.exists(output_path):
+        print(f"[+] Loading existing checkpoint: {output_path}")
+        with open(output_path, "r") as f:
+            all_results = json.load(f)
+        print(f"    Already have {len(all_results['samples'])} samples")
+    else:
+        all_results = {
+            "config": {
+                "layer_idx": layer_idx,
+                "weight_name": weight_name,
+                "sigma": sigma,
+                "num_tokens": num_tokens,
+                "num_seeds": num_seeds,
+                "num_prompts": len(prompts),
+            },
+            "samples": [],
+            "generation_times": [],
+        }
 
     for seed_idx in range(num_seeds):
         seed = 42 + seed_idx
@@ -112,6 +121,13 @@ def run_experiment(
         for i, prompt in enumerate(prompts):
             if i % 5 == 0:
                 print(f"  Seed {seed_idx}: {i}/{len(prompts)}")
+
+            # Skip if already generated
+            existing = [s for s in all_results["samples"]
+                      if s.get("prompt_idx") == i and s.get("seed") == seed + i]
+            if existing:
+                continue
+
             # Tokenize prompt
             enc = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
             input_ids = enc["input_ids"]
@@ -135,9 +151,9 @@ def run_experiment(
 
             sample = {
                 "prompt_idx": i,
-                "seed": seed + i,  # Must match the seed passed to generate()
-                "prompt_text": prompt[:500],  # Truncate for storage
-                "generated_text": generated_text,
+                "seed": seed + i,
+                "prompt_text": prompt[:500],
+                # Don't store full generated_text to save memory
                 "generated_ids": generated_ids.cpu().tolist(),
                 "watermark_key_shape": list(watermark_key.shape),
                 "watermark_key_dtype": str(watermark_key.dtype),
@@ -147,8 +163,12 @@ def run_experiment(
             all_results["samples"].append(sample)
             all_results["generation_times"].append(gen_time)
 
+        # Checkpoint after each seed
+        with open(output_path, "w") as f:
+            json.dump(all_results, f, indent=2)
+        print(f"    Checkpoint saved ({len(all_results['samples'])} samples)")
+
     # Save results
-    output_path = os.path.join(output_dir, f"watermarked_layer{layer_idx}_{weight_name}_sigma{sigma:.0e}.json")
     with open(output_path, "w") as f:
         json.dump(all_results, f, indent=2)
     print(f"\nResults saved to {output_path}")
