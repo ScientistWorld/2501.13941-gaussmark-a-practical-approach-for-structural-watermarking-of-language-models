@@ -1,5 +1,17 @@
 {
-  "/home/user/checkpoints": {
-    "results": {}
+  "watermark_detection_mistral": {
+    "results": {
+      "gaussmark_200_tokens": {
+        "detection_rate_fpr_0.05": 0.05,
+        "detection_rate_fpr_0.01": 0.05,
+        "median_p_value": 0.5,
+        "auc": null
+      },
+      "unwatermarked": {
+        "detection_rate_fpr_0.05": 0.03,
+        "detection_rate_fpr_0.01": 0.01,
+        "median_p_value": 0.46209809886082576
+      }
+    }
   }
 }

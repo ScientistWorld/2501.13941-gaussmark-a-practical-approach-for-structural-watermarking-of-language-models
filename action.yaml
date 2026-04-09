@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark v12: Fixed device_map in all scripts (run_watermark, baseline, detect). All use device=cuda instead of auto. Key persistence via .npy files already committed."
+notes: "GaussMark v13: Added per-sample debug logging (key path, key sum, psi, p_value, dot_product, grad_norm). Debugging why detection rate is 5% instead of 62%. Evaluate.sh fixed to use heredoc."
