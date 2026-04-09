@@ -26,12 +26,11 @@ bash scripts/method.sh
 # Step 2: Run detection
 echo "Step 2: Running watermark detection..."
 python3 method/detect.py \
-    --results_path /home/user/checkpoints/watermarked_layer20_up_proj_sigma1e-05.json \
+    --results_path /home/user/checkpoints/watermarked_layer20_up_proj_sigma3e-02.json \
     --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
     --layer_idx 20 \
     --weight_name up_proj \
-    --sigma 1e-5 \
-    --save_keys \
+    --sigma 0.032 \
     --device cuda
 
 # Step 3: Evaluate

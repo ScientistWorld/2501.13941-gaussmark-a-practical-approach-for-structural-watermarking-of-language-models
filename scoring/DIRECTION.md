@@ -1,94 +1,28 @@
 # Research Direction
 
-<!-- Do not edit this unless you decide to stop -->
-
-<!--
-Define the research direction a scientist must follow when trying to
-improve on the paper's results. This is NOT about resource constraints
-(model size, dataset — those go in CONSTRAINTS.md). This is about
-the methodological scope: what research question is being pursued,
-and what approaches are in-bounds vs out-of-bounds.
-
-WHY THIS MATTERS: Without direction constraints, a scientist evaluate on this
-can trivially "beat" a paper by switching paradigms entirely. As a general
-example: if a paper proposes a novel Mamba variant and benchmarks it
-against prior Mamba models, switching to a Transformer would likely
-beat the numbers — but that tells us nothing about Mamba research.
-The scientist must work within the paper's problem space so that
-improvement demonstrates genuine insight in that area.
-
-THE RIGHT LEVEL OF SPECIFICITY: The direction should be scoped to the
-paper's actual contribution — not so broad that anything goes, but not
-so narrow that it dictates the exact technique. Think of it as: the
-scientist must work on the SAME PROBLEM and improve the SAME KIND OF
-THING the paper contributed, but they have full freedom in HOW they
-improve it.
-
-In the same example: 
-Too broad:  "Must use SSMs" — lets the scientist work on any SSM
-            problem, ignoring what this paper actually contributed.
-Too narrow: "Must use selective scan with input-dependent A matrices"
-            — dictates the technique, leaving no room for creativity.
-Right:      "Must improve input-dependent state dynamics for SSM
-            language modeling" — scoped to the contribution, open on
-            how to achieve it.
-
-WHAT TO WRITE:
-1. Research Problem — what question the paper addresses (one paragraph)
-2. Core Contribution — what specific thing the paper introduced or
-   improved (this is the area the scientist must work within)
-3. Approach Scope — what approach family and what aspects the scientist
-   can modify
-4. Out of Bounds — paradigm switches and scope violations
-
-Be specific to this paper. Explain the reasoning so the scientist
-understands the intent, not just the rule.
-
-Example for a paper proposing a new Mamba variant for language modeling:
-
 ## Research Problem
-This paper improves state-space models (SSMs) for language modeling.
-The core question is whether input-dependent state dynamics can close
-the quality gap between SSMs and Transformers on language tasks. ...
+The core question is whether we can embed a statistically detectable watermark into an LLM's outputs without modifying the generation process, degrading model quality, or requiring retraining. Existing watermarking schemes modify token-level sampling (introducing latency and quality tradeoffs). The question is: can we watermark at the model weight level instead?
 
 ## Core Contribution
-The paper's novelty is a selective scan mechanism that adapts the
-state transition matrices to the input, replacing the fixed dynamics
-of prior SSMs (S4, H3). The scientist must work on improving this
-kind of contribution: how the SSM processes sequences with
-input-dependent dynamics. ...
+The paper's key insight is that small Gaussian perturbations to LLM weights produce detectable signals in the generated text, without harming model quality. The contribution is:
+1. A formal detection framework with exact N(0,1) null distribution (rigorous FPR control)
+2. A zero-overhead watermarking scheme (only weights are perturbed, generation is unchanged)
+3. An empirical validation that this works across multiple model families
+
+The scientist must work within this contribution: improve the watermark signal, reduce quality impact, or increase robustness — but not replace the approach with token-level watermarking, a trained classifier, or a fundamentally different detection mechanism.
 
 ## Approach Scope
-The scientist should focus on the scan / state-dynamics component
-of the SSM. They may:
-- Redesign the selection mechanism (different parameterization,
-  gating, conditioning)
-- Change the state representation (different dimensions, structure,
-  initialization)
-- Modify how input signals interact with the state (mixing,
-  normalization, discretization)
-- Alter the training procedure for the SSM components (loss,
-  scheduling, curriculum)
- - ...
-
-The scientist may also make architectural changes around the core
-SSM block (normalization, skip connections, mixing layers) as long
-as the SSM with input-dependent dynamics remains the central
-sequence-processing component. ...
+The scientist may work on:
+- **Sigma tuning**: Finding the optimal sigma that maximizes detection while preserving quality
+- **Layer selection**: Exploring which layer(s) produce the strongest watermark signal
+- **Rank-reduced perturbation**: Perturbing only the top-k principal components of the weight matrix (mentioned in paper Section 4.4) to allow stronger noise with less quality impact
+- **Detection robustness**: Improving detection after text corruptions (insertions, deletions, paraphrasing)
+- **Multi-layer watermarking**: Watermarking multiple layers instead of just one
+- **Key regeneration**: Improving key sampling strategy (currently uniform Gaussian per sample)
 
 ## Out of Bounds
-- Replacing the SSM backbone with a Transformer or attention-based
-  architecture. The paper's thesis is that SSMs can be competitive
-  — switching to attention sidesteps that thesis entirely.
-- Hybrid architectures that are majority-attention (e.g., Transformer
-  with one SSM layer). A small attention component used as a tool
-  within an SSM-first design is acceptable if justified.
-- Ensemble methods that combine an SSM with a separate Transformer.
-  The goal is a single-model SSM contribution.
-- Working on a different SSM problem (e.g., improving SSM efficiency
-  or hardware utilization) rather than the quality of input-dependent
-  dynamics. Stay on the paper's research question.
- - ...
-
-Delete this comment block and fill in your actual direction below.
--->
+- **Token-level watermarking**: Adding biased sampling or logit modifications during generation. This changes the generation process and has latency overhead — the whole point of GaussMark is zero overhead.
+- **Trained classifiers**: Using a trained model (neural network, random forest, etc.) to classify watermarked vs unwatermarked text. The paper's contribution is a formal statistical test with exact null distribution — replacing it with a learned classifier loses the theoretical guarantees.
+- **Switching model families**: Working on Llama or Phi instead of Mistral. The constraints specify Mistral for a reason.
+- **Fine-tuning or training**: GaussMark requires NO training. Any approach that involves gradient-based updates to the model is out of scope.
+- **Changing the null distribution**: Using a different test statistic or p-value computation that doesn't have the N(0,1) property.

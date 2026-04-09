@@ -25,27 +25,26 @@ echo "Step 1: Generating watermarked text..."
 python3 method/run_watermark.py \
     --model_path "$MODEL_PATH" \
     --data_path "$DATA_PATH" \
-    --num_prompts 100 \
+    --num_prompts 20 \
     --num_tokens 200 \
-    --num_seeds 3 \
+    --num_seeds 1 \
     --layer_idx 20 \
     --weight_name up_proj \
-    --sigma 1e-5 \
+    --sigma 0.032 \
     --output_dir "$OUTPUT_DIR" \
     --device cuda
 
 # Step 2: Run detection
 echo ""
 echo "Step 2: Running watermark detection..."
-RESULTS_FILE="$OUTPUT_DIR/watermarked_layer20_up_proj_sigma1e-05.json"
+RESULTS_FILE="$OUTPUT_DIR/watermarked_layer20_up_proj_sigma3e-02.json"
 if [ -f "$RESULTS_FILE" ]; then
     python3 method/detect.py \
         --results_path "$RESULTS_FILE" \
         --model_path "$MODEL_PATH" \
         --layer_idx 20 \
         --weight_name up_proj \
-        --sigma 1e-5 \
-        --save_keys \
+        --sigma 0.032 \
         --device cuda
 else
     echo "Warning: Results file not found at $RESULTS_FILE"

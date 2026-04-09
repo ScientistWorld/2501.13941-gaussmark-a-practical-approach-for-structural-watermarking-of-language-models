@@ -1,78 +1,35 @@
 # Scientist Constraints
 
-<!-- Do not edit this unless you decide to stop -->
-
-<!--
-A scientist agent will attempt to improve on your reproduced results.
-These constraints define what the scientist must hold fixed, so that
-any improvement reflects genuine methodological innovation — not just
-throwing more resources at the problem.
-
-CONTEXT: Your reproduction becomes a benchmark environment. The scientist
-gets your code, data, evaluation pipeline, and these constraints. They
-must beat your scores while respecting every constraint listed here.
-Without good constraints, a scientist can trivially "improve" by swapping
-in a larger model, using a richer dataset that is simply publicly avaliable, or more 
-— none of which demonstrate real scientific insight.
-
-Your job is to act as a judge: distinguish between flexible innovation
-and non-genuine improvement. Constraints should block trivial gains
-(e.g. just swapping in a bigger model) while leaving room for creative
-methodology (e.g. a clever augmentation strategy, a better loss
-function, a novel use of existing tools). When in doubt, ask: "does
-this require insight, or just more resources?" Lock down the resources,
-leave the insight open. Do not block innovation.
-
-For example, if a scientist downloads online IMDB reviews to supplement a
-sentiment dataset, that's resource scaling. But if they use an LLM to
-augment the existing training data, that's methodology — they designed
-that pipeline. This is just an example, but keep this kind of distinction 
-in mind when writing constraints.
-
-Be SPECIFIC to this paper. Generic constraints are useless. Name the
-exact model, the exact dataset, the exact splits. Explain the reasoning
-so the scientist understands the intent behind each constraint, not
-just the rule — this helps them judge edge cases on their own.
-
-Think about at least:
-- Model: architecture, size, pretrained weights
-- Data: which datasets, which splits, whether external data is allowed
-
-You may add other constraint categories if relevant to this paper
-(e.g. training procedure, evaluation protocol, problem formulation).
-
-Example for a sentiment analysis paper:
-
 ## Model
-The scientist must use BERT-base-uncased (110M parameters, HuggingFace
-`bert-base-uncased`). The paper's contribution is a novel fine-tuning
-strategy, not architecture design. Switching to a larger model (e.g.
-DeBERTa-v3-large, 304M params) would improve accuracy but would not
-demonstrate any methodological insight. The scientist may modify the
-fine-tuning procedure, add adapter layers, change the classification
-head, or alter the training loop — but the base encoder must remain
-BERT-base-uncased with its standard pretrained weights.
+The scientist must use Mistral-7B-Instruct-v0.3 (from HuggingFace `mistralai/Mistral-7B-Instruct-v0.3`).
+The paper's contribution is a structural watermark — changing the model architecture or switching to a different model (Llama, Phi, etc.) would not demonstrate the same methodological contribution. The scientist may modify the watermarking procedure (which layer, how much noise, rank-reduced variant) but must keep the base model fixed.
+
+## Watermark Layer
+The scientist must watermark layer 20 of Mistral-7B (0-indexed, `model.model.layers[20]`). The paper's Table 2 specifies layer 20 for Mistral-7B. The weight to perturb is `up_proj` (MLP upward projection). These are constraints because the paper found these parameters empirically — different layers/weights may have different quality/watermark tradeoffs that are not captured in the evaluation.
+
+## Watermark Key
+The watermark key `xi ~ N(0, sigma^2 * I)` must be sampled fresh for each generation. The scientist cannot reuse a fixed key across samples (that would be a different scheme). The key shape must match the `up_proj` weight matrix at layer 20.
+
+## Sigma (Perturbation Strength)
+The scientist may vary sigma within a reasonable range (e.g., 0.01 to 0.1) to trade off detectability vs quality. However, the sigma used must come from a principled derivation (matching the paper's theory) rather than being fit to maximize detection rates on the test set.
 
 ## Data
-The scientist must use only the provided SST-2 binary sentiment
-dataset (67,349 training examples, 872 validation, 1,821 test).
-No external sentiment corpora or additional human-labeled data.
-The test split must not be used for training or validation.
+The scientist must use C4 realnewslike dataset for prompt generation (first 2000 examples from train split, truncated to 200 tokens as prompts). No external datasets. The test set is the generated text itself — no held-out evaluation set is needed for the detection task.
 
-Delete this comment block and fill in your actual constraints below.
+## Evaluation Protocol
+The scientist must use the same detection procedure: run forward+backward pass on the original (unwatermarked) model, compute psi = <xi, grad>/(sigma * ||grad||), report p-values and detection rates at FPR=0.05 and FPR=0.01. The scientist may not change the detection procedure to make it easier (e.g., different thresholds, softened statistics).
 
-At the very end, write a compliance checklist for the scientist agent.
-Each item should be a concrete, verifiable condition the scientist can
-check off before submitting. These should mirror your constraints above
-but phrased as yes/no checks.
-
-Example checklist (for the sentiment analysis example above):
+## Prohibited
+- Switching to a different base model (Llama, Phi, Gemma, etc.) — this is architecture change, not method improvement.
+- Modifying the detection procedure (e.g., using a different statistic, different p-value computation).
+- Using a non-Gaussian watermark key (e.g., uniform, low-rank structured).
+- Training or fine-tuning the model — GaussMark is a zero-training watermarking scheme.
 
 ## Compliance Checklist
-- [ ] Model is BERT-base-uncased (110M params), not a larger variant
-- [ ] No external sentiment datasets used beyond SST-2
-- [ ] Test split not used for training or validation
-
-ONLY WRITE ABOUT WHAT TO RESTRICT. NEVER WRITE ABOUT WHAT REMAINS OPEN.
-
--->
+- [ ] Model is Mistral-7B-Instruct-v0.3 (7B parameters), not a larger or smaller variant
+- [ ] Watermarked layer is layer 20 (0-indexed)
+- [ ] Watermarked weight is `up_proj` in the MLP at layer 20
+- [ ] Watermark key is Gaussian N(0, sigma^2*I), sampled per-generation
+- [ ] No fine-tuning or training performed on the base model
+- [ ] Detection uses gradient-based psi statistic (not a surrogate classifier)
+- [ ] Evaluation uses same FPR thresholds (0.05 and 0.01) as the paper
