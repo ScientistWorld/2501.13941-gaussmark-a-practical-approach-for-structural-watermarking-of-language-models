@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark v13: Added per-sample debug logging (key path, key sum, psi, p_value, dot_product, grad_norm). Debugging why detection rate is 5% instead of 62%. Evaluate.sh fixed to use heredoc."
+notes: "GaussMark v14: Testing sigma=1e-4 (10x stronger than paper's 1e-5). Previous run showed 5% detection rate (same as FPR) - watermark signal too weak. Now testing stronger perturbation to validate the method works."
