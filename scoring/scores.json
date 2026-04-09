@@ -2,21 +2,15 @@
   "watermark_detection_mistral": {
     "results": {
       "gaussmark_200_tokens": {
-        "detection_rate_fpr_0.05": 0.05,
+        "detection_rate_fpr_0.05": 0.1,
         "detection_rate_fpr_0.01": 0.05,
-        "median_p_value": 0.473710128315351,
-        "mean_p_value": 0.45012774355641644,
-        "std_p_value": 0.2639984166792228,
-        "num_samples": 20,
-        "auc": 0.5215
+        "median_p_value": 0.5,
+        "auc": 0.487
       },
       "unwatermarked": {
         "detection_rate_fpr_0.05": 0.03,
         "detection_rate_fpr_0.01": 0.01,
-        "median_p_value": 0.4424299108208266,
-        "mean_p_value": 0.4725145643404391,
-        "std_p_value": 0.27203456816480637,
-        "num_samples": 100
+        "median_p_value": 0.4424298917576355
       }
     }
   }
