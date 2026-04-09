@@ -32,7 +32,7 @@ print('Loading model...')
 model = AutoModelForCausalLM.from_pretrained(
     '$MODEL_PATH',
     torch_dtype=torch.bfloat16,
-    device_map='auto',
+    device_map='cuda',
 )
 tokenizer = AutoTokenizer.from_pretrained('$MODEL_PATH')
 if tokenizer.pad_token is None:
