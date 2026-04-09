@@ -125,7 +125,7 @@ def load_watermark_key(sample: dict, config: dict) -> np.ndarray:
     if key_path and os.path.exists(key_path):
         return np.load(key_path)
 
-    # Fallback: regenerate from seed.
+    # Regenerate from seed (fallback — prefer saved .npy file above)
     #
     # IMPORTANT: The watermark key is generated with the OUTER seed (42 + seed_idx),
     # NOT the per-prompt seed (42 + seed_idx + prompt_idx).
@@ -137,6 +137,13 @@ def load_watermark_key(sample: dict, config: dict) -> np.ndarray:
     #   sample["seed"] = 42 + seed_idx + i   # per-prompt seed (WRONG for key)
     #   sample["prompt_idx"] = i
     #   outer_seed = seed - prompt_idx = 42 + seed_idx  # CORRECT
+    #
+    # But there is STILL a subtle bug: the key is generated BEFORE _seed_rng(seed+i),
+    # so it uses state at base_seed, NOT at base_seed+i.
+    # The stored seed (base_seed+i) was set AFTER key generation.
+    # So even with outer_seed fix, regeneration may not match for i>0.
+    #
+    # BEST FIX: use saved .npy file if available.
     prompt_idx = sample.get("prompt_idx", 0)
     seed = sample.get("seed")
     if seed is not None:

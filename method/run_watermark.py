@@ -160,6 +160,10 @@ def run_experiment(
                 "gen_time": gen_time,
                 "num_generated_tokens": len(generated_ids),
             }
+            # Save watermark key to .npy file for reliable detection
+            key_path = os.path.join(output_dir, f"key_layer{layer_idx}_{weight_name}_sigma{sigma:.0e}_seed{seed + i}.npy")
+            np.save(key_path, watermark_key)
+            sample["watermark_key_path"] = key_path
             all_results["samples"].append(sample)
             all_results["generation_times"].append(gen_time)
 

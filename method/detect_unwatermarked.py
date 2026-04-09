@@ -84,6 +84,9 @@ def run_detection_unwatermarked(
 
         # Regenerate watermark key from seed.
         # The key is generated with the OUTER seed (42 + seed_idx), not the per-prompt seed.
+        # Since unwatermarked text was generated WITHOUT watermark, any key will produce
+        # p-values uniformly distributed under H0. We use the stored seed's outer seed
+        # for consistency with the watermarked detection path.
         prompt_idx = sample.get("prompt_idx", 0)
         seed = sample.get("seed", 42)
         outer_seed = int(seed) - int(prompt_idx)  # key uses outer seed
