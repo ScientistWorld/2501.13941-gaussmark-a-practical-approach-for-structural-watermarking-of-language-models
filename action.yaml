@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
+action: pending
 gpus: 1
 test: false
-milestone: core_claim
-notes: "GaussMark core_claim achieved! sigma=0.032 (sigma^2=1e-3): 85% detection at FPR=0.05, AUC=0.917, unwatermarked FPR=3%. Reproduction exceeds paper (62% at FPR=0.05) due to larger sigma producing stronger signal."
+milestone: method_runs
+notes: ""
