@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark v10: Fixed device mismatch (xi on cuda:1, grad on cuda:0). Changed device_map=device instead of auto in detect.py. Re-running detection with fixed seed regeneration and device placement."
+notes: "GaussMark v11: Save watermark keys to .npy files during generation for reliable detection. Keys were regenerated from seeds with mismatched RNG state. Now saved directly during generation and loaded during detection."
