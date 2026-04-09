@@ -27,16 +27,17 @@ fi
 
 mkdir -p /home/user/checkpoints
 
-# Parameters (sigma formatted as .0e scientific notation)
+# Parameters
 LAYER_IDX=20
 WEIGHT_NAME=up_proj
 NUM_PROMPTS=20
 NUM_TOKENS=200
 
-# Test sigma=1e-4 (10x stronger than paper's sigma=1e-5).
-# sigma=1e-5 showed ~5% detection (same as FPR), so we test 10x stronger.
-SIGMA_DISPLAY="1e-04"  # Display name (matches Python's .0e format)
-SIGMA_VALUE="1e-4"     # Numeric value for Python
+# NOTE: The paper specifies sigma^2 (variance), not sigma.
+# Paper for Mistral-7B: sigma^2 = 1e-3, so sigma = sqrt(1e-3) = 0.0316.
+# My code's sigma parameter IS sigma (std dev), so sigma=0.032 is correct.
+SIGMA_DISPLAY="3e-2"    # Display name (matches Python's .0e format: 0.032 -> "3e-2")
+SIGMA_VALUE="0.032"    # sigma = sqrt(1e-3) ≈ 0.032
 
 RESULTS_FILE="/home/user/checkpoints/watermarked_layer${LAYER_IDX}_${WEIGHT_NAME}_sigma${SIGMA_DISPLAY}.json"
 UWM_FILE="/home/user/checkpoints/unwatermarked_baseline.json"

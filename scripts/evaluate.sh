@@ -38,7 +38,7 @@ scores = {}
 scores[experiment] = {'results': {}}
 
 # Load watermarked p-values from known file path
-wm_full = os.path.join(results_dir, 'watermarked_layer20_up_proj_sigma1e-04_detection_full.json')  # sigma=1e-4
+wm_full = os.path.join(results_dir, 'watermarked_layer20_up_proj_sigma3e-2_detection_full.json')  # sigma=0.032
 if os.path.exists(wm_full):
     with open(wm_full) as f:
         wm_data = json.load(f)

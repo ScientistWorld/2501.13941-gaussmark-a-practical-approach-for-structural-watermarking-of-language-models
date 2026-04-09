@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark v14: Testing sigma=1e-4 (10x stronger than paper's 1e-5). Previous run showed 5% detection rate (same as FPR) - watermark signal too weak. Now testing stronger perturbation to validate the method works."
+notes: "GaussMark v15: Testing sigma=0.032 (sigma^2=1e-3, matching paper for Mistral-7B). Previous tests: sigma=1e-5 → 5% (FPR), sigma=1e-4 → 10%. Sigma was confused with variance — paper uses sigma^2 (variance), code uses sigma (std dev). sigma=0.032 is sqrt(1e-3)."
