@@ -36,7 +36,7 @@ NUM_TOKENS=200
 # NOTE: The paper specifies sigma^2 (variance), not sigma.
 # Paper for Mistral-7B: sigma^2 = 1e-3, so sigma = sqrt(1e-3) = 0.0316.
 # My code's sigma parameter IS sigma (std dev), so sigma=0.032 is correct.
-SIGMA_DISPLAY="3e-2"    # Display name (matches Python's .0e format: 0.032 -> "3e-2")
+SIGMA_DISPLAY="3e-02"   # Display name (Python's .0e format: 0.032 -> "3e-02")
 SIGMA_VALUE="0.032"    # sigma = sqrt(1e-3) ≈ 0.032
 
 RESULTS_FILE="/home/user/checkpoints/watermarked_layer${LAYER_IDX}_${WEIGHT_NAME}_sigma${SIGMA_DISPLAY}.json"
@@ -44,7 +44,7 @@ UWM_FILE="/home/user/checkpoints/unwatermarked_baseline.json"
 
 # Step 1: Generate watermarked text with sigma=1e-4
 echo ""
-echo "Step 1: Generating watermarked text (sigma=1e-4)..."
+echo "Step 1: Generating watermarked text (sigma=$SIGMA_VALUE)..."
 if [ -f "$RESULTS_FILE" ]; then
     echo "    Results file exists, skipping generation..."
 else
