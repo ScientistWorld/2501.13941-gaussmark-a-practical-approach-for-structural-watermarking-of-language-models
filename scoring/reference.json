@@ -11,10 +11,10 @@
         "auc": {"higher_is_better": true, "coefficient": 0.5}
       },
       "results": {
-        "gaussmark_100_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.28, "detection_rate_fpr_0.01": 0.10, "median_p_value": 0.35, "auc": null},
-        "gaussmark_200_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.62, "detection_rate_fpr_0.01": 0.40, "median_p_value": 0.09, "auc": null},
-        "gaussmark_400_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.88, "detection_rate_fpr_0.01": 0.72, "median_p_value": 0.015, "auc": null},
-        "gaussmark_800_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.97, "detection_rate_fpr_0.01": 0.90, "median_p_value": 0.002, "auc": null},
+        "gaussmark_100_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.28, "detection_rate_fpr_0.01": 0.10, "median_p_value": 0.35, "auc": 0.5},
+        "gaussmark_200_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.62, "detection_rate_fpr_0.01": 0.40, "median_p_value": 0.09, "auc": 0.5},
+        "gaussmark_400_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.88, "detection_rate_fpr_0.01": 0.72, "median_p_value": 0.015, "auc": 0.5},
+        "gaussmark_800_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.97, "detection_rate_fpr_0.01": 0.90, "median_p_value": 0.002, "auc": 0.5},
         "unwatermarked":         {"type": "baseline",  "detection_rate_fpr_0.05": 0.05, "detection_rate_fpr_0.01": 0.01, "median_p_value": 0.50, "auc": 0.50}
       }
     },
