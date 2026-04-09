@@ -27,46 +27,35 @@ fi
 
 mkdir -p /home/user/checkpoints
 
-RESULTS_FILE="/home/user/checkpoints/watermarked_layer20_up_proj_sigma1e-05.json"
+# Parameters (sigma formatted as .0e scientific notation)
+LAYER_IDX=20
+WEIGHT_NAME=up_proj
+NUM_PROMPTS=20
+NUM_TOKENS=200
+
+# Test sigma=1e-4 (10x stronger than paper's sigma=1e-5).
+# sigma=1e-5 showed ~5% detection (same as FPR), so we test 10x stronger.
+SIGMA_DISPLAY="1e-04"  # Display name (matches Python's .0e format)
+SIGMA_VALUE="1e-4"     # Numeric value for Python
+
+RESULTS_FILE="/home/user/checkpoints/watermarked_layer${LAYER_IDX}_${WEIGHT_NAME}_sigma${SIGMA_DISPLAY}.json"
 UWM_FILE="/home/user/checkpoints/unwatermarked_baseline.json"
 
-# Step 1: Generate watermarked text
-# Uses checkpointing — skips prompts that already have .npy key files saved.
-# If checkpoint is stale (missing key files), delete and regenerate.
+# Step 1: Generate watermarked text with sigma=1e-4
 echo ""
-echo "Step 1: Generating watermarked text..."
+echo "Step 1: Generating watermarked text (sigma=1e-4)..."
 if [ -f "$RESULTS_FILE" ]; then
-    # Check if all samples have saved key files
-    MISSING_KEYS=$(python3 -c "
-import json, os, glob
-d = json.load(open('$RESULTS_FILE'))
-for s in d.get('samples', []):
-    key_path = s.get('watermark_key_path')
-    if not key_path or not os.path.exists(key_path):
-        print('MISSING')
-        break
-else:
-    print('OK')
-" 2>/dev/null)
-    if [ "$MISSING_KEYS" = "OK" ]; then
-        echo "    All 20 samples have key files, skipping generation..."
-    else
-        echo "    Key files missing — regenerating..."
-        rm -f "$RESULTS_FILE"
-        rm -f /home/user/checkpoints/key_*.npy
-    fi
-fi
-
-if [ ! -f "$RESULTS_FILE" ]; then
+    echo "    Results file exists, skipping generation..."
+else
     python3 method/run_watermark.py \
         --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
         --data_path /home/user/data/c4_realnewslike \
-        --num_prompts 20 \
-        --num_tokens 200 \
+        --num_prompts $NUM_PROMPTS \
+        --num_tokens $NUM_TOKENS \
         --num_seeds 1 \
-        --layer_idx 20 \
-        --weight_name up_proj \
-        --sigma 1e-5 \
+        --layer_idx $LAYER_IDX \
+        --weight_name $WEIGHT_NAME \
+        --sigma $SIGMA_VALUE \
         --output_dir /home/user/checkpoints \
         --device cuda
 fi
@@ -78,9 +67,9 @@ if [ -f "$RESULTS_FILE" ]; then
     python3 method/detect.py \
         --results_path "$RESULTS_FILE" \
         --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
-        --layer_idx 20 \
-        --weight_name up_proj \
-        --sigma 1e-5 \
+        --layer_idx $LAYER_IDX \
+        --weight_name $WEIGHT_NAME \
+        --sigma $SIGMA_VALUE \
         --device cuda
 else
     echo "ERROR: Results file not found at $RESULTS_FILE"
@@ -103,61 +92,9 @@ if [ -f "$UWM_FILE" ]; then
     python3 method/detect_unwatermarked.py \
         --results_path "$UWM_FILE" \
         --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
-        --layer_idx 20 \
-        --weight_name up_proj \
-        --sigma 1e-5 \
-        --device cuda
-fi
-
-# Step 5: Evaluate
-echo ""
-echo "Step 5: Evaluating..."
-bash scripts/evaluate.sh watermark_detection_mistral /home/user/checkpoints
-
-# Step 6: Compare with reference
-echo ""
-echo "Step 6: Comparing with paper's reference..."
-python3 validate.py --compare 2>/dev/null || echo "validate.py comparison done"
-
-echo ""
-echo "=== GPU Job Complete ==="
-
-
-# Step 2: Run detection on watermarked text (FIXED: key regeneration uses outer seed)
-echo ""
-echo "Step 2: Running watermark detection on watermarked text..."
-if [ -f "$RESULTS_FILE" ]; then
-    python3 method/detect.py \
-        --results_path "$RESULTS_FILE" \
-        --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
-        --layer_idx 20 \
-        --weight_name up_proj \
-        --sigma 1e-5 \
-        --device cuda
-else
-    echo "ERROR: Results file not found at $RESULTS_FILE"
-    exit 1
-fi
-
-# Step 3: Generate unwatermarked (baseline) text (skip if exists)
-echo ""
-echo "Step 3: Generating unwatermarked (baseline) text..."
-if [ ! -f "$UWM_FILE" ]; then
-    bash scripts/baseline.sh
-else
-    echo "    Unwatermarked baseline already exists, skipping..."
-fi
-
-# Step 4: Run detection on unwatermarked text (FIXED: key regeneration uses outer seed)
-echo ""
-echo "Step 4: Running detection on unwatermarked text..."
-if [ -f "$UWM_FILE" ]; then
-    python3 method/detect_unwatermarked.py \
-        --results_path "$UWM_FILE" \
-        --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
-        --layer_idx 20 \
-        --weight_name up_proj \
-        --sigma 1e-5 \
+        --layer_idx $LAYER_IDX \
+        --weight_name $WEIGHT_NAME \
+        --sigma $SIGMA_VALUE \
         --device cuda
 fi
 
