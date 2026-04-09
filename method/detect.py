@@ -225,6 +225,10 @@ def run_detection(
 
         # Load watermark key
         watermark_key = load_watermark_key(sample, config)
+        key_path = sample.get("watermark_key_path", "N/A")
+        if i % 5 == 0:
+            print(f"  Sample {i}: prompt_idx={sample.get('prompt_idx')}, key_path={key_path}, "
+                  f"key_shape={watermark_key.shape}, key_sum={watermark_key.sum():.6f}")
 
         # Run detection
         det_start = time.time()
@@ -243,6 +247,10 @@ def run_detection(
         grad_norms.append(result["grad_norm"])
         dot_products.append(result["dot_product"])
         watermarked_flags.append(result["watermarked"])
+
+        if i % 5 == 0:
+            print(f"    -> psi={result['psi']:.4f}, p_value={result['p_value']:.6f}, "
+                  f"dot_product={result['dot_product']:.8f}, grad_norm={result['grad_norm']:.4f}")
 
     total_time = time.time() - total_start
 
