@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "GaussMark v11: Save watermark keys to .npy files during generation for reliable detection. Keys were regenerated from seeds with mismatched RNG state. Now saved directly during generation and loaded during detection."
+notes: "GaussMark v12: Fixed device_map in all scripts (run_watermark, baseline, detect). All use device=cuda instead of auto. Key persistence via .npy files already committed."
