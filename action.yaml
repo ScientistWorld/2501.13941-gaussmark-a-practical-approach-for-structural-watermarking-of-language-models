@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: pending
+action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: ""
+notes: "Run clean GaussMark Mistral audit-fix pipeline: exact generated token IDs, sigma=sqrt(1e-5), fresh unwatermarked baseline, and C4 cross-entropy quality metrics to attempt core_claim."

@@ -44,30 +44,43 @@ model.tokenizer = tokenizer
 examples_path = os.path.join('$DATA_PATH', 'examples.json')
 with open(examples_path, 'r') as f:
     texts = json.load(f)
-prompts = [' '.join(str(t).split()[:200]) for t in texts[:100]]
+prompts = []
+for item in texts[:100]:
+    text = item.get('text', '') if isinstance(item, dict) else str(item)
+    enc = tokenizer(text, add_special_tokens=False, truncation=True, max_length=200)
+    prompts.append(tokenizer.decode(enc['input_ids'], skip_special_tokens=True))
 print(f'Loaded {len(prompts)} prompts')
 
 # Generate WITHOUT watermark (just use the original model)
 results = {'config': {'watermarked': False, 'num_prompts': len(prompts)}, 'samples': []}
 
 for i, prompt in enumerate(prompts):
+    sample_seed = 42 + i
+    torch.manual_seed(sample_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(sample_seed)
     enc = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
+    input_ids = enc['input_ids'].to(model.device)
+    attention_mask = enc.get('attention_mask')
+    if attention_mask is not None:
+        attention_mask = attention_mask.to(model.device)
     with torch.no_grad():
         out = model.generate(
-            enc['input_ids'].to(model.device),
-            attention_mask=enc.get('attention_mask'),
+            input_ids,
+            attention_mask=attention_mask,
             max_new_tokens=200,
             do_sample=True,
             temperature=1.0,
             top_p=0.9,
             pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
         )
-    gen_ids = out[0][enc['input_ids'].shape[1]:]
+    gen_ids = out[0][input_ids.shape[1]:]
     gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
 
     results['samples'].append({
         'prompt_idx': i,
-        'seed': 42 + i,  # Same scheme as watermarked: seed = 42 + prompt_idx
+        'seed': sample_seed,  # Same scheme as watermarked: seed = 42 + prompt_idx
+        'sample_seed': sample_seed,
         'prompt_text': prompt[:500],
         'generated_text': gen_text,
         'generated_ids': gen_ids.cpu().tolist(),
