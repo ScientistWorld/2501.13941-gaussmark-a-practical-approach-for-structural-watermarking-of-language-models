@@ -175,8 +175,8 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
 
             # Save watermark key to file with path that includes seed
             # Key is generated with outer seed (seed) for this seed_idx
-            key_path = os.path.join(keys_dir, f"key_seed{seed}.npy")
-            np.save(key_path, watermark_key)
+            key_path = os.path.join(keys_dir, f"key_seed{seed}.pt")
+            torch.save(watermark_key, key_path)
 
             sample = {
                 "sample_idx": sample_idx,
@@ -242,7 +242,7 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
         # Load watermark key from saved file
         key_path = sample.get("watermark_key_path")
         if key_path and os.path.exists(key_path):
-            watermark_key = np.load(key_path)
+            watermark_key = torch.load(key_path, weights_only=True, map_location="cpu").numpy()
         else:
             # Fallback: regenerate
             print(f"  WARNING: Key not found at {key_path}, regenerating...")

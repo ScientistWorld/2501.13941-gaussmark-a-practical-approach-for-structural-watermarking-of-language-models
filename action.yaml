@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: core_claim
-notes: "GaussMark sigma=1e-3 generation + detection (sigma=1e-5 gives only 4% detection, need larger sigma). Reuses existing unwatermarked baseline from previous successful job."
+notes: "Fix: use torch.save/load instead of np.save/load for watermark keys (npy files were corrupted with 128 bytes missing). Pipeline: generate 100 samples with sigma=1e-3, detect, compare against existing unwatermarked baseline. Reuses existing unwatermarked p-values from job ee2ace3f-95b."
