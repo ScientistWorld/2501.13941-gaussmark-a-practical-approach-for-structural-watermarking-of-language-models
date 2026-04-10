@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Corrected GaussMark run supports core_claim: 78.0% detection at p<0.05, 60.4% at p<0.01, AUC 0.9477, C4 CE ratio 1.0102; generation time ratio 1.295 in the simple HF pipeline; unwatermarked FPR was 7/94 at p<0.05 and 1/94 at p<0.01."
+notes: "Final verification passed; method-safe gym documentation was tightened and core_claim remains justified."

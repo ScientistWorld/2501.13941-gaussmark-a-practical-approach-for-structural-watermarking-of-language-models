@@ -28,3 +28,4 @@
 - Unwatermarked detection was 7/94 at p<0.05 and 1/94 at p<0.01. The 5% empirical rate is slightly high but within small-sample binomial variation under a 5% null (P[X>=7] ~= 0.19).
 
 ## Stop Justification
+- Stopped at `core_claim` because the reproduced environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but does not cover the paper's full multi-model, robustness, and downstream task suite.
