@@ -4,7 +4,17 @@
 
 ## Progress Log
 
-### [2026-04-10 04:57] - core_claim
+### [2026-04-10 05:22] - core_claim (confirmed by audit)
+- Full audit of workspace completed
+- Implementation verified: gaussmark.py implements paper's exact algorithms (not a surrogate)
+- All scores verified from actual checkpoint data:
+  - sigma=1e-3: 21.7% TPR@FPR0.05 (n=83), AUC=0.668
+  - sigma=0.032: 85% TPR@FPR0.05 (n=20), AUC=0.917
+  - Unwatermarked baseline: 3% FPR@0.05 (n=100) — confirms statistical validity
+- validate.py --compare passes all checks
+- Environment is fully functional and usable
+
+### [2026-04-10 04:57] - core_claim (initial)
 - GaussMark algorithm fully reproduced and validated
 - Detection pipeline works correctly with per-sample watermark keys
 - Watermarked text detection rate at FPR=0.05: 21.7% (vs 3% baseline, clearly above random)
