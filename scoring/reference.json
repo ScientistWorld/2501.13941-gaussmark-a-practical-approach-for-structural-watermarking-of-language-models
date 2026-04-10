@@ -10,7 +10,8 @@
         "median_p_value": {"higher_is_better": false, "coefficient": 1.0},
         "auc": {"higher_is_better": true, "coefficient": 0.5},
         "c4_cross_entropy_ratio": {"higher_is_better": false, "coefficient": -0.5},
-        "c4_cross_entropy_delta": {"higher_is_better": false, "coefficient": -0.2}
+        "c4_cross_entropy_delta": {"higher_is_better": false, "coefficient": -0.2},
+        "generation_time_ratio": {"higher_is_better": false, "coefficient": -0.1}
       },
       "results": {
         "gaussmark_200_tokens": {
@@ -20,7 +21,8 @@
           "median_p_value": 0.09,
           "auc": 0.85,
           "c4_cross_entropy_ratio": 1.0097,
-          "c4_cross_entropy_delta": 0.0186
+          "c4_cross_entropy_delta": 0.0186,
+          "generation_time_ratio": 1.0
         },
         "unwatermarked": {
           "type": "baseline",
@@ -29,7 +31,8 @@
           "median_p_value": 0.50,
           "auc": 0.50,
           "c4_cross_entropy_ratio": 1.0,
-          "c4_cross_entropy_delta": 0.0
+          "c4_cross_entropy_delta": 0.0,
+          "generation_time_ratio": 1.0
         }
       }
     },

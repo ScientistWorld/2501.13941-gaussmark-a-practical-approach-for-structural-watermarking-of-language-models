@@ -49,6 +49,28 @@ def latest_watermarked_file(results_dir: str) -> str | None:
     return max(candidates, key=os.path.getmtime)
 
 
+def latest_watermarked_generation_file(results_dir: str) -> str | None:
+    candidates = glob.glob(os.path.join(results_dir, "watermarked_wm_l20_up_proj_s*.json"))
+    candidates = [
+        p for p in candidates
+        if os.path.isfile(p) and "_detection_" not in os.path.basename(p)
+    ]
+    if not candidates:
+        return None
+    return max(candidates, key=os.path.getmtime)
+
+
+def mean_generation_time(path: str | None) -> float | None:
+    if not path or not os.path.exists(path):
+        return None
+    with open(path) as f:
+        data = json.load(f)
+    times = [float(t) for t in data.get("generation_times", []) if float(t) > 0]
+    if not times:
+        return None
+    return sum(times) / len(times)
+
+
 def evaluate(
     results_dir: str,
     experiment: str,
@@ -89,6 +111,15 @@ def evaluate(
 
     if p_wm and p_uwm:
         scores["experiments"][experiment]["results"]["gaussmark_200_tokens"]["auc"] = pairwise_auc(p_wm, p_uwm)
+
+    wm_gen_time = mean_generation_time(latest_watermarked_generation_file(results_dir))
+    uwm_gen_time = mean_generation_time(os.path.join(results_dir, "unwatermarked_baseline_exact.json"))
+    if wm_gen_time and uwm_gen_time and "gaussmark_200_tokens" in scores["experiments"][experiment]["results"]:
+        scores["experiments"][experiment]["results"]["gaussmark_200_tokens"]["generation_time_ratio"] = (
+            wm_gen_time / uwm_gen_time
+        )
+        if "unwatermarked" in scores["experiments"][experiment]["results"]:
+            scores["experiments"][experiment]["results"]["unwatermarked"]["generation_time_ratio"] = 1.0
 
     return scores
 

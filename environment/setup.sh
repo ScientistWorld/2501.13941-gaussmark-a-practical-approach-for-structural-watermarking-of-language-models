@@ -16,6 +16,10 @@
 
 set -e
 
+if ! command -v uv >/dev/null 2>&1; then
+    python3 -m pip install uv
+fi
+
 uv pip install --system \
     torch \
     transformers \

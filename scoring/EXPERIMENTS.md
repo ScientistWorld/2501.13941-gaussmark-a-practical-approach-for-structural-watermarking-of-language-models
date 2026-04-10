@@ -14,6 +14,7 @@ This file describes the experiments in `scoring/scores.json`. Each experiment na
 - Generation: 200 tokens per prompt, temperature=1.0, top-p=0.9
 - Detection: significance-thresholded p-values at 5% and 1% false-positive thresholds, plus median p-value and AUC
 - Quality constraint: C4 cross-entropy is reported as a ratio/delta between the marked and original model on the same prompt source
+- Latency constraint: generation-time ratio is reported from the same HuggingFace run as a lightweight check on the no-extra-generation-latency claim
 
 **Methods evaluated:**
 1. `gaussmark_200_tokens` — primary marked-generation result, 100 prompts by default

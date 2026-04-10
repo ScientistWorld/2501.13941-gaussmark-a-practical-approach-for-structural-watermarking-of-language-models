@@ -430,6 +430,11 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
         dot_products.append(result["dot_product"])
 
     total_time = time.time() - total_start
+    if not p_values:
+        raise RuntimeError(
+            f"No samples with at least {MIN_TOKENS} generated tokens for {output_prefix}; "
+            "cannot compute detection metrics."
+        )
 
     metrics = {
         "num_samples": len(p_values),
@@ -594,6 +599,10 @@ def main():
             json.dump(detection_full, f, indent=2)
 
     # Step 6: Write scores.json
+    wm_generation_time = float(statistics.mean(wm_data.get("generation_times", [1.0])))
+    uw_generation_time = float(statistics.mean(uw_data.get("generation_times", [wm_generation_time])))
+    generation_time_ratio = wm_generation_time / uw_generation_time if uw_generation_time > 0 else float("inf")
+
     scores = {
         "experiments": {
             "watermark_detection_mistral": {
@@ -605,6 +614,7 @@ def main():
                         "auc": wm_metrics.get("auc", 0.5),
                         "c4_cross_entropy_ratio": quality_metrics["c4_cross_entropy_ratio"],
                         "c4_cross_entropy_delta": quality_metrics["c4_cross_entropy_delta"],
+                        "generation_time_ratio": generation_time_ratio,
                     },
                     "unwatermarked": {
                         "detection_rate_fpr_0.05": uw_metrics["detection_rate_fpr_0.05"],
@@ -612,6 +622,7 @@ def main():
                         "median_p_value": uw_metrics["median_p_value"],
                         "c4_cross_entropy_ratio": 1.0,
                         "c4_cross_entropy_delta": 0.0,
+                        "generation_time_ratio": 1.0,
                     },
                 }
             }

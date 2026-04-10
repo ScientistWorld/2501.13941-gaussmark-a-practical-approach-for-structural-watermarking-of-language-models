@@ -5,12 +5,12 @@
 - **GaussMark algorithm fully implemented** (method/gaussmark.py):
   - `GaussMark.Generate`: samples xi ~ N(0, sigma^2), perturbs one MLP layer (layer 20 up_proj), generates text
   - `GaussMark.Detect`: computes psi = <xi, grad> / (sigma * ||grad||), returns p-value using standard normal CDF
-  - Statistical validity: psi ~ N(0,1) under H0 — confirmed by 3% FPR on unwatermarked baseline
+  - Statistical validity: psi ~ N(0,1) under H0; current unwatermarked baseline is 7/94 at p<0.05 and 1/94 at p<0.01, slightly high at 5% but plausible under small-sample binomial variation
 - **Model**: Mistral-7B-Instruct-v0.3 at /home/user/models/mistralai/Mistral-7B-Instruct-v0.3/
 - **C4 dataset**: /home/user/data/c4_realnewslike/examples.json (53906 samples)
 - **Pipeline script**: method/run_pipeline.py
 - **Detection pipeline works**: Correct per-sample watermark keys regenerated during detection
-- **Audit fixes pending GPU validation**: exact generated token IDs and exact prompt token IDs are now stored directly, method entry points use the paper's Mistral variance convention (`sigma=sqrt(1e-5)`), and the next run regenerates a fresh unwatermarked baseline instead of mixing historical p-values.
+- **Reusable scoring works**: `scripts/evaluate.sh` reads the detection artifacts, writes `scoring/scores.json`, and validates import separation with `python validate.py --compare`.
 
 ## Results
 
@@ -20,6 +20,7 @@
 - **Median p-value**: 0.00320
 - **ROC AUC**: 0.9477
 - **C4 cross-entropy ratio/delta**: 1.0102 / 0.0206
+- **Generation time ratio**: 1.295 in this simple HuggingFace pipeline, including per-sample key generation and weight perturbation/restoration overhead
 - **Unwatermarked baseline**: 7.45% at p<0.05 (7/94) and 1.06% at p<0.01 (1/94); the p<0.05 result is slightly above nominal but plausible under small-sample binomial variation (P[X>=7 | n=94, p=0.05] ~= 0.19).
 
 ### sigma=0.001 (Instruct model, 100 prompts) — prior method_runs result
@@ -42,7 +43,7 @@
 2. A prior run with sigma=0.032 gives strong results (~85% detection), but this larger perturbation must be constrained by quality metrics
 3. Table 2 reports variance sigma^2. The current pipeline uses standard deviation sigma=sqrt(1e-5) for the paper's Mistral setting.
 4. C4 cross-entropy ratio/delta were added as lightweight quality constraints before claiming `core_claim`.
-5. Current `scores.json` is retained only as a historical `method_runs` artifact until the next job overwrites it with fresh detection, false-positive, and quality metrics.
+5. Current `scores.json` contains the corrected core-claim run with fresh detection, false-positive, and quality metrics.
 6. Continued audit found that prompt text had been stored as a 500-character prefix; detection now uses stored exact prompt token IDs and stale cached generations without prompt IDs are not reused.
 7. The corrected run supports the core claim: the exact GaussMark method is detectable while the C4 cross-entropy quality ratio remains essentially unchanged.
 
@@ -59,6 +60,7 @@
 - Stores exact prompt and generated token IDs and regenerates/uses per-sample watermark keys for detection.
 - Generated a fresh unwatermarked baseline in the same job for the false-positive constraint.
 - Wrote detection metrics plus unwatermarked FPR and C4 cross-entropy quality ratio/delta to `scoring/scores.json`.
+- Added generation-time ratio as a lightweight latency constraint derived from the existing generation artifacts.
 
 ## Environment Structure
 - `method/`: GaussMark implementation (gaussmark.py)

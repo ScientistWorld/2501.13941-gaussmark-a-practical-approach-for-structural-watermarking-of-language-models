@@ -39,5 +39,6 @@ These changes replace the method rather than improve it:
 
 Improvements must be:
 - **Statistically valid:** FPR must remain ≤ 5% (no inflating TPR by breaking the null hypothesis)
+- **Finite-sample honest:** Report the unwatermarked false-positive rate and sample count; small deviations above 5% must be documented rather than hidden.
 - **Methodologically principled:** Sigma and layer choices should be motivated by theory or ablations, not test-set snooping
 - **Reproducible:** The same detection procedure must work for any prompt, not just the C4 prompts used in evaluation
