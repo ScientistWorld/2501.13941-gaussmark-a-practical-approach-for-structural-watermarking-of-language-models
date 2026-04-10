@@ -37,16 +37,24 @@ experiment = os.environ.get('EXPERIMENT', 'watermark_detection_mistral')
 scores = {}
 scores[experiment] = {'results': {}}
 
-# Load watermarked p-values from known file path
-wm_full = os.path.join(results_dir, 'watermarked_layer20_up_proj_sigma3e-02_detection_full.json')  # sigma=0.032
+# Try sigma=1e-3 detection results first (current run with per-sample keys)
+wm_full = os.path.join(results_dir, 'wm_wm_l20_up_proj_s0001_detection_full.json')
 if os.path.exists(wm_full):
     with open(wm_full) as f:
         wm_data = json.load(f)
     p_wm = wm_data.get('p_values', [])
-    print(f'Watermarked p-values: {len(p_wm)}')
+    print(f'Sigma=1e-3 Watermarked p-values: {len(p_wm)}')
 else:
-    p_wm = []
-    print(f'Watermarked file not found: {wm_full}')
+    # Fallback: try sigma=0.032 detection results
+    wm_full = os.path.join(results_dir, 'watermarked_layer20_up_proj_sigma3e-02_detection_full.json')
+    if os.path.exists(wm_full):
+        with open(wm_full) as f:
+            wm_data = json.load(f)
+        p_wm = wm_data.get('p_values', [])
+        print(f'Sigma=0.032 Watermarked p-values: {len(p_wm)}')
+    else:
+        p_wm = []
+        print(f'Watermarked file not found: checked {os.path.join(results_dir, "wm_wm_l20_up_proj_s0001_detection_full.json")} and sigma=0.032')
 
 # Load unwatermarked p-values from known file path
 uwm_full = os.path.join(results_dir, 'unwatermarked_baseline_unwatermarked_detection_full.json')

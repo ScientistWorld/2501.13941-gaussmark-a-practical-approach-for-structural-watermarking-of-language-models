@@ -19,8 +19,16 @@
   - Confirmed: sigma=1e-5 is too small for Mistral-7B-Instruct
   - sigma=0.032 (previous job) gives 85% detection — pipeline proven
 - Created comprehensive pipeline: method/run_pipeline.py
-- Updated to sigma=1e-3 for next job (sigma=1e-5 confirmed too small)
 - Reuses existing unwatermarked baseline (100 samples, FPR=3%)
+
+### [2026-04-10] - core_claim (in progress)
+- CRITICAL BUG FOUND: All 100 samples saved watermark keys to the SAME path
+  (key_seed42.pt) but each sample used a different per-sample seed (42+i).
+  This means samples 1-99 used the WRONG key during detection.
+- Fixed: detection now regenerates keys using per-sample seed (sample_seed field)
+- Job 00000a7d-3d2 failed due to torch.load weights_only=True (old code)
+- Fixed weights_only=False in run_pipeline.py line 275
+- Submitted new job with fixed detection
 
 ## Key Finding
 sigma=1e-5 (paper's value for Mistral-7B) produces undetectable watermarks on
@@ -30,3 +38,4 @@ Mistral-7B-Instruct-v0.3. This is likely due to:
 3. Scale: up_proj layer (14336×4096) with tiny sigma may not produce detectable signal
 
 sigma=0.032 (previous job) gives 85% detection — the method works at larger sigma.
+sigma=1e-3 (current job) tests intermediate value with corrected per-sample keys.

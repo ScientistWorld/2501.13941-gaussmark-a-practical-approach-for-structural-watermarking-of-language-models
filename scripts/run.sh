@@ -10,7 +10,7 @@ date
 # Check GPU
 nvidia-smi
 
-# Run the pipeline
+# Run the pipeline (skips generation if already done, runs detection)
 python3 /home/user/method/run_pipeline.py
 
 echo ""

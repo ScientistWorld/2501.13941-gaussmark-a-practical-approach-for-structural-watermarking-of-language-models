@@ -256,25 +256,41 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
 
     total_start = time.time()
 
+    # Filter samples with too few generated tokens (likely hit EOS early)
+    MIN_TOKENS = 50
+    filtered = [s for s in samples if len(s["generated_ids"]) >= MIN_TOKENS]
+    if len(filtered) < len(samples):
+        print(f"[!] Skipping {len(samples) - len(filtered)} samples with <{MIN_TOKENS} tokens")
+    samples = filtered
+
     for i, sample in enumerate(samples):
         if i % 20 == 0:
             print(f"  Detecting: {i}/{len(samples)}")
 
         prompt_text = sample["prompt_text"]
         generated_ids = sample["generated_ids"]
-        seed = sample.get("seed", 42)
+        # The per-sample seed is the key used during generation.
+        # We regenerate the key here rather than loading from file because
+        # the saved keys may have been saved with the wrong (outer) seed.
+        # sample["sample_seed"] = seed + i where i is the prompt index.
+        per_sample_seed = sample.get("sample_seed", sample.get("seed", 42))
 
-        # Load watermark key from saved file
+        # Try to load the key from a per-sample path first.
+        # If generation was done correctly, keys are saved per-sample_seed.
         key_path = sample.get("watermark_key_path")
-        if key_path:
-            # Prefer .pt if it exists (new format), else fall back to .npy (legacy)
-            pt_path = key_path if key_path.endswith('.pt') else key_path.replace('.npy', '.pt')
-            npy_path = key_path if key_path.endswith('.npy') else key_path.replace('.pt', '.npy')
+        loaded_from_file = False
+        watermark_key = None
 
-            if pt_path.endswith('.pt') and os.path.exists(pt_path):
+        if key_path:
+            # Try per-sample path: key_seed{sample_seed}.npy (legacy)
+            npy_path = os.path.join(os.path.dirname(key_path), f"key_seed{per_sample_seed}.npy")
+            # Try per-sample path: key_seed{sample_seed}.pt
+            pt_path = os.path.join(os.path.dirname(key_path), f"key_seed{per_sample_seed}.pt")
+
+            if os.path.exists(pt_path):
                 watermark_key = torch.load(pt_path, weights_only=False, map_location="cpu").numpy()
-            elif npy_path.endswith('.npy') and os.path.exists(npy_path):
-                # Legacy .npy format — may need padding/truncation fix
+                loaded_from_file = True
+            elif os.path.exists(npy_path):
                 npy_arr = np.load(npy_path)
                 expected_elements = wm.target_param.numel()
                 if npy_arr.size != expected_elements:
@@ -286,18 +302,16 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
                     watermark_key = flat.reshape(wm.target_shape)
                 else:
                     watermark_key = npy_arr
+                loaded_from_file = True
                 # Convert to .pt for future use
                 torch.save(torch.from_numpy(watermark_key), pt_path)
-                # Update path in sample so future runs use .pt directly
-                sample['watermark_key_path'] = pt_path
-            else:
-                watermark_key = np.load(key_path)
-        else:
-            # Fallback: regenerate
-            print(f"  WARNING: Key not found at {key_path}, regenerating...")
-            shape = tuple(sample.get("watermark_key_shape", config.get("watermark_key_shape", [])))
-            rng = np.random.RandomState(int(seed))
-            watermark_key = rng.normal(0, sigma, shape).astype(np.float32)
+
+        if not loaded_from_file:
+            # Regenerate key using the per-sample seed.
+            # This reproduces exactly what was done during generation.
+            if per_sample_seed != seed:
+                print(f"  NOTE: Regen key for sample {i} using per_sample_seed={per_sample_seed} (outer={seed})")
+            watermark_key = wm.regenerate_watermark_key(per_sample_seed)
 
         prompt_enc = tokenizer(prompt_text, return_tensors="pt", truncation=True, max_length=512)
         input_ids = prompt_enc["input_ids"]
