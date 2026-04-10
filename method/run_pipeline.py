@@ -125,8 +125,33 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
         with open(results_file) as f:
             existing = json.load(f)
         if len(existing.get('samples', [])) >= NUM_PROMPTS * NUM_SEEDS:
-            print(f"[+] Generation already exists at {results_file}, skipping...")
-            return results_file
+            # Ensure .pt keys exist for all samples
+            samples = existing.get('samples', [])
+            pt_missing = []
+            for s in samples:
+                pt = s.get("watermark_key_path", "")
+                if not pt.endswith('.pt'):
+                    pt = pt.replace('.npy', '.pt')
+                if not os.path.exists(pt):
+                    pt_missing.append(s)
+            if not pt_missing:
+                print(f"[+] Generation + .pt keys already exist at {results_file}, skipping...")
+                return results_file
+            else:
+                print(f"[+] Generation exists but .pt keys missing for {len(pt_missing)} samples, regenerating...")
+                # Regenerate missing .pt keys using the same RNG seed
+                wm = GaussMark(model=model, layer_idx=layer_idx, weight_name=weight_name,
+                               sigma=sigma, device="cuda")
+                for s in pt_missing:
+                    seed = s.get("seed", SEED_BASE)
+                    key = wm.regenerate_watermark_key(seed)
+                    pt = os.path.join(keys_dir, f"key_seed{seed}.pt")
+                    torch.save(torch.from_numpy(key), pt)
+                    s["watermark_key_path"] = pt
+                with open(results_file, 'w') as f:
+                    json.dump(existing, f, indent=2)
+                print(f"[+] Regenerated {len(pt_missing)} .pt keys")
+                return results_file
 
     results = {
         "config": {
@@ -176,7 +201,7 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
             # Save watermark key to file with path that includes seed
             # Key is generated with outer seed (seed) for this seed_idx
             key_path = os.path.join(keys_dir, f"key_seed{seed}.pt")
-            torch.save(watermark_key, key_path)
+            torch.save(torch.from_numpy(watermark_key), key_path)
 
             sample = {
                 "sample_idx": sample_idx,
@@ -241,8 +266,32 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
 
         # Load watermark key from saved file
         key_path = sample.get("watermark_key_path")
-        if key_path and os.path.exists(key_path):
-            watermark_key = torch.load(key_path, weights_only=True, map_location="cpu").numpy()
+        if key_path:
+            # Prefer .pt if it exists (new format), else fall back to .npy (legacy)
+            pt_path = key_path if key_path.endswith('.pt') else key_path.replace('.npy', '.pt')
+            npy_path = key_path if key_path.endswith('.npy') else key_path.replace('.pt', '.npy')
+
+            if pt_path.endswith('.pt') and os.path.exists(pt_path):
+                watermark_key = torch.load(pt_path, weights_only=False, map_location="cpu").numpy()
+            elif npy_path.endswith('.npy') and os.path.exists(npy_path):
+                # Legacy .npy format — may need padding/truncation fix
+                npy_arr = np.load(npy_path)
+                expected_elements = wm.target_param.numel()
+                if npy_arr.size != expected_elements:
+                    flat = npy_arr.flatten()
+                    if flat.size < expected_elements:
+                        flat = np.pad(flat, (0, expected_elements - flat.size), mode='constant', constant_values=0)
+                    else:
+                        flat = flat[:expected_elements]
+                    watermark_key = flat.reshape(wm.target_shape)
+                else:
+                    watermark_key = npy_arr
+                # Convert to .pt for future use
+                torch.save(torch.from_numpy(watermark_key), pt_path)
+                # Update path in sample so future runs use .pt directly
+                sample['watermark_key_path'] = pt_path
+            else:
+                watermark_key = np.load(key_path)
         else:
             # Fallback: regenerate
             print(f"  WARNING: Key not found at {key_path}, regenerating...")

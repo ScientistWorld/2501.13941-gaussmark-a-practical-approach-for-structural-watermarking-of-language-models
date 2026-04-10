@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: core_claim
-notes: "Fix: use torch.save/load instead of np.save/load for watermark keys (npy files were corrupted with 128 bytes missing). Pipeline: generate 100 samples with sigma=1e-3, detect, compare against existing unwatermarked baseline. Reuses existing unwatermarked p-values from job ee2ace3f-95b."
+notes: "Fix: torch.save keys as torch tensors (not numpy), load with weights_only=False. Legacy .npy handling with padding fix + auto-convert to .pt. Regenerate missing keys via regenerate_watermark_key(seed)."
