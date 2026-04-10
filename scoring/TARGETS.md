@@ -12,13 +12,13 @@ This file documents what a scientist agent should optimize for when improving on
 
 **detection_rate_fpr_0.05**
 - **What**: Fraction of watermarked samples detected at 5% false-positive rate (p < 0.05).
-- **Paper target**: ~62% at 200 tokens (base Mistral-7B). Our reproduction: 21.7% with sigma=1e-3.
+- **Paper target**: ~62% at 200 tokens (base Mistral-7B). Current clean `sqrt(1e-5)` run is pending; the prior 21.7% result used a stale sigma=1e-3 artifact and is not the core-claim score.
 - **How to run**: Generate 200 tokens with GaussMark-watermarked model, run `GaussMark.Detect` on each sample, compute fraction with p-value < 0.05.
 - **Direction**: Higher is better.
 
 **detection_rate_fpr_0.01**
 - **What**: Fraction detected at stricter 1% false-positive rate (p < 0.01).
-- **Paper target**: ~40% at 200 tokens. Our reproduction: 6.0% with sigma=1e-3.
+- **Paper target**: ~40% at 200 tokens. Current clean `sqrt(1e-5)` run is pending; the prior 6.0% result used a stale sigma=1e-3 artifact and is not the core-claim score.
 - **How to run**: Same as above, threshold p < 0.01.
 - **Direction**: Higher is better.
 
@@ -53,14 +53,14 @@ This file documents what a scientist agent should optimize for when improving on
 
 **auc**
 - **What**: ROC AUC of watermarked vs unwatermarked p-values (lower p = more likely watermarked).
-- **Paper target**: >0.85 at 200 tokens. Our reproduction: 0.668 (sigma=1e-3), 0.917 (sigma=0.032).
+- **Paper target**: >0.85 at 200 tokens. Current clean `sqrt(1e-5)` run is pending; prior sigma diagnostics are retained only in progress notes.
 - **Why**: Threshold-independent measure of discriminative power.
 - **How to run**: Concatenate watermarked and unwatermarked p-values with labels, compute AUC with inverted scores.
 - **Direction**: Higher is better.
 
 **median_p_value**
 - **What**: Median p-value across watermarked samples.
-- **Paper target**: ~0.09 at 200 tokens. Our reproduction: 0.195 (sigma=1e-3), ~3e-7 (sigma=0.032).
+- **Paper target**: ~0.09 at 200 tokens. Current clean `sqrt(1e-5)` run is pending; prior sigma diagnostics are retained only in progress notes.
 - **Why**: Indicates typical strength of detection signal. Lower = stronger signal.
 - **Direction**: Lower is better.
 

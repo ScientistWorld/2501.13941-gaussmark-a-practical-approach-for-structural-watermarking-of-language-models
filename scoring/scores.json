@@ -3,22 +3,17 @@
     "watermark_detection_mistral": {
       "results": {
         "gaussmark_200_tokens": {
-          "detection_rate_fpr_0.05": 0.2169,
-          "detection_rate_fpr_0.01": 0.0602,
-          "median_p_value": 0.1954,
-          "auc": 0.6684
-        },
-        "gaussmark_200_tokens_sigma0032": {
-          "detection_rate_fpr_0.05": 0.85,
-          "detection_rate_fpr_0.01": 0.80,
-          "median_p_value": 0.0000003,
-          "auc": 0.917
+          "detection_rate_fpr_0.05": 0.21686746987951808,
+          "detection_rate_fpr_0.01": 0.060240963855421686,
+          "median_p_value": 0.1954071062291396,
+          "auc": 0.668433734939759
         },
         "unwatermarked": {
           "detection_rate_fpr_0.05": 0.03,
           "detection_rate_fpr_0.01": 0.01,
-          "median_p_value": 0.4424,
-          "auc": 0.50
+          "median_p_value": 0.44242989877282496,
+          "c4_cross_entropy_ratio": 1.0,
+          "c4_cross_entropy_delta": 0.0
         }
       }
     }

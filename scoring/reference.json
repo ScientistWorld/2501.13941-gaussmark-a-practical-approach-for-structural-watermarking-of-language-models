@@ -22,15 +22,6 @@
           "c4_cross_entropy_ratio": 1.0097,
           "c4_cross_entropy_delta": 0.0186
         },
-        "gaussmark_200_tokens_sigma0032": {
-          "type": "proposed",
-          "detection_rate_fpr_0.05": 0.85,
-          "detection_rate_fpr_0.01": 0.80,
-          "median_p_value": 0.0000003,
-          "auc": 0.917,
-          "c4_cross_entropy_ratio": 1.0097,
-          "c4_cross_entropy_delta": 0.0186
-        },
         "unwatermarked": {
           "type": "baseline",
           "detection_rate_fpr_0.05": 0.05,

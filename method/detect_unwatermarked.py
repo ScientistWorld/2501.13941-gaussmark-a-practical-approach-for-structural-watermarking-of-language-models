@@ -19,6 +19,7 @@ import os
 import sys
 import time
 import statistics
+import math
 from pathlib import Path
 
 import torch
@@ -32,6 +33,9 @@ from transformers import (
 
 sys.path.insert(0, str(Path(__file__).parent))
 from gaussmark import GaussMark, compute_detection_metrics
+
+
+DEFAULT_SIGMA = math.sqrt(1e-5)
 
 
 def load_model_and_tokenizer(model_path: str, device: str = "cuda", torch_dtype=torch.bfloat16):
@@ -82,15 +86,13 @@ def run_detection_unwatermarked(
         attention_mask = prompt_enc.get("attention_mask")
         gen_tensor = torch.tensor([generated_ids]).long()
 
-        # Regenerate watermark key from seed.
-        # The key is generated with the OUTER seed (42 + seed_idx), not the per-prompt seed.
-        # Since unwatermarked text was generated WITHOUT watermark, any key will produce
-        # p-values uniformly distributed under H0. We use the stored seed's outer seed
-        # for consistency with the watermarked detection path.
+        # Since unwatermarked text was generated WITHOUT watermark, any independent
+        # Gaussian key gives uniform p-values under H0. Use the per-sample seed so
+        # this matches the current watermarked detection path.
         prompt_idx = sample.get("prompt_idx", 0)
         seed = sample.get("seed", 42)
-        outer_seed = int(seed) - int(prompt_idx)  # key uses outer seed
-        watermark_key = wm.regenerate_watermark_key(outer_seed)
+        sample_seed = sample.get("sample_seed", int(seed) + int(prompt_idx))
+        watermark_key = wm.regenerate_watermark_key(int(sample_seed))
 
         det_start = time.time()
         result = wm.detect(
@@ -166,7 +168,7 @@ def main():
     parser.add_argument("--model_path", type=str, default="/home/user/models/mistralai/Mistral-7B-Instruct-v0.3")
     parser.add_argument("--layer_idx", type=int, default=20)
     parser.add_argument("--weight_name", type=str, default="up_proj")
-    parser.add_argument("--sigma", type=float, default=1e-5)
+    parser.add_argument("--sigma", type=float, default=DEFAULT_SIGMA)
     parser.add_argument("--device", type=str, default="cuda")
     args = parser.parse_args()
 

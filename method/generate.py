@@ -6,14 +6,14 @@ This script provides a simple CLI for generating watermarked text using the
 GaussMark watermarking scheme. It wraps GaussMark.Generate from gaussmark.py.
 
 Usage:
-    # Basic usage with defaults (Mistral-7B, layer 20, up_proj, sigma=1e-5)
+    # Basic usage with defaults (Mistral-7B, layer 20, up_proj, sigma=sqrt(1e-5))
     python method/generate.py --prompt "Once upon a time"
 
     # With custom parameters
     python method/generate.py \
         --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
         --prompt "The future of AI is" \
-        --sigma 1e-5 \
+        --sigma 0.0031622776601683794 \
         --num_tokens 100 \
         --layer 20 \
         --weight_name up_proj \
@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+import math
 from pathlib import Path
 
 import torch
@@ -47,6 +48,7 @@ from gaussmark import GaussMark
 
 
 DEFAULT_MODEL_PATH = "/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
+DEFAULT_SIGMA = math.sqrt(1e-5)
 
 
 def load_model_and_tokenizer(
@@ -106,9 +108,9 @@ Examples:
     parser.add_argument(
         "--sigma",
         type=float,
-        default=1e-5,
+        default=DEFAULT_SIGMA,
         help="Gaussian noise standard deviation (variance = sigma^2). "
-             "Default: 1e-5 (from paper Table 2 for Mistral-7B)",
+             "Default: sqrt(1e-5), because Table 2 reports Mistral-7B variance",
     )
     parser.add_argument(
         "--num_tokens",

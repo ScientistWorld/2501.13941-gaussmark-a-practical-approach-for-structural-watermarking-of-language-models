@@ -13,6 +13,16 @@
 set -e
 
 C4_DIR="/home/user/data/c4_realnewslike"
+MODEL_DIR="/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
+
+if [ -f "$MODEL_DIR/config.json" ] && ls "$MODEL_DIR"/*.safetensors >/dev/null 2>&1; then
+    echo "Mistral model already exists, skipping."
+else
+    echo "Downloading Mistral-7B-Instruct-v0.3 model..."
+    mkdir -p "$MODEL_DIR"
+    huggingface-cli download mistralai/Mistral-7B-Instruct-v0.3 \
+        --local-dir "$MODEL_DIR"
+fi
 
 # Check if C4 dataset already exists
 if [ -f "$C4_DIR/dataset_info.json" ] || [ -f "$C4_DIR/.arrow" ]; then
@@ -43,18 +53,8 @@ print(f'Saved {len(ds)} examples')
 " 2>/dev/null; then
             echo "C4 dataset downloaded successfully (direct)."
         else
-            echo "Direct load also failed. Creating minimal synthetic dataset..."
-            # Method 3: Create synthetic prompts as fallback
-            python3 -c "
-import json, os
-os.makedirs('/home/user/data/c4_realnewslike', exist_ok=True)
-# Create 2000 simple prompts
-data = [{'text': f'Prompt {i}: ' + ' '.join(['word'] * 200)} for i in range(2000)]
-from datasets import Dataset
-ds = Dataset.from_list(data)
-ds.save_to_disk('/home/user/data/c4_realnewslike')
-print(f'Created synthetic dataset with {len(ds)} examples')
-"
+            echo "Direct C4 download also failed. Refusing to create a synthetic fallback for the primary reproduction." >&2
+            exit 1
         fi
     fi
 fi

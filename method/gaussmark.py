@@ -15,7 +15,8 @@ Key equations from the paper:
   - GaussMark.Detect: psi = <xi, grad_theta log p_theta(y|x)> / (sigma * ||grad_theta log p_theta(y|x)||)
     p_value = 1 - Phi(psi) where Phi is standard normal CDF
 
-For Mistral-7B: layer 20, up_proj, sigma=1e-5 (from paper Table 2).
+For Mistral-7B: layer 20, up_proj, variance sigma^2=1e-5 (from paper
+Table 2), so the standard deviation parameter is sqrt(1e-5).
 """
 
 from __future__ import annotations
@@ -23,8 +24,12 @@ from __future__ import annotations
 import torch
 import torch.nn as nn
 import numpy as np
+import math
 from scipy.stats import norm
 from typing import Dict, List, Optional, Tuple, Any
+
+
+MISTRAL_TABLE2_SIGMA = math.sqrt(1e-5)
 
 
 class GaussMark:
@@ -45,7 +50,7 @@ class GaussMark:
         model: nn.Module,
         layer_idx: int = 20,
         weight_name: str = "up_proj",
-        sigma: float = 1e-5,
+        sigma: float = MISTRAL_TABLE2_SIGMA,
         device: str = "cuda",
     ):
         """
@@ -57,8 +62,9 @@ class GaussMark:
                           (paper uses layer 20 for Mistral-7B).
             weight_name:  MLP weight to perturb. Options: 'up_proj', 'down_proj',
                           'gate_proj'. Default: 'up_proj' (per paper Table 2).
-            sigma:        Standard deviation of Gaussian noise (sqrt of variance).
-                          Paper Table 2 uses 1e-5 for Mistral-7B.
+            sigma:        Standard deviation of Gaussian noise. Paper Table 2
+                          reports variance sigma^2=1e-5 for Mistral-7B, so the
+                          default standard deviation is sqrt(1e-5).
             device:       Device for computation. Default: 'cuda'.
         """
         self.model = model
@@ -166,7 +172,8 @@ class GaussMark:
             generated_text:  The generated text string.
             watermark_key:   The Gaussian watermark key (numpy array, shape matches
                             the perturbed weight matrix).
-            metadata:        Dict with generation info (shape, sigma, layer, etc.).
+            metadata:        Dict with generation info (shape, sigma, layer, token
+                            IDs, etc.).
         """
         self._seed_rng(seed)
 
@@ -225,6 +232,7 @@ class GaussMark:
                 "layer_idx": self.layer_idx,
                 "weight_name": self.weight_name,
                 "num_generated_tokens": len(generated_ids),
+                "generated_ids": generated_ids.detach().cpu().tolist(),
                 "prompt_length": prompt_len,
             }
 
@@ -466,13 +474,13 @@ class GaussMark:
         This is useful for detection when the key is not directly stored.
         The same seed + sigma produces the same key.
 
-        IMPORTANT: Pass the OUTER seed (42 + seed_idx), NOT the per-prompt seed.
-        The outer seed is what was used during generation before the per-prompt
-        RNG advancement. The per-prompt seed (42 + seed_idx + prompt_idx) produces
-        a DIFFERENT key because the RNG state was advanced by prompt_idx steps.
+        Pass the exact seed used for GaussMark.generate(). The pipeline samples a
+        fresh key per prompt by calling generate(seed=seed_base + prompt_idx), so
+        detection must regenerate with that same per-sample seed when the saved key
+        is unavailable.
 
         Args:
-            seed: The outer random seed (42 + seed_idx). NOT the per-prompt seed.
+            seed: The exact random seed passed to GaussMark.generate().
 
         Returns:
             Watermark key as numpy array (same shape as target parameter).

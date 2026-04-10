@@ -49,10 +49,15 @@ def latest_watermarked_file(results_dir: str) -> str | None:
     return max(candidates, key=os.path.getmtime)
 
 
-def evaluate(results_dir: str, experiment: str) -> dict[str, Any]:
+def evaluate(
+    results_dir: str,
+    experiment: str,
+    watermarked_file: str | None = None,
+    unwatermarked_file: str | None = None,
+) -> dict[str, Any]:
     scores: dict[str, Any] = {"experiments": {experiment: {"results": {}}}}
 
-    wm_path = latest_watermarked_file(results_dir)
+    wm_path = watermarked_file or latest_watermarked_file(results_dir)
     p_wm: list[float] = []
     wm_data: dict[str, Any] = {}
     if wm_path:
@@ -67,7 +72,9 @@ def evaluate(results_dir: str, experiment: str) -> dict[str, Any]:
     else:
         print("No watermarked detection result file found.")
 
-    uwm_path = os.path.join(results_dir, "unwatermarked_baseline_unwatermarked_detection_full.json")
+    uwm_path = unwatermarked_file or os.path.join(
+        results_dir, "unwatermarked_baseline_unwatermarked_detection_full.json"
+    )
     p_uwm: list[float] = []
     if os.path.exists(uwm_path):
         p_uwm, _ = load_p_values(uwm_path)
@@ -91,9 +98,16 @@ def main() -> None:
     parser.add_argument("--results-dir", default="/home/user/checkpoints")
     parser.add_argument("--experiment", default="watermark_detection_mistral")
     parser.add_argument("--output", default="/home/user/scoring/scores.json")
+    parser.add_argument("--watermarked-file", default=None)
+    parser.add_argument("--unwatermarked-file", default=None)
     args = parser.parse_args()
 
-    scores = evaluate(args.results_dir, args.experiment)
+    scores = evaluate(
+        args.results_dir,
+        args.experiment,
+        watermarked_file=args.watermarked_file,
+        unwatermarked_file=args.unwatermarked_file,
+    )
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     with open(args.output, "w") as f:
         json.dump(scores, f, indent=2)

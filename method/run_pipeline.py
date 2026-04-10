@@ -3,7 +3,8 @@
 GaussMark end-to-end pipeline for reproduction.
 
 This script runs the full pipeline:
-1. Generate watermarked text with sigma=1e-5 (paper's parameter)
+1. Generate watermarked text with sigma=sqrt(1e-5), because Table 2 reports
+   variance sigma^2=1e-5 for Mistral.
 2. Run detection on watermarked text (using saved keys)
 3. Run detection on unwatermarked baseline
 4. Evaluate and write scores.json
@@ -47,7 +48,17 @@ SEED_BASE = 42
 QUALITY_PROMPTS = 25
 
 
-def load_c4_prompts(num_prompts=100, max_words=200):
+def _truncate_prompt(text, tokenizer, max_tokens=200):
+    enc = tokenizer(
+        text,
+        add_special_tokens=False,
+        truncation=True,
+        max_length=max_tokens,
+    )
+    return tokenizer.decode(enc["input_ids"], skip_special_tokens=True)
+
+
+def load_c4_prompts(num_prompts=100, tokenizer=None, max_tokens=200):
     """Load prompts from C4 realnewslike dataset."""
     print(f"[+] Loading C4 prompts...")
 
@@ -59,8 +70,7 @@ def load_c4_prompts(num_prompts=100, max_words=200):
         prompts = []
         for item in data[:num_prompts]:
             text = item.get('text', '')
-            words = text.split()
-            truncated = ' '.join(words[:max_words])
+            truncated = _truncate_prompt(text, tokenizer, max_tokens) if tokenizer else text
             prompts.append(truncated)
         print(f"[+] Loaded {len(prompts)} prompts from examples.json")
         return prompts
@@ -76,8 +86,7 @@ def load_c4_prompts(num_prompts=100, max_words=200):
                         break
                     obj = json.loads(line)
                     text = obj.get('text', '')
-                    words = text.split()
-                    truncated = ' '.join(words[:max_words])
+                    truncated = _truncate_prompt(text, tokenizer, max_tokens) if tokenizer else text
                     prompts.append(truncated)
             if len(prompts) >= num_prompts:
                 break
@@ -201,9 +210,10 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
             gen_time = time.time() - gen_start
             results["generation_times"].append(gen_time)
 
-            # Tokenize generated text
-            gen_enc = tokenizer(generated_text, return_tensors="pt", add_special_tokens=False)
-            generated_ids = gen_enc["input_ids"][0].cpu().tolist()
+            # Use the exact generated token IDs from model.generate. Re-tokenizing
+            # decoded text can alter token boundaries and corrupt the detection
+            # statistic because Detect needs log p_theta(y | x) for the sampled y.
+            generated_ids = metadata["generated_ids"]
 
             # Save the exact per-sample key produced by wm.generate(seed=seed+i).
             sample_seed = seed + i
@@ -245,6 +255,77 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
     print(f"\n[+] Generation done: {sample_idx} samples in {total_time:.1f}s")
     print(f"[+] Results: {results_file}")
     print(f"[+] Keys: {keys_dir}/")
+    return results_file
+
+
+def generate_unwatermarked(model, tokenizer, prompts, num_tokens, seed_base):
+    """Generate a fresh unwatermarked baseline with the same prompts/settings."""
+    results_file = os.path.join(CHECKPOINT_DIR, "unwatermarked_baseline_exact.json")
+    if os.path.exists(results_file):
+        with open(results_file) as f:
+            existing = json.load(f)
+        if (
+            existing.get("config", {}).get("exact_token_ids")
+            and len(existing.get("samples", [])) >= len(prompts)
+        ):
+            print(f"[+] Fresh unwatermarked baseline already exists at {results_file}, skipping generation...")
+            return results_file
+
+    print(f"\n[+] Generating fresh unwatermarked baseline ({len(prompts)} prompts)...")
+    results = {
+        "config": {
+            "watermarked": False,
+            "num_tokens": num_tokens,
+            "num_prompts": len(prompts),
+            "seed_base": seed_base,
+            "exact_token_ids": True,
+        },
+        "samples": [],
+        "generation_times": [],
+    }
+
+    for i, prompt in enumerate(prompts):
+        if i % 20 == 0:
+            print(f"  Unwatermarked: {i}/{len(prompts)}")
+        sample_seed = seed_base + i
+        torch.manual_seed(sample_seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(sample_seed)
+        enc = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
+        input_ids = enc["input_ids"].to(model.device)
+        attention_mask = enc.get("attention_mask")
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(model.device)
+        start = time.time()
+        with torch.no_grad():
+            outputs = model.generate(
+                input_ids,
+                attention_mask=attention_mask,
+                max_new_tokens=num_tokens,
+                do_sample=True,
+                temperature=1.0,
+                top_p=0.9,
+                pad_token_id=getattr(model.config, "pad_token_id", None) or 0,
+            )
+        gen_time = time.time() - start
+        generated_ids = outputs[0][input_ids.shape[1]:].detach().cpu().tolist()
+        generated_text = tokenizer.decode(generated_ids, skip_special_tokens=True)
+        results["generation_times"].append(gen_time)
+        results["samples"].append({
+            "sample_idx": i,
+            "prompt_idx": i,
+            "seed": sample_seed,
+            "sample_seed": sample_seed,
+            "prompt_text": prompt[:500],
+            "generated_text": generated_text,
+            "generated_ids": generated_ids,
+            "gen_time": gen_time,
+            "num_generated_tokens": len(generated_ids),
+        })
+
+    with open(results_file, "w") as f:
+        json.dump(results, f, indent=2)
+    print(f"[+] Unwatermarked baseline saved to {results_file}")
     return results_file
 
 
@@ -422,43 +503,6 @@ def compute_c4_cross_entropy(model, tokenizer, prompts, layer_idx, weight_name, 
     return metrics
 
 
-def load_unwatermarked_baseline(num_samples=100):
-    """Load unwatermarked baseline samples from previous job.
-
-    The previous successful job (ee2ace3f-95b) generated 100 unwatermarked samples
-    and ran detection on them. Those p-values are in:
-        /home/user/checkpoints/unwatermarked_baseline_unwatermarked_detection_full.json
-
-    This function loads those pre-computed p-values for the FPR calculation.
-    Returns (samples, p_values) where samples is the raw data and p_values is the list
-    of pre-computed detection p-values.
-    """
-    # Try to load pre-computed detection results from previous job
-    detection_path = os.path.join(CHECKPOINT_DIR, "unwatermarked_baseline_unwatermarked_detection_full.json")
-    if os.path.exists(detection_path):
-        with open(detection_path) as f:
-            det_data = json.load(f)
-        p_values = det_data.get("p_values", [])
-        if len(p_values) >= 50:
-            print(f"[+] Using pre-computed unwatermarked p-values ({len(p_values)} samples)")
-            print(f"    Median p={np.median(p_values):.4f}, FPR@0.05={np.mean([p<0.05 for p in p_values]):.4f}")
-            # Return a dummy samples list with the right length
-            return [{"dummy": True}] * len(p_values), p_values
-
-    # Fallback: try raw baseline
-    baseline_path = os.path.join(CHECKPOINT_DIR, "unwatermarked_baseline.json")
-    if os.path.exists(baseline_path):
-        with open(baseline_path) as f:
-            d = json.load(f)
-        samples = d.get("samples", d) if isinstance(d, dict) else d
-        if samples and len(samples[0].get("generated_ids", [])) >= 50:
-            print(f"[+] Loading unwatermarked baseline ({len(samples)} samples)")
-            return samples, None
-
-    print(f"[+] No usable unwatermarked baseline found, will use watermarked-only detection")
-    return None, None
-
-
 def main():
     print("=" * 60)
     print("  GaussMark Reproduction Pipeline")
@@ -469,9 +513,9 @@ def main():
     model.tokenizer = tokenizer
 
     # Load C4 prompts
-    prompts = load_c4_prompts(num_prompts=NUM_PROMPTS)
+    prompts = load_c4_prompts(num_prompts=NUM_PROMPTS, tokenizer=tokenizer)
 
-    # Step 1: Generate watermarked text with sigma=1e-5
+    # Step 1: Generate watermarked text with sigma=sqrt(1e-5)
     cfg_name = f"wm_l{LAYER_IDX}_{WEIGHT_NAME}_s{SIGMA}".replace('.', '')
     wm_results_file = generate_watermarked(
         model=model, tokenizer=tokenizer, prompts=prompts,
@@ -494,35 +538,19 @@ def main():
         output_prefix=os.path.join(CHECKPOINT_DIR, f"wm_{cfg_name}_detection"),
     )
 
-    # Step 3: Load unwatermarked baseline (prefer pre-computed from previous job)
-    uw_raw, uw_preexisting_pvalues = load_unwatermarked_baseline()
-    uw_samples = None
-    uw_metrics = {}
-
-    if uw_preexisting_pvalues is not None:
-        # Use pre-computed unwatermarked p-values from previous job
-        print(f"\n[+] Using pre-computed unwatermarked p-values ({len(uw_preexisting_pvalues)} samples)")
-        uw_metrics = {
-            "p_values": uw_preexisting_pvalues,
-            "median_p_value": float(np.median(uw_preexisting_pvalues)),
-            "mean_p_value": float(np.mean(uw_preexisting_pvalues)),
-            "std_p_value": float(np.std(uw_preexisting_pvalues)),
-            "detection_rate_fpr_0.05": float(sum(1 for p in uw_preexisting_pvalues if p < 0.05) / len(uw_preexisting_pvalues)),
-            "detection_rate_fpr_0.01": float(sum(1 for p in uw_preexisting_pvalues if p < 0.01) / len(uw_preexisting_pvalues)),
-        }
-    elif uw_raw is not None:
-        # Generate and detect on unwatermarked text
-        print(f"\n[+] Generating unwatermarked baseline ({len(uw_raw)} samples)...")
-        uw_samples = uw_raw
-        uw_config = {"_keys_dir": None}
-        uw_metrics = run_detection(
-            model=model, tokenizer=tokenizer, samples=uw_samples,
-            config=uw_config, layer_idx=LAYER_IDX,
-            weight_name=WEIGHT_NAME, sigma=SIGMA,
-            output_prefix=os.path.join(CHECKPOINT_DIR, "uw_baseline_detection"),
-        )
-    else:
-        print(f"\n[+] No unwatermarked baseline, using watermarked-only metrics")
+    # Step 3: Generate and detect a fresh unwatermarked baseline in this run.
+    uw_results_file = generate_unwatermarked(
+        model=model, tokenizer=tokenizer, prompts=prompts,
+        num_tokens=NUM_TOKENS, seed_base=SEED_BASE,
+    )
+    with open(uw_results_file) as f:
+        uw_data = json.load(f)
+    uw_metrics = run_detection(
+        model=model, tokenizer=tokenizer, samples=uw_data["samples"],
+        config={"_keys_dir": None}, layer_idx=LAYER_IDX,
+        weight_name=WEIGHT_NAME, sigma=SIGMA,
+        output_prefix=os.path.join(CHECKPOINT_DIR, "unwatermarked_baseline_unwatermarked_detection"),
+    )
 
     # Step 4: Compute AUC using both watermarked p-values and unwatermarked p-values
     if wm_metrics["p_values"] and uw_metrics.get("p_values"):

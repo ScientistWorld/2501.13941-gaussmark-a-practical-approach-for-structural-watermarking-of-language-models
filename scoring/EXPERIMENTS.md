@@ -10,14 +10,13 @@ This file describes the experiments in `scoring/scores.json`. Each experiment na
 
 **Setup:**
 - Model: Mistral-7B-Instruct-v0.3 (HuggingFace `mistralai/Mistral-7B-Instruct-v0.3`)
-- Prompts: 100 prompts from C4 realnewslike dataset (truncated to ≤200 words each)
+- Prompts: 100 prompts from C4 realnewslike dataset (truncated to ≤200 tokens each)
 - Generation: 200 tokens per prompt, temperature=1.0, top-p=0.9
-- Watermark: Layer 20, `up_proj` weight, Gaussian noise xi ~ N(0, sigma^2); for Mistral Table 2 reports variance sigma^2=1e-5, so the implementation uses standard deviation sigma=sqrt(1e-5)
-- Detection: Gradient-based test statistic psi = <xi, grad>/(sigma * ||grad||), p-value from N(0,1)
-- Quality constraint: C4 cross-entropy is computed on the same prompts for the original and perturbed model and reported as ratio/delta
+- Detection: significance-thresholded p-values at 5% and 1% false-positive thresholds, plus median p-value and AUC
+- Quality constraint: C4 cross-entropy is reported as a ratio/delta between the marked and original model on the same prompt source
 
 **Methods evaluated:**
-1. `gaussmark_200_tokens` — sigma=sqrt(1e-5), 100 prompts by default
+1. `gaussmark_200_tokens` — primary marked-generation result, 100 prompts by default
 2. `unwatermarked` — no watermark applied, 100 samples (for FPR baseline)
 
 **What success looks like:**

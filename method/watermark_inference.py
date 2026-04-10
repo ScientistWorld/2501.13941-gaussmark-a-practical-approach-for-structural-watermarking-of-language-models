@@ -6,7 +6,8 @@ This script implements the inference-time watermarking described in the paper:
 - Loads Mistral-7B-Instruct from the specified path
 - Loads the first 100 prompts from the C4 realnewslike dataset
 - Truncates each prompt to 200 tokens (as in the paper)
-- Runs GaussMark.Generate with sigma=1e-5 (Table 2 for Mistral)
+- Runs GaussMark.Generate with sigma=sqrt(1e-5), because Table 2 reports
+  variance sigma^2=1e-5 for Mistral
 - Saves generated text and watermark keys for later detection
 
 Usage:
@@ -24,6 +25,7 @@ import os
 import sys
 import time
 import statistics
+import math
 from pathlib import Path
 
 import torch
@@ -50,6 +52,7 @@ DEFAULT_MODEL_PATH = "/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
 DEFAULT_DATA_PATH = "/home/user/data/c4_realnewslike"
 DEFAULT_OUTPUT_PATH = "/home/user/checkpoints/watermarked_outputs.json"
 DEFAULT_OUTPUT_DIR = "/home/user/checkpoints"
+DEFAULT_SIGMA = math.sqrt(1e-5)
 
 
 def load_model_and_tokenizer(
@@ -175,7 +178,7 @@ def run_watermark_generation(
     prompts: list,
     layer_idx: int = 20,
     weight_name: str = "up_proj",
-    sigma: float = 1e-5,
+    sigma: float = DEFAULT_SIGMA,
     num_tokens: int = 200,
     num_seeds: int = 3,
     seed_base: int = 42,
@@ -196,7 +199,7 @@ def run_watermark_generation(
         prompts:      List of input prompt strings.
         layer_idx:    Transformer layer to watermark. Default: 20.
         weight_name:  MLP weight name to perturb. Default: 'up_proj'.
-        sigma:        Gaussian noise standard deviation. Default: 1e-5.
+        sigma:        Gaussian noise standard deviation. Default: sqrt(1e-5).
         num_tokens:   Number of tokens to generate. Default: 200.
         num_seeds:    Number of seeds (watermark keys) per prompt. Default: 3.
         seed_base:    Base seed for reproducibility. Default: 42.
@@ -278,13 +281,7 @@ def run_watermark_generation(
             gen_time = time.time() - gen_start
             results["generation_times"].append(gen_time)
 
-            # Tokenize generated text
-            gen_enc = tokenizer(
-                generated_text,
-                return_tensors="pt",
-                add_special_tokens=False,
-            )
-            generated_ids = gen_enc["input_ids"][0].cpu().tolist()
+            generated_ids = metadata["generated_ids"]
 
             # Save the watermark key to a .npy file (too large for JSON)
             keys_dir = Path(results.get("_keys_dir", DEFAULT_OUTPUT_DIR)) / "watermark_keys"
@@ -405,8 +402,8 @@ def main():
     parser.add_argument(
         "--sigma",
         type=float,
-        default=1e-5,
-        help="Gaussian noise std dev (default: 1e-5, per paper Table 2 for Mistral)",
+        default=DEFAULT_SIGMA,
+        help="Gaussian noise std dev (default: sqrt(1e-5), because Table 2 reports Mistral variance)",
     )
     parser.add_argument(
         "--device",

@@ -14,6 +14,7 @@ import json
 import os
 import sys
 import time
+import math
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 import numpy as np
@@ -21,6 +22,9 @@ import numpy as np
 # Add method to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 from gaussmark import GaussMark, compute_p_value
+
+
+DEFAULT_SIGMA = math.sqrt(1e-5)
 
 
 def load_model_and_tokenizer(model_path: str, device: str = "cuda"):
@@ -72,7 +76,7 @@ def run_experiment(
     prompts: list,
     layer_idx: int = 20,
     weight_name: str = "up_proj",
-    sigma: float = 1e-5,
+    sigma: float = DEFAULT_SIGMA,
     num_tokens: int = 200,
     num_seeds: int = 3,
     device: str = "cuda",
@@ -145,16 +149,14 @@ def run_experiment(
             )
             gen_time = time.time() - gen_start
 
-            # Tokenize generated text
-            gen_enc = tokenizer(generated_text, return_tensors="pt", add_special_tokens=False)
-            generated_ids = gen_enc["input_ids"][0]
+            generated_ids = metadata["generated_ids"]
 
             sample = {
                 "prompt_idx": i,
                 "seed": seed + i,
                 "prompt_text": prompt[:500],
                 # Don't store full generated_text to save memory
-                "generated_ids": generated_ids.cpu().tolist(),
+                "generated_ids": generated_ids,
                 "watermark_key_shape": list(watermark_key.shape),
                 "watermark_key_dtype": str(watermark_key.dtype),
                 "gen_time": gen_time,
@@ -197,7 +199,7 @@ def main():
     parser.add_argument("--num_seeds", type=int, default=3)
     parser.add_argument("--layer_idx", type=int, default=20)
     parser.add_argument("--weight_name", type=str, default="up_proj")
-    parser.add_argument("--sigma", type=float, default=1e-5)
+    parser.add_argument("--sigma", type=float, default=DEFAULT_SIGMA)
     parser.add_argument("--output_dir", type=str, default="/home/user/checkpoints")
     parser.add_argument("--device", type=str, default="cuda")
     args = parser.parse_args()

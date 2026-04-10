@@ -19,40 +19,14 @@ echo "Model: $MODEL_PATH"
 echo "Data: $DATA_PATH"
 echo "Output: $OUTPUT_DIR"
 
-# Step 1: Generate watermarked text
+# Step 1: Run the end-to-end GaussMark pipeline
 echo ""
-echo "Step 1: Generating watermarked text..."
-python3 method/run_watermark.py \
-    --model_path "$MODEL_PATH" \
-    --data_path "$DATA_PATH" \
-    --num_prompts 20 \
-    --num_tokens 200 \
-    --num_seeds 1 \
-    --layer_idx 20 \
-    --weight_name up_proj \
-    --sigma 0.032 \
-    --output_dir "$OUTPUT_DIR" \
-    --device cuda
+echo "Step 1: Running generation, detection, and quality check..."
+python3 method/run_pipeline.py
 
-# Step 2: Run detection
+# Step 2: Evaluate
 echo ""
-echo "Step 2: Running watermark detection..."
-RESULTS_FILE="$OUTPUT_DIR/watermarked_layer20_up_proj_sigma3e-02.json"
-if [ -f "$RESULTS_FILE" ]; then
-    python3 method/detect.py \
-        --results_path "$RESULTS_FILE" \
-        --model_path "$MODEL_PATH" \
-        --layer_idx 20 \
-        --weight_name up_proj \
-        --sigma 0.032 \
-        --device cuda
-else
-    echo "Warning: Results file not found at $RESULTS_FILE"
-fi
-
-# Step 3: Evaluate
-echo ""
-echo "Step 3: Evaluating..."
+echo "Step 2: Evaluating..."
 bash scripts/evaluate.sh "$OUTPUT_DIR" watermark_detection_mistral
 
 echo ""
