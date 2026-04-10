@@ -13,7 +13,7 @@
 
 ## Results
 
-### sigma=0.001 (Instruct model, 100 prompts) — core_claim achieved
+### sigma=0.001 (Instruct model, 100 prompts) — prior method_runs result
 - **Detection rate at FPR=0.05**: 21.7% (vs 3% unwatermarked baseline)
 - **Detection rate at FPR=0.01**: 6.0%
 - **Median p-value**: 0.195 — significant shift from uniform 0.50
@@ -29,17 +29,24 @@
 - **ROC AUC**: 0.917
 
 ## Key Findings
-1. Paper's sigma=1e-5 (for base Mistral-7B) produces nearly undetectable watermarks on Mistral-7B-Instruct-v0.3 (~4% detection)
-2. sigma=1e-3 gives detectable results (~22% at FPR=5%), clearly above 3% baseline
-3. sigma=0.032 gives strong results (~85% detection)
-4. Instruct models have lower entropy sequences, requiring larger sigma for detectable watermarks
+1. A prior run with sigma=1e-3 gives detectable results (~22% at FPR=5%), clearly above 3% baseline
+2. A prior run with sigma=0.032 gives strong results (~85% detection), but this larger perturbation must be constrained by quality metrics
+3. Table 2 reports variance sigma^2. The current pipeline uses standard deviation sigma=sqrt(1e-5) for the paper's Mistral setting.
+4. C4 cross-entropy ratio/delta were added as lightweight quality constraints before claiming `core_claim`.
 
 ## Deviations from Paper
 - Using Mistral-7B-Instruct-v0.3 (paper uses base model)
-- Using larger sigma (1e-3 to 0.032 vs paper's 1e-5) due to Instruct model
+- Using Mistral-7B-Instruct-v0.3 instead of the paper's base Mistral-7B
+- The current submitted run uses the paper's Mistral variance interpreted correctly as sigma=sqrt(1e-5), but on the Instruct variant
 - Using 100 prompts × 1 seed (paper uses 1000 × 3 seeds)
-- No quality evaluation on SuperGLUE/GSM-8K benchmarks (requires lm-evaluation-harness)
+- Using C4 cross-entropy as a lightweight quality constraint instead of full SuperGLUE/GSM-8K benchmark runs
 - No AlpacaEval-2.0 evaluation (requires GPT-4o API)
+
+## Current Submitted Job
+
+- Runs GaussMark on Mistral-7B-Instruct-v0.3 with layer 20 `up_proj`, sigma=sqrt(1e-5), 100 C4 realnewslike prompts, and 200 generated tokens.
+- Regenerates/uses per-sample watermark keys for detection.
+- Writes detection metrics plus unwatermarked FPR and C4 cross-entropy quality ratio/delta to `scoring/scores.json`.
 
 ## Environment Structure
 - `method/`: GaussMark implementation (gaussmark.py)

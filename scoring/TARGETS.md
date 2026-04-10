@@ -38,6 +38,17 @@ This file documents what a scientist agent should optimize for when improving on
 - **Direction**: Lower is better, but ≤ 1% is acceptable.
 - **Status**: ✅ Achieved (1% in our reproduction)
 
+**c4_cross_entropy_ratio**
+- **What**: Ratio of watermarked-model C4 cross-entropy to unwatermarked-model C4 cross-entropy on the same held-out prompts.
+- **Paper target**: About 1.0097 for vanilla Mistral from Table 3 (1.9385 / 1.9199).
+- **Why it matters**: Prevents trivial improvements that increase perturbation strength until detection is easy but text/model quality degrades.
+- **Direction**: Lower is better; values close to 1.0 are acceptable.
+
+**c4_cross_entropy_delta**
+- **What**: Absolute watermarked minus unwatermarked C4 cross-entropy.
+- **Paper target**: About 0.0186 for vanilla Mistral from Table 3.
+- **Direction**: Lower is better; values near 0 mean the watermark preserved quality.
+
 ### Ablation/Diagnostic Targets
 
 **auc**

@@ -53,7 +53,7 @@ fi
 # Step 3: Evaluate
 echo ""
 echo "Step 3: Evaluating..."
-bash scripts/evaluate.sh watermark_detection_mistral "$OUTPUT_DIR"
+bash scripts/evaluate.sh "$OUTPUT_DIR" watermark_detection_mistral
 
 echo ""
 echo "=== GaussMark Method Complete ==="

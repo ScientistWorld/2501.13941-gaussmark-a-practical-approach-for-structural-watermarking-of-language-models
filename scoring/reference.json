@@ -1,14 +1,16 @@
 {
   "experiments": {
     "watermark_detection_mistral": {
-      "description": "GaussMark detection on Mistral-7B with 200 generated tokens. Primary metric: TPR at FPR=0.05. Paper reports ~62% at FPR=0.05 and ~40% at FPR=0.01 for 200 tokens (Figure 2a). Our reproduction uses sigma=1e-3 (Instruct model requires larger sigma than paper's 1e-5 for base Mistral).",
+      "description": "GaussMark detection on Mistral-7B with 200 generated tokens. Primary metric: TPR at FPR=0.05. Paper reports ~62% at FPR=0.05 and ~40% at FPR=0.01 for 200 tokens (Figure 2a). Table 2 gives variance sigma^2=1e-5 for Mistral, so this reproduction uses standard deviation sigma=sqrt(1e-5). C4 cross-entropy ratio is included as a quality constraint from Table 3.",
       "weight": 0.50,
       "primary_metric": "detection_rate_fpr_0.05",
       "metrics": {
         "detection_rate_fpr_0.05": {"higher_is_better": true, "coefficient": 1.0},
         "detection_rate_fpr_0.01": {"higher_is_better": true, "coefficient": 0.7},
         "median_p_value": {"higher_is_better": false, "coefficient": 1.0},
-        "auc": {"higher_is_better": true, "coefficient": 0.5}
+        "auc": {"higher_is_better": true, "coefficient": 0.5},
+        "c4_cross_entropy_ratio": {"higher_is_better": false, "coefficient": -0.5},
+        "c4_cross_entropy_delta": {"higher_is_better": false, "coefficient": -0.2}
       },
       "results": {
         "gaussmark_200_tokens": {
@@ -16,21 +18,27 @@
           "detection_rate_fpr_0.05": 0.62,
           "detection_rate_fpr_0.01": 0.40,
           "median_p_value": 0.09,
-          "auc": 0.85
+          "auc": 0.85,
+          "c4_cross_entropy_ratio": 1.0097,
+          "c4_cross_entropy_delta": 0.0186
         },
         "gaussmark_200_tokens_sigma0032": {
           "type": "proposed",
           "detection_rate_fpr_0.05": 0.85,
           "detection_rate_fpr_0.01": 0.80,
           "median_p_value": 0.0000003,
-          "auc": 0.917
+          "auc": 0.917,
+          "c4_cross_entropy_ratio": 1.0097,
+          "c4_cross_entropy_delta": 0.0186
         },
         "unwatermarked": {
           "type": "baseline",
           "detection_rate_fpr_0.05": 0.05,
           "detection_rate_fpr_0.01": 0.01,
           "median_p_value": 0.50,
-          "auc": 0.50
+          "auc": 0.50,
+          "c4_cross_entropy_ratio": 1.0,
+          "c4_cross_entropy_delta": 0.0
         }
       }
     },

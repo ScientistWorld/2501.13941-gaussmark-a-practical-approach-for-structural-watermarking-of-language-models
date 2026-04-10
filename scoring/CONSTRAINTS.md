@@ -7,7 +7,7 @@ These constraints define what a scientist must hold fixed when trying to improve
 ## Model
 - **Required:** Mistral-7B-Instruct-v0.3 from HuggingFace (`mistralai/Mistral-7B-Instruct-v0.3`)
 - **Why fixed:** The paper's contribution is a structural watermark. Switching to a different model family (Llama, Phi, Gemma) or a different size variant changes the problem entirely.
-- **Deviation in our reproduction:** We use the Instruct variant; the paper uses base Mistral-7B. The Instruct model requires larger sigma (1e-3 vs 1e-5) due to lower entropy sequences.
+- **Deviation in our reproduction:** We use the Instruct variant; the paper uses base Mistral-7B.
 
 ## Watermark Target Parameters
 - **Required layer:** Layer 20 (0-indexed: `model.model.layers[20]`)
@@ -21,10 +21,11 @@ These constraints define what a scientist must hold fixed when trying to improve
 - **Shape constraint:** Key must be a full-rank isotropic Gaussian vector, not a structured or low-rank perturbation
 
 ## Sigma (Perturbation Strength)
-- **Allowed range:** 1e-5 to 0.1
+- **Primary setting:** Use standard deviation `sigma=sqrt(1e-5)` for the Mistral experiment because the paper reports variance `sigma^2=1e-5`.
+- **Allowed range for diagnostic experiments:** 1e-5 to 0.1
 - **Required constraint:** Sigma must be chosen before seeing test-set detection results
 - **Prohibited:** Fitting sigma to maximize detection rates on the test set post-hoc
-- **Note:** For Instruct models, sigma must be larger (e.g., 1e-3) than for base models (e.g., 1e-5) to achieve detectable watermarks
+- **Note:** If exploring different sigma values on the Instruct model, report them as separate diagnostic experiments and include the C4 cross-entropy quality constraint.
 
 ## Data
 - **Prompts:** C4 realnewslike dataset, train split, first 2000 examples, truncated to ≤200 words per prompt

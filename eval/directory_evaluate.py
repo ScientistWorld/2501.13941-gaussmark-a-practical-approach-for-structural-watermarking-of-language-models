@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Evaluate GaussMark-style result artifacts without importing method code."""
+
+from __future__ import annotations
+
+import argparse
+import glob
+import json
+import os
+from typing import Any
+
+
+def load_p_values(path: str) -> tuple[list[float], dict[str, Any]]:
+    with open(path) as f:
+        data = json.load(f)
+    return [float(p) for p in data.get("p_values", [])], data
+
+
+def detection_metrics(p_values: list[float]) -> dict[str, float]:
+    if not p_values:
+        return {}
+    sorted_p = sorted(p_values)
+    n = len(sorted_p)
+    median = sorted_p[n // 2] if n % 2 else (sorted_p[n // 2 - 1] + sorted_p[n // 2]) / 2
+    return {
+        "detection_rate_fpr_0.05": sum(p < 0.05 for p in sorted_p) / n,
+        "detection_rate_fpr_0.01": sum(p < 0.01 for p in sorted_p) / n,
+        "median_p_value": median,
+    }
+
+
+def pairwise_auc(p_wm: list[float], p_uwm: list[float]) -> float:
+    wins = sum(1 for p_i in p_wm for p_j in p_uwm if p_i < p_j)
+    ties = sum(1 for p_i in p_wm for p_j in p_uwm if p_i == p_j)
+    return (wins + 0.5 * ties) / (len(p_wm) * len(p_uwm))
+
+
+def latest_watermarked_file(results_dir: str) -> str | None:
+    patterns = [
+        "wm_wm_l20_up_proj_s*_detection_full.json",
+        "watermarked_layer20_up_proj_sigma*_detection_full.json",
+    ]
+    candidates: list[str] = []
+    for pattern in patterns:
+        candidates.extend(glob.glob(os.path.join(results_dir, pattern)))
+    candidates = [p for p in candidates if os.path.isfile(p)]
+    if not candidates:
+        return None
+    return max(candidates, key=os.path.getmtime)
+
+
+def evaluate(results_dir: str, experiment: str) -> dict[str, Any]:
+    scores: dict[str, Any] = {"experiments": {experiment: {"results": {}}}}
+
+    wm_path = latest_watermarked_file(results_dir)
+    p_wm: list[float] = []
+    wm_data: dict[str, Any] = {}
+    if wm_path:
+        p_wm, wm_data = load_p_values(wm_path)
+        if p_wm:
+            wm_scores = detection_metrics(p_wm)
+            for key in ("auc", "c4_cross_entropy_ratio", "c4_cross_entropy_delta"):
+                if key in wm_data:
+                    wm_scores[key] = float(wm_data[key])
+            scores["experiments"][experiment]["results"]["gaussmark_200_tokens"] = wm_scores
+            print(f"Watermarked p-values: {len(p_wm)} from {wm_path}")
+    else:
+        print("No watermarked detection result file found.")
+
+    uwm_path = os.path.join(results_dir, "unwatermarked_baseline_unwatermarked_detection_full.json")
+    p_uwm: list[float] = []
+    if os.path.exists(uwm_path):
+        p_uwm, _ = load_p_values(uwm_path)
+        if p_uwm:
+            uwm_scores = detection_metrics(p_uwm)
+            uwm_scores["c4_cross_entropy_ratio"] = 1.0
+            uwm_scores["c4_cross_entropy_delta"] = 0.0
+            scores["experiments"][experiment]["results"]["unwatermarked"] = uwm_scores
+            print(f"Unwatermarked p-values: {len(p_uwm)} from {uwm_path}")
+    else:
+        print(f"Unwatermarked result file not found: {uwm_path}")
+
+    if p_wm and p_uwm:
+        scores["experiments"][experiment]["results"]["gaussmark_200_tokens"]["auc"] = pairwise_auc(p_wm, p_uwm)
+
+    return scores
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--results-dir", default="/home/user/checkpoints")
+    parser.add_argument("--experiment", default="watermark_detection_mistral")
+    parser.add_argument("--output", default="/home/user/scoring/scores.json")
+    args = parser.parse_args()
+
+    scores = evaluate(args.results_dir, args.experiment)
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    with open(args.output, "w") as f:
+        json.dump(scores, f, indent=2)
+    print(json.dumps(scores, indent=2))
+    print(f"Scores written to {args.output}")
+
+
+if __name__ == "__main__":
+    main()

@@ -23,6 +23,7 @@ from pathlib import Path
 import torch
 import numpy as np
 from scipy.stats import norm
+import math
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 
@@ -36,11 +37,14 @@ C4_DATA_PATH = "/home/user/data/c4_realnewslike"
 # Paper parameters for Mistral-7B (from Table 2)
 LAYER_IDX = 20
 WEIGHT_NAME = "up_proj"
-SIGMA = 1e-3  # sigma=1e-5 too small (4% detection). sigma=1e-3 expected ~20-40%.
+# Table 2 reports variance sigma^2=1e-5 for Mistral-7B. The code parameter is
+# the standard deviation sigma used in xi ~ N(0, sigma^2 I).
+SIGMA = math.sqrt(1e-5)
 NUM_TOKENS = 200
 NUM_PROMPTS = 100  # 100 prompts × 1 seed = 100 samples for better stats
 NUM_SEEDS = 1
 SEED_BASE = 42
+QUALITY_PROMPTS = 25
 
 
 def load_c4_prompts(num_prompts=100, max_words=200):
@@ -129,13 +133,16 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
             samples = existing.get('samples', [])
             pt_missing = []
             for s in samples:
-                pt = s.get("watermark_key_path", "")
-                if not pt.endswith('.pt'):
-                    pt = pt.replace('.npy', '.pt')
+                expected_seed = s.get("sample_seed", s.get("seed", SEED_BASE))
+                pt = os.path.join(keys_dir, f"key_seed{expected_seed}.pt")
                 if not os.path.exists(pt):
                     pt_missing.append(s)
+                else:
+                    s["watermark_key_path"] = pt
             if not pt_missing:
-                print(f"[+] Generation + .pt keys already exist at {results_file}, skipping...")
+                print(f"[+] Generation + per-sample .pt keys already exist at {results_file}, skipping...")
+                with open(results_file, 'w') as f:
+                    json.dump(existing, f, indent=2)
                 return results_file
             else:
                 print(f"[+] Generation exists but .pt keys missing for {len(pt_missing)} samples, regenerating...")
@@ -143,7 +150,7 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
                 wm = GaussMark(model=model, layer_idx=layer_idx, weight_name=weight_name,
                                sigma=sigma, device="cuda")
                 for s in pt_missing:
-                    seed = s.get("seed", SEED_BASE)
+                    seed = s.get("sample_seed", s.get("seed", SEED_BASE))
                     key = wm.regenerate_watermark_key(seed)
                     pt = os.path.join(keys_dir, f"key_seed{seed}.pt")
                     torch.save(torch.from_numpy(key), pt)
@@ -198,16 +205,16 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
             gen_enc = tokenizer(generated_text, return_tensors="pt", add_special_tokens=False)
             generated_ids = gen_enc["input_ids"][0].cpu().tolist()
 
-            # Save watermark key to file with path that includes seed
-            # Key is generated with outer seed (seed) for this seed_idx
-            key_path = os.path.join(keys_dir, f"key_seed{seed}.pt")
+            # Save the exact per-sample key produced by wm.generate(seed=seed+i).
+            sample_seed = seed + i
+            key_path = os.path.join(keys_dir, f"key_seed{sample_seed}.pt")
             torch.save(torch.from_numpy(watermark_key), key_path)
 
             sample = {
                 "sample_idx": sample_idx,
                 "prompt_idx": i,
                 "seed": seed,
-                "sample_seed": seed + i,
+                "sample_seed": sample_seed,
                 "prompt_text": prompt[:500],
                 "generated_text": generated_text,
                 "generated_ids": generated_ids,
@@ -367,6 +374,54 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
     return metrics
 
 
+def compute_c4_cross_entropy(model, tokenizer, prompts, layer_idx, weight_name, sigma):
+    """Compute a lightweight C4 CE quality constraint before/after watermarking."""
+    texts = prompts[:QUALITY_PROMPTS]
+    print(f"\n[+] Computing C4 cross-entropy quality check on {len(texts)} prompts...")
+
+    def mean_ce():
+        losses = []
+        with torch.no_grad():
+            for text in texts:
+                enc = tokenizer(
+                    text,
+                    return_tensors="pt",
+                    truncation=True,
+                    max_length=256,
+                )
+                input_ids = enc["input_ids"].to(model.device)
+                attention_mask = enc.get("attention_mask")
+                if attention_mask is not None:
+                    attention_mask = attention_mask.to(model.device)
+                out = model(input_ids=input_ids, attention_mask=attention_mask, labels=input_ids)
+                losses.append(float(out.loss.item()))
+        return float(statistics.mean(losses))
+
+    wm = GaussMark(model=model, layer_idx=layer_idx, weight_name=weight_name,
+                   sigma=sigma, device="cuda")
+    base_ce = mean_ce()
+
+    key = wm.regenerate_watermark_key(SEED_BASE)
+    key_tensor = torch.from_numpy(key).to(model.device, dtype=wm.target_param.dtype)
+    original_data = wm.target_param.data.clone()
+    wm.target_param.data = (wm.target_param.data + key_tensor).to(dtype=wm.target_param.dtype)
+    try:
+        watermarked_ce = mean_ce()
+    finally:
+        wm.target_param.data = original_data
+
+    metrics = {
+        "c4_cross_entropy_unwatermarked": base_ce,
+        "c4_cross_entropy_watermarked": watermarked_ce,
+        "c4_cross_entropy_delta": watermarked_ce - base_ce,
+        "c4_cross_entropy_ratio": watermarked_ce / base_ce if base_ce > 0 else float("inf"),
+    }
+    print(f"    Unwatermarked CE: {base_ce:.4f}")
+    print(f"    Watermarked CE:   {watermarked_ce:.4f}")
+    print(f"    CE ratio:         {metrics['c4_cross_entropy_ratio']:.4f}")
+    return metrics
+
+
 def load_unwatermarked_baseline(num_samples=100):
     """Load unwatermarked baseline samples from previous job.
 
@@ -484,20 +539,40 @@ def main():
         except:
             pass
 
+    # Step 5: Compute a lightweight no-quality-loss constraint.
+    quality_metrics = compute_c4_cross_entropy(
+        model=model, tokenizer=tokenizer, prompts=prompts,
+        layer_idx=LAYER_IDX, weight_name=WEIGHT_NAME, sigma=SIGMA,
+    )
+    wm_metrics.update(quality_metrics)
+    detection_full_path = os.path.join(CHECKPOINT_DIR, f"wm_{cfg_name}_detection_full.json")
+    if os.path.exists(detection_full_path):
+        with open(detection_full_path) as f:
+            detection_full = json.load(f)
+        detection_full.update(quality_metrics)
+        with open(detection_full_path, "w") as f:
+            json.dump(detection_full, f, indent=2)
+
     # Step 6: Write scores.json
     scores = {
-        "watermark_detection_mistral": {
-            "results": {
-                "gaussmark_200_tokens": {
-                    "detection_rate_fpr_0.05": wm_metrics["detection_rate_fpr_0.05"],
-                    "detection_rate_fpr_0.01": wm_metrics["detection_rate_fpr_0.01"],
-                    "median_p_value": wm_metrics["median_p_value"],
-                    "auc": wm_metrics.get("auc", 0.5),
-                },
-                "unwatermarked": {
-                    "detection_rate_fpr_0.05": uw_metrics["detection_rate_fpr_0.05"],
-                    "detection_rate_fpr_0.01": uw_metrics["detection_rate_fpr_0.01"],
-                    "median_p_value": uw_metrics["median_p_value"],
+        "experiments": {
+            "watermark_detection_mistral": {
+                "results": {
+                    "gaussmark_200_tokens": {
+                        "detection_rate_fpr_0.05": wm_metrics["detection_rate_fpr_0.05"],
+                        "detection_rate_fpr_0.01": wm_metrics["detection_rate_fpr_0.01"],
+                        "median_p_value": wm_metrics["median_p_value"],
+                        "auc": wm_metrics.get("auc", 0.5),
+                        "c4_cross_entropy_ratio": quality_metrics["c4_cross_entropy_ratio"],
+                        "c4_cross_entropy_delta": quality_metrics["c4_cross_entropy_delta"],
+                    },
+                    "unwatermarked": {
+                        "detection_rate_fpr_0.05": uw_metrics["detection_rate_fpr_0.05"],
+                        "detection_rate_fpr_0.01": uw_metrics["detection_rate_fpr_0.01"],
+                        "median_p_value": uw_metrics["median_p_value"],
+                        "c4_cross_entropy_ratio": 1.0,
+                        "c4_cross_entropy_delta": 0.0,
+                    },
                 }
             }
         }

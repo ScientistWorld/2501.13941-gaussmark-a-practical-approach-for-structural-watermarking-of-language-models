@@ -38,9 +38,9 @@ Check off items as you complete them. Order doesn't matter — work however make
 ## Milestones
 - [x] `none` — Just started
 - [x] `method_runs` — Algorithm executes end-to-end without errors
-- [x] `core_claim` — Minimum experiment supports central claim
+- [ ] `core_claim` — Minimum experiment supports central claim
 
 ## Notes
 - Model deviation: Using Mistral-7B-Instruct-v0.3 (paper uses base model)
-- Sigma deviation: 1e-3 to 0.032 (paper uses 1e-5) — Instruct model needs larger sigma
+- Sigma note: the paper reports Mistral variance sigma^2=1e-5; the current job uses standard deviation sigma=sqrt(1e-5)
 - Not reproduced: SuperGLUE/GSM-8K quality evaluation, Llama/Phi experiments, robustness

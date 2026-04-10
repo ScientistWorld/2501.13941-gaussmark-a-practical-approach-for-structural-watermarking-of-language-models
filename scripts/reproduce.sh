@@ -35,7 +35,7 @@ python3 method/detect.py \
 
 # Step 3: Evaluate
 echo "Step 3: Evaluating results..."
-bash scripts/evaluate.sh watermark_detection_mistral /home/user/checkpoints
+bash scripts/evaluate.sh /home/user/checkpoints watermark_detection_mistral
 
 # Step 4: Compare with reference
 echo "Step 4: Comparing with paper's reported numbers..."

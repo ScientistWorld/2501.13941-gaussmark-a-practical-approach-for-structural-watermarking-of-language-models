@@ -110,8 +110,8 @@ def load_watermark_key(sample: dict, config: dict) -> np.ndarray:
     """
     Load the watermark key for a sample.
 
-    The key is stored as a .npy file. If the path is not available in the sample,
-    regenerate it from the seed.
+    The key is stored with the generated sample. If the path is not available,
+    regenerate it from the recorded per-sample seed.
 
     Args:
         sample:  Sample dict from the results JSON.
@@ -120,35 +120,24 @@ def load_watermark_key(sample: dict, config: dict) -> np.ndarray:
     Returns:
         Watermark key as numpy array.
     """
-    # Try to load from saved .npy file
+    # Try to load the exact saved key first. Current pipeline outputs .pt tensors;
+    # older artifacts may contain .npy arrays.
     key_path = sample.get("watermark_key_path")
     if key_path and os.path.exists(key_path):
+        if key_path.endswith(".pt"):
+            key = torch.load(key_path, map_location="cpu")
+            if isinstance(key, torch.Tensor):
+                return key.detach().cpu().numpy()
+            return np.asarray(key)
         return np.load(key_path)
 
-    # Regenerate from seed (fallback — prefer saved .npy file above)
-    #
-    # IMPORTANT: The watermark key is generated with the OUTER seed (42 + seed_idx),
-    # NOT the per-prompt seed (42 + seed_idx + prompt_idx).
-    # In generate():
-    #   1. np.random.seed(42 + seed_idx)     # outer seed
-    #   2. watermark_key = np.random.normal(...)  # uses outer seed
-    #   3. _seed_rng(seed + i)                # advances RNG but key already generated
-    # In detect():
-    #   sample["seed"] = 42 + seed_idx + i   # per-prompt seed (WRONG for key)
-    #   sample["prompt_idx"] = i
-    #   outer_seed = seed - prompt_idx = 42 + seed_idx  # CORRECT
-    #
-    # But there is STILL a subtle bug: the key is generated BEFORE _seed_rng(seed+i),
-    # so it uses state at base_seed, NOT at base_seed+i.
-    # The stored seed (base_seed+i) was set AFTER key generation.
-    # So even with outer_seed fix, regeneration may not match for i>0.
-    #
-    # BEST FIX: use saved .npy file if available.
-    prompt_idx = sample.get("prompt_idx", 0)
-    seed = sample.get("seed")
-    if seed is not None:
-        outer_seed = int(seed) - int(prompt_idx)
-        rng = np.random.RandomState(outer_seed)
+    # Regenerate from the per-sample seed used by GaussMark.generate().
+    sample_seed = sample.get("sample_seed")
+    if sample_seed is not None:
+        rng = np.random.RandomState(int(sample_seed))
+    elif sample.get("seed") is not None:
+        prompt_idx = sample.get("prompt_idx", 0)
+        rng = np.random.RandomState(int(sample["seed"]) + int(prompt_idx))
     else:
         rng = np.random.RandomState(42)
 
