@@ -24,19 +24,19 @@ This file documents what a scientist agent should optimize for when improving on
 
 ### Constraint Targets (must stay controlled)
 
-**unwatermarked.detection_rate_fpr_0.05**
+**unwatermarked_detection_rate_fpr_0.05**
 - **What**: False-positive rate on genuinely unwatermarked text at p < 0.05 threshold.
 - **Paper target**: ~5% (uniform null). Current reproduction: 7/94 = 7.4%, slightly above the nominal threshold in a small sample.
 - **Why it matters**: If this exceeds 5%, the method falsely accuses human/other text.
 - **How to run**: Generate text without any watermark, run the same evaluator, and compute the fraction p < 0.05. Must be statistically consistent with the 5% target.
 - **Direction**: Lower is better, with values statistically consistent with 5% acceptable.
-- **Status**: Measured in `scores.json`; larger unwatermarked samples should tighten the estimate around the nominal null rate.
+- **Status**: Measured in `scores.json` as a constraint metric attached to the marked-output result; larger unwatermarked samples should tighten the estimate around the nominal null rate.
 
-**unwatermarked.detection_rate_fpr_0.01**
+**unwatermarked_detection_rate_fpr_0.01**
 - **What**: False-positive rate at p < 0.01 threshold on unwatermarked text.
 - **Paper target**: ~1%. Current reproduction: 1/94 = 1.1%.
 - **Direction**: Lower is better, with values statistically consistent with 1% acceptable.
-- **Status**: Measured in `scores.json`.
+- **Status**: Measured in `scores.json` as a constraint metric attached to the marked-output result.
 
 **c4_cross_entropy_ratio**
 - **What**: Ratio of watermarked-model C4 cross-entropy to unwatermarked-model C4 cross-entropy on the same held-out prompts.

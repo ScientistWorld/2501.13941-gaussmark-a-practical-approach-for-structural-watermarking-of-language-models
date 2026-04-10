@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate GaussMark-style result artifacts without importing method code."""
+"""Evaluate watermarking result artifacts without importing method code."""
 
 from __future__ import annotations
 
@@ -37,20 +37,28 @@ def pairwise_auc(p_wm: list[float], p_uwm: list[float]) -> float:
 
 def latest_watermarked_file(results_dir: str) -> str | None:
     patterns = [
-        "wm_wm_l20_up_proj_s*_detection_full.json",
-        "watermarked_layer20_up_proj_sigma*_detection_full.json",
+        "marked*_detection_full.json",
+        "watermarked*_detection_full.json",
+        "*wm*_detection_full.json",
+        "*watermark*_detection_full.json",
     ]
     candidates: list[str] = []
     for pattern in patterns:
         candidates.extend(glob.glob(os.path.join(results_dir, pattern)))
-    candidates = [p for p in candidates if os.path.isfile(p)]
+    candidates = [
+        p for p in candidates
+        if os.path.isfile(p)
+        and "unwatermarked" not in os.path.basename(p)
+        and "baseline" not in os.path.basename(p)
+        and "robustness" not in os.path.basename(p)
+    ]
     if not candidates:
         return None
     return max(candidates, key=os.path.getmtime)
 
 
 def latest_watermarked_generation_file(results_dir: str) -> str | None:
-    candidates = glob.glob(os.path.join(results_dir, "watermarked_wm_l20_up_proj_s*.json"))
+    candidates = glob.glob(os.path.join(results_dir, "watermarked*.json"))
     candidates = [
         p for p in candidates
         if os.path.isfile(p) and "_detection_" not in os.path.basename(p)
@@ -74,6 +82,7 @@ def mean_generation_time(path: str | None) -> float | None:
 def evaluate(
     results_dir: str,
     experiment: str,
+    method_name: str,
     watermarked_file: str | None = None,
     unwatermarked_file: str | None = None,
 ) -> dict[str, Any]:
@@ -89,7 +98,7 @@ def evaluate(
             for key in ("auc", "c4_cross_entropy_ratio", "c4_cross_entropy_delta"):
                 if key in wm_data:
                     wm_scores[key] = float(wm_data[key])
-            scores["experiments"][experiment]["results"]["gaussmark_200_tokens"] = wm_scores
+            scores["experiments"][experiment]["results"][method_name] = wm_scores
             print(f"Watermarked p-values: {len(p_wm)} from {wm_path}")
     else:
         print("No watermarked detection result file found.")
@@ -105,17 +114,25 @@ def evaluate(
             uwm_scores["c4_cross_entropy_ratio"] = 1.0
             uwm_scores["c4_cross_entropy_delta"] = 0.0
             scores["experiments"][experiment]["results"]["unwatermarked"] = uwm_scores
+            if method_name in scores["experiments"][experiment]["results"]:
+                marked_scores = scores["experiments"][experiment]["results"][method_name]
+                marked_scores["unwatermarked_detection_rate_fpr_0.05"] = uwm_scores[
+                    "detection_rate_fpr_0.05"
+                ]
+                marked_scores["unwatermarked_detection_rate_fpr_0.01"] = uwm_scores[
+                    "detection_rate_fpr_0.01"
+                ]
             print(f"Unwatermarked p-values: {len(p_uwm)} from {uwm_path}")
     else:
         print(f"Unwatermarked result file not found: {uwm_path}")
 
     if p_wm and p_uwm:
-        scores["experiments"][experiment]["results"]["gaussmark_200_tokens"]["auc"] = pairwise_auc(p_wm, p_uwm)
+        scores["experiments"][experiment]["results"][method_name]["auc"] = pairwise_auc(p_wm, p_uwm)
 
     wm_gen_time = mean_generation_time(latest_watermarked_generation_file(results_dir))
     uwm_gen_time = mean_generation_time(os.path.join(results_dir, "unwatermarked_baseline_exact.json"))
-    if wm_gen_time and uwm_gen_time and "gaussmark_200_tokens" in scores["experiments"][experiment]["results"]:
-        scores["experiments"][experiment]["results"]["gaussmark_200_tokens"]["generation_time_ratio"] = (
+    if wm_gen_time and uwm_gen_time and method_name in scores["experiments"][experiment]["results"]:
+        scores["experiments"][experiment]["results"][method_name]["generation_time_ratio"] = (
             wm_gen_time / uwm_gen_time
         )
         if "unwatermarked" in scores["experiments"][experiment]["results"]:
@@ -128,6 +145,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--results-dir", default="/home/user/checkpoints")
     parser.add_argument("--experiment", default="watermark_detection_mistral")
+    parser.add_argument("--method-name", default="gaussmark_200_tokens")
     parser.add_argument("--output", default="/home/user/scoring/scores.json")
     parser.add_argument("--watermarked-file", default=None)
     parser.add_argument("--unwatermarked-file", default=None)
@@ -136,6 +154,7 @@ def main() -> None:
     scores = evaluate(
         args.results_dir,
         args.experiment,
+        args.method_name,
         watermarked_file=args.watermarked_file,
         unwatermarked_file=args.unwatermarked_file,
     )

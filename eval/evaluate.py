@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Evaluation code for GaussMark watermarking.
+Evaluation helpers for LLM watermarking.
 
 This module evaluates watermarking performance:
 1. Detection rate (TPR at FPR=0.05 and FPR=0.01) for watermarked text
@@ -197,7 +197,7 @@ def run_evaluation(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate GaussMark watermarking")
+    parser = argparse.ArgumentParser(description="Evaluate LLM watermarking results")
     parser.add_argument("--watermarked_results", type=str, required=True)
     parser.add_argument("--unwatermarked_results", type=str, default=None)
     parser.add_argument("--output", type=str, default="/home/user/scoring/scores.json")

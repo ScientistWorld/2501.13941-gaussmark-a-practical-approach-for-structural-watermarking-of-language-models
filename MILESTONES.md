@@ -32,5 +32,10 @@
 - Prepared a GPU test job to evaluate 25% corruption on up to 40 watermarked and unwatermarked Mistral samples per corruption type.
 - Keeping the milestone at `core_claim` until the robustness job completes and its artifact is reviewed.
 
+### [2026-04-10 08:05] - core_claim
+- Final verification kept the milestone at `core_claim`.
+- Tightened scoring so the unwatermarked false-positive rates are explicit constraint metrics on the marked-output result, not just a separate baseline row.
+- Confirmed `python3 validate.py --compare` passes and `eval/` still does not import from `method/`.
+
 ## Current Limitation
 - Current completed milestone remains `core_claim`: the environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but completed scored results do not yet cover the paper's full multi-model, robustness, and downstream task suite.
