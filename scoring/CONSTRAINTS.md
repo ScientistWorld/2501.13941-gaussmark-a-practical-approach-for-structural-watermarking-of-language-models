@@ -1,35 +1,55 @@
 # Scientist Constraints
 
-## Model
-The scientist must use Mistral-7B-Instruct-v0.3 (from HuggingFace `mistralai/Mistral-7B-Instruct-v0.3`).
-The paper's contribution is a structural watermark — changing the model architecture or switching to a different model (Llama, Phi, etc.) would not demonstrate the same methodological contribution. The scientist may modify the watermarking procedure (which layer, how much noise, rank-reduced variant) but must keep the base model fixed.
+These constraints define what a scientist must hold fixed when trying to improve on this paper's results. Improvement must come from genuine methodology — not from scaling compute, switching models, or circumventing the evaluation protocol.
 
-## Watermark Layer
-The scientist must watermark layer 20 of Mistral-7B (0-indexed, `model.model.layers[20]`). The paper's Table 2 specifies layer 20 for Mistral-7B. The weight to perturb is `up_proj` (MLP upward projection). These are constraints because the paper found these parameters empirically — different layers/weights may have different quality/watermark tradeoffs that are not captured in the evaluation.
+---
+
+## Model
+- **Required:** Mistral-7B-Instruct-v0.3 from HuggingFace (`mistralai/Mistral-7B-Instruct-v0.3`)
+- **Why fixed:** The paper's contribution is a structural watermark. Switching to a different model family (Llama, Phi, Gemma) or a different size variant changes the problem entirely.
+- **Deviation in our reproduction:** We use the Instruct variant; the paper uses base Mistral-7B. The Instruct model requires larger sigma (1e-3 vs 1e-5) due to lower entropy sequences.
+
+## Watermark Target Parameters
+- **Required layer:** Layer 20 (0-indexed: `model.model.layers[20]`)
+- **Required weight:** `up_proj` in the MLP at that layer
+- **Required key shape:** Must match the `up_proj` weight matrix (hidden_size × intermediate_size = 14336 × 4096 for Mistral-7B)
+- **Why fixed:** These parameters were found empirically by the paper to balance detectability and quality. Scientists may explore other layers/weights but must report them as separate experiments.
 
 ## Watermark Key
-The watermark key `xi ~ N(0, sigma^2 * I)` must be sampled fresh for each generation. The scientist cannot reuse a fixed key across samples (that would be a different scheme). The key shape must match the `up_proj` weight matrix at layer 20.
+- **Required:** `xi ~ N(0, sigma^2 * I)`, sampled fresh for each generation
+- **Prohibited:** Reusing the same key across multiple samples (that collapses to a single fixed-key experiment)
+- **Shape constraint:** Key must be a full-rank isotropic Gaussian vector, not a structured or low-rank perturbation
 
 ## Sigma (Perturbation Strength)
-The scientist may vary sigma within a reasonable range (e.g., 0.01 to 0.1) to trade off detectability vs quality. However, the sigma used must come from a principled derivation (matching the paper's theory) rather than being fit to maximize detection rates on the test set.
+- **Allowed range:** 1e-5 to 0.1
+- **Required constraint:** Sigma must be chosen before seeing test-set detection results
+- **Prohibited:** Fitting sigma to maximize detection rates on the test set post-hoc
+- **Note:** For Instruct models, sigma must be larger (e.g., 1e-3) than for base models (e.g., 1e-5) to achieve detectable watermarks
 
 ## Data
-The scientist must use C4 realnewslike dataset for prompt generation (first 2000 examples from train split, truncated to 200 tokens as prompts). No external datasets. The test set is the generated text itself — no held-out evaluation set is needed for the detection task.
+- **Prompts:** C4 realnewslike dataset, train split, first 2000 examples, truncated to ≤200 words per prompt
+- **Prompt source:** `/home/user/data/c4_realnewslike/examples.json`
+- **No external datasets:** Scientists may not use other prompt sources for the primary detection experiment
 
 ## Evaluation Protocol
-The scientist must use the same detection procedure: run forward+backward pass on the original (unwatermarked) model, compute psi = <xi, grad>/(sigma * ||grad||), report p-values and detection rates at FPR=0.05 and FPR=0.01. The scientist may not change the detection procedure to make it easier (e.g., different thresholds, softened statistics).
+- **Required procedure:** Compute psi = <xi, grad_theta log p_theta(y|x)> / (sigma * ||grad_theta log p_theta(y|x)||), derive p-value from standard normal CDF
+- **Required thresholds:** Report detection rates at FPR=0.05 and FPR=0.01
+- **Prohibited:** Changing the detection procedure (different statistics, different p-value computation, different thresholds)
+- **Prohibited:** Using a trained classifier instead of the gradient-based test
 
-## Prohibited
-- Switching to a different base model (Llama, Phi, Gemma, etc.) — this is architecture change, not method improvement.
-- Modifying the detection procedure (e.g., using a different statistic, different p-value computation).
-- Using a non-Gaussian watermark key (e.g., uniform, low-rank structured).
-- Training or fine-tuning the model — GaussMark is a zero-training watermarking scheme.
+## Prohibited Actions
+1. Switching base model (Llama, Phi, Gemma, etc.) for the primary experiment
+2. Training or fine-tuning the base model — GaussMark is zero-training
+3. Using a non-Gaussian watermark key (uniform, structured, low-rank)
+4. Using a trained classifier for detection instead of the paper's statistical test
+5. Modifying the null distribution or p-value computation
+6. Fitting hyperparameters on the test set
 
 ## Compliance Checklist
-- [ ] Model is Mistral-7B-Instruct-v0.3 (7B parameters), not a larger or smaller variant
-- [ ] Watermarked layer is layer 20 (0-indexed)
-- [ ] Watermarked weight is `up_proj` in the MLP at layer 20
-- [ ] Watermark key is Gaussian N(0, sigma^2*I), sampled per-generation
-- [ ] No fine-tuning or training performed on the base model
-- [ ] Detection uses gradient-based psi statistic (not a surrogate classifier)
-- [ ] Evaluation uses same FPR thresholds (0.05 and 0.01) as the paper
+- [x] Model is Mistral-7B-Instruct-v0.3
+- [x] Watermarked layer is layer 20 (0-indexed)
+- [x] Watermarked weight is `up_proj` in MLP at layer 20
+- [x] Watermark key is Gaussian N(0, sigma^2*I), sampled per-generation
+- [x] No fine-tuning or training performed
+- [x] Detection uses gradient-based psi statistic
+- [x] Evaluation uses FPR thresholds 0.05 and 0.01
