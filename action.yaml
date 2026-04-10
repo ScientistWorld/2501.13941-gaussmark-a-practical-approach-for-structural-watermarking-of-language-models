@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Validated the existing GaussMark core-claim reproduction with python validate.py --compare; no further productive GPU work is needed for the minimum goal."
+notes: "Final verification passed: core_claim remains justified, scoring now includes explicit unwatermarked FPR constraints, and the gym is ready for use."
