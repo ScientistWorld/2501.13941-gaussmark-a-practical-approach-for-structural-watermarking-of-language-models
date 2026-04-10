@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: core_claim
-notes: "Fixed detection: regenerate keys using per-sample seed. Generation already done (100 samples, sigma=1e-3). Runs detection only - should be fast (~30 min). Uses corrected run_pipeline.py with weights_only=False and per-sample seed regeneration."
+notes: "Fix NameError: 'seed' not defined in run_detection. Use outer_seed variable instead. Detection with corrected per-sample keys on 83 samples (skipping 17 with <50 tokens)."
