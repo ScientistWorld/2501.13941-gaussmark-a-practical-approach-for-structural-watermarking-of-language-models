@@ -4,5 +4,5 @@
 action: submit
 gpus: 1
 test: false
-milestone: method_runs
-notes: "GaussMark reproduction: generate 50 samples with sigma=1e-5, run detection with correct keys, validate pipeline"
+milestone: core_claim
+notes: "GaussMark sigma=1e-3 generation + detection (sigma=1e-5 gives only 4% detection, need larger sigma). Reuses existing unwatermarked baseline from previous successful job."
