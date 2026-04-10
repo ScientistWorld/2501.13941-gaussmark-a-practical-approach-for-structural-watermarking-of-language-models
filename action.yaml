@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Final verification passed; method-safe gym documentation was tightened and core_claim remains justified."
+notes: "Validated the existing GaussMark core-claim reproduction with python validate.py --compare; no further productive GPU work is needed for the minimum goal."
