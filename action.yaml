@@ -5,4 +5,4 @@ action: submit
 gpus: 1
 test: false
 milestone: method_runs
-notes: "Run clean GaussMark Mistral audit-fix pipeline: exact generated token IDs, sigma=sqrt(1e-5), fresh unwatermarked baseline, and C4 cross-entropy quality metrics to attempt core_claim."
+notes: "Run corrected GaussMark Mistral pipeline: exact prompt and generated token IDs, sigma=sqrt(1e-5), fresh unwatermarked baseline, and C4 cross-entropy quality metrics to attempt core_claim."

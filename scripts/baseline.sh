@@ -52,7 +52,15 @@ for item in texts[:100]:
 print(f'Loaded {len(prompts)} prompts')
 
 # Generate WITHOUT watermark (just use the original model)
-results = {'config': {'watermarked': False, 'num_prompts': len(prompts)}, 'samples': []}
+results = {
+    'config': {
+        'watermarked': False,
+        'num_prompts': len(prompts),
+        'exact_token_ids': True,
+        'exact_prompt_ids': True,
+    },
+    'samples': [],
+}
 
 for i, prompt in enumerate(prompts):
     sample_seed = 42 + i
@@ -82,6 +90,7 @@ for i, prompt in enumerate(prompts):
         'seed': sample_seed,  # Same scheme as watermarked: seed = 42 + prompt_idx
         'sample_seed': sample_seed,
         'prompt_text': prompt[:500],
+        'prompt_ids': input_ids[0].detach().cpu().tolist(),
         'generated_text': gen_text,
         'generated_ids': gen_ids.cpu().tolist(),
         'watermarked': False,

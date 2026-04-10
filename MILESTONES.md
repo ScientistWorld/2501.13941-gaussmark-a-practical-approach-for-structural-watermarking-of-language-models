@@ -15,4 +15,10 @@
 - Normalized sigma defaults to `sqrt(1e-5)` across method entry points and made the main pipeline regenerate a fresh unwatermarked baseline in the same run.
 - Removed the non-paper high-sigma diagnostic from the reference target and prepared a new GPU job for a clean `core_claim` attempt.
 
+### [2026-04-10 06:44] - method_runs
+- Continued audit from a reset `method_runs` milestone.
+- Found that generation artifacts stored exact generated token IDs but only a 500-character prompt prefix, so detection could condition on a different prompt than generation used.
+- Fixed the method pipeline and optional baseline script to store exact prompt token IDs, require `exact_prompt_ids` before reusing cached generations, and detect from the stored prompt IDs.
+- Kept the milestone at `method_runs` and prepared a corrected GPU job to regenerate the clean Mistral detection, false-positive, and C4 cross-entropy scores.
+
 ## Stop Justification

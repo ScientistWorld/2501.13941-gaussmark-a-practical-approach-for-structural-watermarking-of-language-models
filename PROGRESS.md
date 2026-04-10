@@ -10,7 +10,7 @@
 - **C4 dataset**: /home/user/data/c4_realnewslike/examples.json (53906 samples)
 - **Pipeline script**: method/run_pipeline.py
 - **Detection pipeline works**: Correct per-sample watermark keys regenerated during detection
-- **Audit fixes pending GPU validation**: exact generated token IDs are now stored directly, method entry points use the paper's Mistral variance convention (`sigma=sqrt(1e-5)`), and the next run regenerates a fresh unwatermarked baseline instead of mixing historical p-values.
+- **Audit fixes pending GPU validation**: exact generated token IDs and exact prompt token IDs are now stored directly, method entry points use the paper's Mistral variance convention (`sigma=sqrt(1e-5)`), and the next run regenerates a fresh unwatermarked baseline instead of mixing historical p-values.
 
 ## Results
 
@@ -35,6 +35,7 @@
 3. Table 2 reports variance sigma^2. The current pipeline uses standard deviation sigma=sqrt(1e-5) for the paper's Mistral setting.
 4. C4 cross-entropy ratio/delta were added as lightweight quality constraints before claiming `core_claim`.
 5. Current `scores.json` is retained only as a historical `method_runs` artifact until the next job overwrites it with fresh detection, false-positive, and quality metrics.
+6. Continued audit found that prompt text had been stored as a 500-character prefix; detection now uses stored exact prompt token IDs and stale cached generations without prompt IDs are not reused.
 
 ## Deviations from Paper
 - Using Mistral-7B-Instruct-v0.3 instead of the paper's base Mistral-7B
@@ -46,7 +47,7 @@
 ## Current Submitted Job
 
 - Runs GaussMark on Mistral-7B-Instruct-v0.3 with layer 20 `up_proj`, sigma=sqrt(1e-5), 100 C4 realnewslike prompts, and 200 generated tokens.
-- Stores exact generated token IDs and regenerates/uses per-sample watermark keys for detection.
+- Stores exact prompt and generated token IDs and regenerates/uses per-sample watermark keys for detection.
 - Generates a fresh unwatermarked baseline in the same job for the false-positive constraint.
 - Writes detection metrics plus unwatermarked FPR and C4 cross-entropy quality ratio/delta to `scoring/scores.json`.
 

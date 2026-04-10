@@ -137,7 +137,10 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
     if os.path.exists(results_file):
         with open(results_file) as f:
             existing = json.load(f)
-        if len(existing.get('samples', [])) >= NUM_PROMPTS * NUM_SEEDS:
+        if (
+            existing.get("config", {}).get("exact_prompt_ids")
+            and len(existing.get('samples', [])) >= NUM_PROMPTS * NUM_SEEDS
+        ):
             # Ensure .pt keys exist for all samples
             samples = existing.get('samples', [])
             pt_missing = []
@@ -175,6 +178,7 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
             "sigma": sigma, "num_tokens": num_tokens,
             "num_seeds": num_seeds, "num_prompts": len(prompts),
             "total_samples": len(prompts) * num_seeds,
+            "exact_prompt_ids": True,
         },
         "samples": [],
         "generation_times": [],
@@ -226,6 +230,7 @@ def generate_watermarked(model, tokenizer, prompts, layer_idx, weight_name, sigm
                 "seed": seed,
                 "sample_seed": sample_seed,
                 "prompt_text": prompt[:500],
+                "prompt_ids": input_ids[0].detach().cpu().tolist(),
                 "generated_text": generated_text,
                 "generated_ids": generated_ids,
                 "watermark_key_shape": list(watermark_key.shape),
@@ -266,6 +271,7 @@ def generate_unwatermarked(model, tokenizer, prompts, num_tokens, seed_base):
             existing = json.load(f)
         if (
             existing.get("config", {}).get("exact_token_ids")
+            and existing.get("config", {}).get("exact_prompt_ids")
             and len(existing.get("samples", [])) >= len(prompts)
         ):
             print(f"[+] Fresh unwatermarked baseline already exists at {results_file}, skipping generation...")
@@ -279,6 +285,7 @@ def generate_unwatermarked(model, tokenizer, prompts, num_tokens, seed_base):
             "num_prompts": len(prompts),
             "seed_base": seed_base,
             "exact_token_ids": True,
+            "exact_prompt_ids": True,
         },
         "samples": [],
         "generation_times": [],
@@ -317,6 +324,7 @@ def generate_unwatermarked(model, tokenizer, prompts, num_tokens, seed_base):
             "seed": sample_seed,
             "sample_seed": sample_seed,
             "prompt_text": prompt[:500],
+            "prompt_ids": input_ids[0].detach().cpu().tolist(),
             "generated_text": generated_text,
             "generated_ids": generated_ids,
             "gen_time": gen_time,
@@ -355,7 +363,6 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
         if i % 20 == 0:
             print(f"  Detecting: {i}/{len(samples)}")
 
-        prompt_text = sample["prompt_text"]
         generated_ids = sample["generated_ids"]
         # The per-sample seed is the key used during generation.
         # We regenerate the key here rather than loading from file because
@@ -402,9 +409,14 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
                 print(f"  NOTE: Regen key for sample {i} using per_sample_seed={per_sample_seed} (outer={outer_seed})")
             watermark_key = wm.regenerate_watermark_key(per_sample_seed)
 
-        prompt_enc = tokenizer(prompt_text, return_tensors="pt", truncation=True, max_length=512)
-        input_ids = prompt_enc["input_ids"]
-        attention_mask = prompt_enc.get("attention_mask")
+        if "prompt_ids" in sample:
+            input_ids = torch.tensor([sample["prompt_ids"]], dtype=torch.long)
+            attention_mask = torch.ones_like(input_ids)
+        else:
+            prompt_text = sample["prompt_text"]
+            prompt_enc = tokenizer(prompt_text, return_tensors="pt", truncation=True, max_length=512)
+            input_ids = prompt_enc["input_ids"]
+            attention_mask = prompt_enc.get("attention_mask")
         gen_tensor = torch.tensor([generated_ids]).long()
 
         result = wm.detect(
