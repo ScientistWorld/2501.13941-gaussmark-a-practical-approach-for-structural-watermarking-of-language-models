@@ -1,6 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
-milestone: core_claim
-notes: "core_claim achieved and documented. GaussMark detection confirmed: 21.7% TPR@FPR0.05 (vs 3% baseline, AUC=0.668). FPR controlled at 3%. Environment complete with all scoring docs, validate.py passes."
+action: pending
+gpus: 1
+test: false
+milestone: method_runs
+notes: ""
