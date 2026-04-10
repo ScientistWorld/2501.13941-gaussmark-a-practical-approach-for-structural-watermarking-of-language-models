@@ -2,10 +2,10 @@
   "watermark_detection_mistral": {
     "results": {
       "gaussmark_200_tokens": {
-        "detection_rate_fpr_0.05": 0.06,
-        "detection_rate_fpr_0.01": 0.0,
-        "median_p_value": 0.5,
-        "auc": 0.4826
+        "detection_rate_fpr_0.05": 0.21686746987951808,
+        "detection_rate_fpr_0.01": 0.060240963855421686,
+        "median_p_value": 0.1954071062291396,
+        "auc": 0.668433734939759
       },
       "unwatermarked": {
         "detection_rate_fpr_0.05": 0.03,
