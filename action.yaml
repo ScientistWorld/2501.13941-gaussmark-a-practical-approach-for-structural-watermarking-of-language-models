@@ -1,6 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
-milestone: core_claim
-notes: "core_claim achieved. GaussMark pipeline working with corrected per-sample keys. sigma=1e-3: 21.7% detection (FPR=5%), AUC=0.668. sigma=0.032: 85% detection. Unwatermarked baseline: 3% FPR (correct). Paper's method is reproduced — watermark signal is statistically detectable on Mistral-7B-Instruct."
+action: pending
+gpus: 1
+test: false
+milestone: method_runs
+notes: ""
