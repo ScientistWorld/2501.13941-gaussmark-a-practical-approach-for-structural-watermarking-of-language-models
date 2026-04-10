@@ -46,6 +46,7 @@
 5. Current `scores.json` contains the corrected core-claim run with fresh detection, false-positive, and quality metrics.
 6. Continued audit found that prompt text had been stored as a 500-character prefix; detection now uses stored exact prompt token IDs and stale cached generations without prompt IDs are not reused.
 7. The corrected run supports the core claim: the exact GaussMark method is detectable while the C4 cross-entropy quality ratio remains essentially unchanged.
+8. Added `method/run_robustness.py` to evaluate the paper's token-corruption robustness setting by applying random deletions, insertions, and substitutions to existing generated token IDs and re-running the same GaussMark detector.
 
 ## Deviations from Paper
 - Using Mistral-7B-Instruct-v0.3 instead of the paper's base Mistral-7B
@@ -53,6 +54,7 @@
 - Using 100 prompts × 1 seed (paper uses 1000 × 3 seeds)
 - Using C4 cross-entropy as a lightweight quality constraint instead of full SuperGLUE/GSM-8K benchmark runs
 - No AlpacaEval-2.0 evaluation (requires GPT-4o API)
+- Token-corruption robustness is being tested on a bounded 40-sample subset rather than the paper's full 1000-prompt x 3-seed robustness sweep.
 
 ## Completed Core-Claim Job
 
@@ -61,6 +63,12 @@
 - Generated a fresh unwatermarked baseline in the same job for the false-positive constraint.
 - Wrote detection metrics plus unwatermarked FPR and C4 cross-entropy quality ratio/delta to `scoring/scores.json`.
 - Added generation-time ratio as a lightweight latency constraint derived from the existing generation artifacts.
+
+## Pending Robustness Job
+
+- Prepared `scripts/run.sh` to run `python3 /home/user/method/run_robustness.py --fraction 0.25 --max-samples 40`.
+- The job reuses the existing watermarked and unwatermarked generation artifacts, applies 25% delete/insert/substitute token corruptions, and writes `/home/user/checkpoints/robustness_token_corruption_mistral.json`.
+- Current milestone remains `core_claim` until this GPU job finishes and the robustness result is reviewed.
 
 ## Environment Structure
 - `method/`: GaussMark implementation (gaussmark.py)

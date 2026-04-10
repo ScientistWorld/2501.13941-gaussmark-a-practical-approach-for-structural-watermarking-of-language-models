@@ -11,8 +11,16 @@ set -e
 
 cd /home/user
 
-MODEL_PATH="/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
-DATA_PATH="/home/user/data/c4_realnewslike"
+MODEL_PATH="${GAUSSMARK_MODEL_PATH:-$(python3 - <<'PY'
+from method.paths import default_model_path
+print(default_model_path())
+PY
+)}"
+DATA_PATH="${GAUSSMARK_DATA_PATH:-$(python3 - <<'PY'
+from method.paths import default_data_path
+print(default_data_path())
+PY
+)}"
 OUTPUT_DIR="/home/user/checkpoints"
 
 echo "=== Baseline (Unwatermarked) ==="
@@ -99,10 +107,12 @@ for i, prompt in enumerate(prompts):
         print(f'Generated {i+1}/{len(prompts)}')
 
 # Save
-output_file = '$OUTPUT_DIR/unwatermarked_baseline.json'
+output_file = '$OUTPUT_DIR/unwatermarked_baseline_exact.json'
 with open(output_file, 'w') as f:
     json.dump(results, f)
 print(f'Saved {len(results[\"samples\"])} unwatermarked samples to {output_file}')
 "
 
 echo "Baseline generation complete."
+echo "Evaluating available detection artifacts..."
+bash scripts/evaluate.sh "$OUTPUT_DIR" watermark_detection_mistral

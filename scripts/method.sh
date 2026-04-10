@@ -10,8 +10,16 @@ set -e
 
 cd /home/user
 
-MODEL_PATH="/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
-DATA_PATH="/home/user/data/c4_realnewslike"
+MODEL_PATH="${GAUSSMARK_MODEL_PATH:-$(python3 - <<'PY'
+from method.paths import default_model_path
+print(default_model_path())
+PY
+)}"
+DATA_PATH="${GAUSSMARK_DATA_PATH:-$(python3 - <<'PY'
+from method.paths import default_data_path
+print(default_data_path())
+PY
+)}"
 OUTPUT_DIR="/home/user/checkpoints"
 
 echo "=== GaussMark Method ==="

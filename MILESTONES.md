@@ -27,5 +27,10 @@
 - C4 cross-entropy ratio was 1.0102 and delta was 0.0206, close to the paper's Table 3 Mistral quality constraint.
 - Unwatermarked detection was 7/94 at p<0.05 and 1/94 at p<0.01. The 5% empirical rate is slightly high but within small-sample binomial variation under a 5% null (P[X>=7] ~= 0.19).
 
-## Stop Justification
-- Stopped at `core_claim` because the reproduced environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but does not cover the paper's full multi-model, robustness, and downstream task suite.
+### [2026-04-10 07:36] - core_claim
+- Added a token-corruption robustness runner that keeps the GaussMark detection computation intact and applies random deletion, insertion, and substitution corruptions to existing generated token IDs.
+- Prepared a GPU test job to evaluate 25% corruption on up to 40 watermarked and unwatermarked Mistral samples per corruption type.
+- Keeping the milestone at `core_claim` until the robustness job completes and its artifact is reviewed.
+
+## Current Limitation
+- Current completed milestone remains `core_claim`: the environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but completed scored results do not yet cover the paper's full multi-model, robustness, and downstream task suite.
