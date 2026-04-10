@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Progress Log
 
@@ -20,5 +20,11 @@
 - Found that generation artifacts stored exact generated token IDs but only a 500-character prompt prefix, so detection could condition on a different prompt than generation used.
 - Fixed the method pipeline and optional baseline script to store exact prompt token IDs, require `exact_prompt_ids` before reusing cached generations, and detect from the stored prompt IDs.
 - Kept the milestone at `method_runs` and prepared a corrected GPU job to regenerate the clean Mistral detection, false-positive, and C4 cross-entropy scores.
+
+### [2026-04-10 07:08] - core_claim
+- Corrected GPU job completed successfully on Mistral-7B-Instruct-v0.3 with the paper's GaussMark computation, layer 20 `up_proj`, and sigma=sqrt(1e-5).
+- Achieved 78.0% detection at p<0.05 and 60.4% at p<0.01 on 91 usable watermarked 200-token samples, with ROC AUC 0.9477.
+- C4 cross-entropy ratio was 1.0102 and delta was 0.0206, close to the paper's Table 3 Mistral quality constraint.
+- Unwatermarked detection was 7/94 at p<0.05 and 1/94 at p<0.01. The 5% empirical rate is slightly high but within small-sample binomial variation under a 5% null (P[X>=7] ~= 0.19).
 
 ## Stop Justification

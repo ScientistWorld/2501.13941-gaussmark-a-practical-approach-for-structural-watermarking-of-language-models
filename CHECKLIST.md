@@ -38,7 +38,7 @@ Check off items as you complete them. Order doesn't matter — work however make
 ## Milestones
 - [x] `none` — Just started
 - [x] `method_runs` — Algorithm executes end-to-end without errors
-- [ ] `core_claim` — Minimum experiment supports central claim
+- [x] `core_claim` — Minimum experiment supports central claim
 
 ## Notes
 - Model deviation: Using Mistral-7B-Instruct-v0.3 (paper uses base model)

@@ -14,6 +14,14 @@
 
 ## Results
 
+### sigma=sqrt(1e-5) (Mistral-7B-Instruct, 100 prompts, exact prompt/token IDs) — core_claim
+- **Watermarked detection rate at FPR=0.05**: 78.0% (71/91 usable samples)
+- **Watermarked detection rate at FPR=0.01**: 60.4% (55/91 usable samples)
+- **Median p-value**: 0.00320
+- **ROC AUC**: 0.9477
+- **C4 cross-entropy ratio/delta**: 1.0102 / 0.0206
+- **Unwatermarked baseline**: 7.45% at p<0.05 (7/94) and 1.06% at p<0.01 (1/94); the p<0.05 result is slightly above nominal but plausible under small-sample binomial variation (P[X>=7 | n=94, p=0.05] ~= 0.19).
+
 ### sigma=0.001 (Instruct model, 100 prompts) — prior method_runs result
 - **Detection rate at FPR=0.05**: 21.7% (vs 3% unwatermarked baseline)
 - **Detection rate at FPR=0.01**: 6.0%
@@ -36,6 +44,7 @@
 4. C4 cross-entropy ratio/delta were added as lightweight quality constraints before claiming `core_claim`.
 5. Current `scores.json` is retained only as a historical `method_runs` artifact until the next job overwrites it with fresh detection, false-positive, and quality metrics.
 6. Continued audit found that prompt text had been stored as a 500-character prefix; detection now uses stored exact prompt token IDs and stale cached generations without prompt IDs are not reused.
+7. The corrected run supports the core claim: the exact GaussMark method is detectable while the C4 cross-entropy quality ratio remains essentially unchanged.
 
 ## Deviations from Paper
 - Using Mistral-7B-Instruct-v0.3 instead of the paper's base Mistral-7B
@@ -44,12 +53,12 @@
 - Using C4 cross-entropy as a lightweight quality constraint instead of full SuperGLUE/GSM-8K benchmark runs
 - No AlpacaEval-2.0 evaluation (requires GPT-4o API)
 
-## Current Submitted Job
+## Completed Core-Claim Job
 
-- Runs GaussMark on Mistral-7B-Instruct-v0.3 with layer 20 `up_proj`, sigma=sqrt(1e-5), 100 C4 realnewslike prompts, and 200 generated tokens.
+- Ran GaussMark on Mistral-7B-Instruct-v0.3 with layer 20 `up_proj`, sigma=sqrt(1e-5), 100 C4 realnewslike prompts, and 200 generated tokens.
 - Stores exact prompt and generated token IDs and regenerates/uses per-sample watermark keys for detection.
-- Generates a fresh unwatermarked baseline in the same job for the false-positive constraint.
-- Writes detection metrics plus unwatermarked FPR and C4 cross-entropy quality ratio/delta to `scoring/scores.json`.
+- Generated a fresh unwatermarked baseline in the same job for the false-positive constraint.
+- Wrote detection metrics plus unwatermarked FPR and C4 cross-entropy quality ratio/delta to `scoring/scores.json`.
 
 ## Environment Structure
 - `method/`: GaussMark implementation (gaussmark.py)
