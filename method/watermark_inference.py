@@ -12,8 +12,8 @@ This script implements the inference-time watermarking described in the paper:
 
 Usage:
     python method/watermark_inference.py \
-        --model_path /home/user/models/mistralai/Mistral-7B-Instruct-v0.3 \
-        --data_path /home/user/data/c4_realnewslike \
+        --model_path /home/user/shared/models/mistralai/Mistral-7B-Instruct-v0.3 \
+        --data_path /home/user/shared/datasets/c4_realnewslike \
         --output_path /home/user/checkpoints/watermarked_outputs.json
 """
 
@@ -45,11 +45,12 @@ from transformers import (
 
 sys.path.insert(0, str(Path(__file__).parent))
 from gaussmark import GaussMark
+from paths import default_data_path, default_model_path
 
 
 # Default paths
-DEFAULT_MODEL_PATH = "/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
-DEFAULT_DATA_PATH = "/home/user/data/c4_realnewslike"
+DEFAULT_MODEL_PATH = default_model_path()
+DEFAULT_DATA_PATH = default_data_path()
 DEFAULT_OUTPUT_PATH = "/home/user/checkpoints/watermarked_outputs.json"
 DEFAULT_OUTPUT_DIR = "/home/user/checkpoints"
 DEFAULT_SIGMA = math.sqrt(1e-5)

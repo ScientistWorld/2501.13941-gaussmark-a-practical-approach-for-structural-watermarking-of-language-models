@@ -30,10 +30,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 
 sys.path.insert(0, '/home/user/method')
 from gaussmark import GaussMark
+from paths import default_data_path, default_model_path
 
-MODEL_PATH = "/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
+MODEL_PATH = default_model_path()
 CHECKPOINT_DIR = "/home/user/checkpoints"
-C4_DATA_PATH = "/home/user/data/c4_realnewslike"
+C4_DATA_PATH = default_data_path()
 
 # Paper parameters for Mistral-7B (from Table 2)
 LAYER_IDX = 20

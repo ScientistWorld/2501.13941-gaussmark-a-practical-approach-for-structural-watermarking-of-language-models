@@ -192,8 +192,11 @@ def run_experiment(
 
 def main():
     parser = argparse.ArgumentParser(description="Run GaussMark watermarking experiments")
-    parser.add_argument("--model_path", type=str, default="/home/user/models/mistralai/Mistral-7B-Instruct-v0.3")
-    parser.add_argument("--data_path", type=str, default="/home/user/data/c4_realnewslike")
+    sys.path.insert(0, str(Path(__file__).parent))
+    from paths import default_data_path, default_model_path
+
+    parser.add_argument("--model_path", type=str, default=default_model_path())
+    parser.add_argument("--data_path", type=str, default=default_data_path())
     parser.add_argument("--num_prompts", type=int, default=100)
     parser.add_argument("--num_tokens", type=int, default=200)
     parser.add_argument("--num_seeds", type=int, default=3)

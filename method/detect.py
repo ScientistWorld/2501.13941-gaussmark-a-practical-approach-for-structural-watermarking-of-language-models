@@ -36,10 +36,11 @@ from transformers import (
 
 sys.path.insert(0, str(Path(__file__).parent))
 from gaussmark import GaussMark, compute_detection_metrics
+from paths import default_model_path
 
 
 # Default paths
-DEFAULT_MODEL_PATH = "/home/user/models/mistralai/Mistral-7B-Instruct-v0.3"
+DEFAULT_MODEL_PATH = default_model_path()
 DEFAULT_RESULTS_PATH = "/home/user/checkpoints/watermarked_outputs.json"
 
 
