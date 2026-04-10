@@ -274,6 +274,7 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
         # the saved keys may have been saved with the wrong (outer) seed.
         # sample["sample_seed"] = seed + i where i is the prompt index.
         per_sample_seed = sample.get("sample_seed", sample.get("seed", 42))
+        outer_seed = sample.get("seed", 42)
 
         # Try to load the key from a per-sample path first.
         # If generation was done correctly, keys are saved per-sample_seed.
@@ -309,8 +310,8 @@ def run_detection(model, tokenizer, samples, config, layer_idx, weight_name, sig
         if not loaded_from_file:
             # Regenerate key using the per-sample seed.
             # This reproduces exactly what was done during generation.
-            if per_sample_seed != seed:
-                print(f"  NOTE: Regen key for sample {i} using per_sample_seed={per_sample_seed} (outer={seed})")
+            if per_sample_seed != outer_seed:
+                print(f"  NOTE: Regen key for sample {i} using per_sample_seed={per_sample_seed} (outer={outer_seed})")
             watermark_key = wm.regenerate_watermark_key(per_sample_seed)
 
         prompt_enc = tokenizer(prompt_text, return_tensors="pt", truncation=True, max_length=512)
