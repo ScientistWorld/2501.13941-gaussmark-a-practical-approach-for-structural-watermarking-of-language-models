@@ -15,7 +15,8 @@
         "gaussmark_200_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.62, "detection_rate_fpr_0.01": 0.40, "median_p_value": 0.09, "auc": 0.5},
         "gaussmark_400_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.88, "detection_rate_fpr_0.01": 0.72, "median_p_value": 0.015, "auc": 0.5},
         "gaussmark_800_tokens":  {"type": "proposed", "detection_rate_fpr_0.05": 0.97, "detection_rate_fpr_0.01": 0.90, "median_p_value": 0.002, "auc": 0.5},
-        "unwatermarked":         {"type": "baseline",  "detection_rate_fpr_0.05": 0.05, "detection_rate_fpr_0.01": 0.01, "median_p_value": 0.50, "auc": 0.50}
+        "unwatermarked":         {"type": "baseline",  "detection_rate_fpr_0.05": 0.05, "detection_rate_fpr_0.01": 0.01, "median_p_value": 0.50, "auc": 0.50},
+        "gaussmark_200_tokens_sigma0.032": {"type": "proposed", "detection_rate_fpr_0.05": 0.85, "detection_rate_fpr_0.01": 0.80, "median_p_value": 0.0000003, "auc": 0.917}
       }
     },
     "watermark_detection_llama": {

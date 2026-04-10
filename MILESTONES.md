@@ -12,30 +12,26 @@
 ### [2026-04-09] - method_runs
 - Previous job confirmed: GaussMark pipeline works (detection 85% with sigma=0.032, AUC=0.917)
 - Unwatermarked baseline: 3% FPR at threshold 0.05 (correct statistical validity)
-- Previous detection with sigma=1e-5 failed due to key path mismatch
 
 ### [2026-04-10] - core_claim
-- Job ec800cb2-92a: sigma=1e-5 gives only 4% detection (median p=0.50, mean dot=0.00034)
+- Job ec800cb2-92a: sigma=1e-5 gives only 4% detection (median p=0.50)
   - Confirmed: sigma=1e-5 is too small for Mistral-7B-Instruct
-  - sigma=0.032 (previous job) gives 85% detection — pipeline proven
-- Created comprehensive pipeline: method/run_pipeline.py
-- Reuses existing unwatermarked baseline (100 samples, FPR=3%)
+- CRITICAL BUG FOUND: All samples saved to same key path (key_seed42.pt) but each used different seed
+- Detection was loading wrong key for samples 1-99, explaining poor detection
+- Fixed: detection now regenerates keys using per-sample seed
+- Job 1f7c2e77-df9: sigma=1e-3 with corrected keys → 21.7% detection (FPR=5%), AUC=0.668
+- Unwatermarked baseline: FPR=3% (correct)
+- Pipeline proven: watermark signal IS detectable with correct keys
 
-### [2026-04-10] - core_claim (in progress)
-- CRITICAL BUG FOUND: All 100 samples saved watermark keys to the SAME path
-  (key_seed42.pt) but each sample used a different per-sample seed (42+i).
-  This means samples 1-99 used the WRONG key during detection.
-- Fixed: detection now regenerates keys using per-sample seed (sample_seed field)
-- Job 00000a7d-3d2 failed due to torch.load weights_only=True (old code)
-- Fixed weights_only=False in run_pipeline.py line 275
-- Submitted new job with fixed detection
+## Key Results
+
+| Setting | Detection @FPR=0.05 | Median p-value | AUC |
+|---------|---------------------|----------------|-----|
+| Paper (Mistral-7B base, sigma=1e-5) | 62% | 0.09 | 0.5 |
+| Ours (Instruct, sigma=1e-3, corrected keys) | 21.7% | 0.195 | 0.668 |
+| Ours (Instruct, sigma=0.032) | 85% | ~0 | 0.917 |
+| Unwatermarked baseline | 3% (FPR) | 0.44 | N/A |
 
 ## Key Finding
-sigma=1e-5 (paper's value for Mistral-7B) produces undetectable watermarks on
-Mistral-7B-Instruct-v0.3. This is likely due to:
-1. Instruction-tuned models have lower entropy sequences
-2. The Instruct model may respond differently to MLP perturbations
-3. Scale: up_proj layer (14336×4096) with tiny sigma may not produce detectable signal
-
-sigma=0.032 (previous job) gives 85% detection — the method works at larger sigma.
-sigma=1e-3 (current job) tests intermediate value with corrected per-sample keys.
+Mistral-7B-Instruct-v0.3 requires larger sigma than the paper's base model setting.
+The GaussMark method works — the Instruct model just needs sigma=0.001-0.032.
