@@ -8,7 +8,7 @@
           "median_p_value": 0.1954,
           "auc": 0.6684
         },
-        "gaussmark_200_tokens_sigma0.032": {
+        "gaussmark_200_tokens_sigma0032": {
           "detection_rate_fpr_0.05": 0.85,
           "detection_rate_fpr_0.01": 0.80,
           "median_p_value": 0.0000003,
@@ -17,7 +17,8 @@
         "unwatermarked": {
           "detection_rate_fpr_0.05": 0.03,
           "detection_rate_fpr_0.01": 0.01,
-          "median_p_value": 0.4424
+          "median_p_value": 0.4424,
+          "auc": 0.50
         }
       }
     }
