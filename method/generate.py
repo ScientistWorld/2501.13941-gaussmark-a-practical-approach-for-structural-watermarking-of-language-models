@@ -11,7 +11,7 @@ Usage:
 
     # With custom parameters
     python method/generate.py \
-        --model_path /home/user/shared/models/mistralai/Mistral-7B-Instruct-v0.3 \
+        --model_path /home/user/data/downloads/models/mistralai/Mistral-7B-Instruct-v0.3 \
         --prompt "The future of AI is" \
         --sigma 0.0031622776601683794 \
         --num_tokens 100 \

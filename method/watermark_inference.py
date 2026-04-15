@@ -12,8 +12,8 @@ This script implements the inference-time watermarking described in the paper:
 
 Usage:
     python method/watermark_inference.py \
-        --model_path /home/user/shared/models/mistralai/Mistral-7B-Instruct-v0.3 \
-        --data_path /home/user/shared/datasets/c4_realnewslike \
+        --model_path /home/user/data/downloads/models/mistralai/Mistral-7B-Instruct-v0.3 \
+        --data_path /home/user/data/downloads/c4_realnewslike \
         --output_path /home/user/checkpoints/watermarked_outputs.json
 """
 

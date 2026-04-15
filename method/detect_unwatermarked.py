@@ -33,6 +33,7 @@ from transformers import (
 
 sys.path.insert(0, str(Path(__file__).parent))
 from gaussmark import GaussMark, compute_detection_metrics
+from paths import default_model_path
 
 
 DEFAULT_SIGMA = math.sqrt(1e-5)
@@ -165,7 +166,7 @@ def save_metrics(metrics: dict, output_path: str) -> None:
 def main():
     parser = argparse.ArgumentParser(description="Detect watermarked text (unwatermarked baseline).")
     parser.add_argument("--results_path", type=str, required=True)
-    parser.add_argument("--model_path", type=str, default="/home/user/models/mistralai/Mistral-7B-Instruct-v0.3")
+    parser.add_argument("--model_path", type=str, default=default_model_path())
     parser.add_argument("--layer_idx", type=int, default=20)
     parser.add_argument("--weight_name", type=str, default="up_proj")
     parser.add_argument("--sigma", type=float, default=DEFAULT_SIGMA)
