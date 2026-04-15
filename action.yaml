@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Fixed fresh-clone downloads to use public Hugging Face sources under data/downloads and removed shared path defaults."
+notes: "Added first-half train and second-half held-out test rescoring for existing GaussMark p-value artifacts; train/test TPR@0.05 is 0.783/0.778 with AUC 0.961/0.932."
