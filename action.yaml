@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Retry CPU split evaluation after confirming the cleaned environment is healthy locally (apt-only container.def, setup.sh-only Python deps, fresh container.sif); likely transient scheduler env misclassification."
+notes: "Retry CPU split evaluation after switching container base from nvidia/cuda:12.1.0-runtime-ubuntu22.04 to ubuntu:22.04 and keeping Python deps in setup.sh; force a fresh container build path while reusing the known-good setup overlay."
