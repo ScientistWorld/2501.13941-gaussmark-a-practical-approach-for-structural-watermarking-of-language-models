@@ -15,10 +15,8 @@
 # Do NOT create a venv (python -m venv, virtualenv, etc.).
 
 set -e
-
-if ! command -v uv >/dev/null 2>&1; then
-    python3 -m pip install uv
-fi
+# The scheduler's setup wrapper provides uv; keep this script minimal so
+# the overlay hash changes only when the actual Python environment changes.
 
 uv pip install --system \
     torch \
