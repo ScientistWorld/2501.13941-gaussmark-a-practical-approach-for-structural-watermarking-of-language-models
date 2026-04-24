@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Added first-half train and second-half held-out test rescoring for existing GaussMark p-value artifacts; train/test TPR@0.05 is 0.783/0.778 with AUC 0.961/0.932."
+notes: "First-half train/second-half held-out test rescoring via method enumeration; evaluate_train.sh and evaluate_test.sh enumerate all watermarked methods from detection files, no hardcoded defaults; eval/train/ and eval/test/ independently evaluate; scores_train.json and scores_test.json produced at runtime by scripts."
