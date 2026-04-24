@@ -11,7 +11,7 @@ These constraints define what a scientist must hold fixed when trying to improve
 
 ## Data
 - **Prompts:** C4 realnewslike dataset, train split, first available examples, truncated to ≤200 tokens per prompt; the current scaled reproduction evaluates 100 prompts
-- **Prompt source:** `/home/user/data/c4_realnewslike/examples.json`
+- **Prompt source:** `/home/user/data/downloads/c4_realnewslike/examples.json`
 - **No external datasets:** Scientists may not use other prompt sources for the primary detection experiment
 
 ## Generation

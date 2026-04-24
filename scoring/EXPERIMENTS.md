@@ -6,7 +6,7 @@ This file describes the experiments in `scoring/scores.json`. Each experiment na
 
 ## watermark_detection_mistral
 
-**Goal:** Establish whether a watermarking system can mark Mistral-7B-Instruct-v0.3 outputs so an authorized detector separates marked from unmarked text at controlled false-positive rates.
+**Goal:** Establish whether a system can mark Mistral-7B-Instruct-v0.3 outputs so an authorized detector separates marked from unmarked text at controlled false-positive rates.
 
 **Setup:**
 - Model: Mistral-7B-Instruct-v0.3 (HuggingFace `mistralai/Mistral-7B-Instruct-v0.3`)
@@ -17,8 +17,8 @@ This file describes the experiments in `scoring/scores.json`. Each experiment na
 - Latency constraint: generation-time ratio is reported from the same HuggingFace run as a lightweight check on the no-extra-generation-latency claim
 
 **Result rows:**
-1. `gaussmark_200_tokens` — historical key for the current marked-output result, 100 prompts by default
-2. `unwatermarked` — no watermark applied, 100 samples for the false-positive baseline
+1. `gaussmark_200_tokens` — current scored marked-output row, 100 prompts by default
+2. `unwatermarked` — unmarked comparison row for the false-positive baseline
 
 The false-positive rates from the unmarked comparison are also copied into the marked-output row as explicit constraint metrics so a future system cannot score well by raising unmarked detections.
 

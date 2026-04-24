@@ -1,39 +1,36 @@
 # Verification Report
 
 ## Initial Assessment
-The workspace started at `core_claim`. That milestone is justified: the code implements the paper's watermark generation and detection computation, the completed Mistral-7B-Instruct run produced measured scores, and `python3 validate.py --compare` passed at the start of verification.
+The workspace started at `core_claim`, and that milestone was justified. The method implementation matches the paper's core computation, the scored Mistral detection run is present in `scoring/scores.json`, and both `python3 validate.py` and `python3 validate.py --compare --post-design` pass.
 
-The prior action requested an additional robustness GPU test, but the completed scored evidence remains the core Mistral detection/quality/latency experiment. I did not reset the milestone or rerun heavy compute.
+The main risk was not algorithmic correctness but gym readiness: the standalone evaluator and some scoring docs still carried unnecessary reproduction-specific assumptions that would make future scientist runs less portable than they should be.
 
 ## Issues Found
-- Minor: The main scored experiment measured unwatermarked false-positive rates only as a separate baseline row. That made the primary marked-output row insufficiently explicit about the false-positive constraint future agents must preserve.
-- Minor: The reusable directory evaluator had method-specific default artifact patterns and a method-specific docstring, even though it did not import method code.
-- Minor: `scoring/TARGETS.md` used dotted names for the unwatermarked FPR targets that did not match the metric names in `scores.json`.
-- Cosmetic: Root has legacy/system artifacts, including an ignored local `models/` directory and ignored root placeholder files. These do not affect the scored gym path; moving 28 GB of model weights during final verification would add risk without improving the benchmark.
+- Minor: `scripts/evaluate.sh` and `eval/directory_evaluate.py` still defaulted to a baked-in method name and fixed artifact paths, which made the reusable evaluator more coupled to this reproduction than necessary.
+- Minor: `scoring/CONSTRAINTS.md` pointed at an outdated prompt path outside the committed download layout.
+- Cosmetic: `scoring/EXPERIMENTS.md` referred to the current scored row using the paper method name rather than describing it as the scored marked-output row.
 
 ## Fixes Applied
-- Added explicit `unwatermarked_detection_rate_fpr_0.05` and `unwatermarked_detection_rate_fpr_0.01` constraint metrics to the marked-output result in `scoring/scores.json`.
-- Updated `eval/directory_evaluate.py` so future methods can pass a method name and use generic marked-output artifact discovery, while preserving the existing `gaussmark_200_tokens` score key by default.
-- Updated `scoring/reference.json` coefficients so primary detection remains the main benefit, thresholded null false-positive rates are explicit negative constraints, and median p-value/AUC are lower-weight diagnostic metrics.
-- Updated `scoring/TARGETS.md` and `scoring/EXPERIMENTS.md` to match the revised scoring structure without adding method details.
-- Re-ran `bash scripts/evaluate.sh /home/user/checkpoints watermark_detection_mistral` and `python3 validate.py --compare`; both pass.
+- Generalized `eval/directory_evaluate.py` to:
+  - infer a marked method name when none is supplied,
+  - discover generic marked and unmarked detection artifacts,
+  - discover generic generation artifacts for the latency ratio,
+  - keep the existing scored key when the caller provides it explicitly.
+- Updated `scripts/evaluate.sh` so it no longer requires a hardcoded default method key and can optionally accept explicit marked/unmarked artifact paths.
+- Corrected `scoring/CONSTRAINTS.md` to the portable prompt path under `data/downloads/`.
+- Tightened `scoring/EXPERIMENTS.md` wording so it stays method-safe while still matching the existing result keys.
+- Re-ran:
+  - `bash scripts/evaluate.sh /home/user/checkpoints watermark_detection_mistral gaussmark_200_tokens`
+  - `python3 validate.py`
+  - `python3 validate.py --compare --post-design`
+  - `curl -I -L --max-time 15` on both C4 shard URLs in `scripts/download.sh`
 
 ## Final Judgment
-The workspace is ready to serve as a research gym. Improve-mode agents can use the method implementation and measured core-claim scores. From-scratch agents can use the problem/evaluation/scoring guidance and the evaluator without importing from `method/`; the strict method-agnostic files do not describe the paper's algorithm.
+The workspace is ready to serve as a gym at the `core_claim` milestone. Improve-mode agents can use the existing method and scored baseline. From-scratch agents can use the problem definition, evaluation rules, constraints, and reusable evaluator without importing `method/` or being told the paper's algorithm in the method-agnostic files.
 
-The post-design split evaluation also completed successfully on April 24, 2026.
-`scripts/run.sh` executed `evaluate_train.sh`, `evaluate_test.sh`, and
-`validate.py --compare --post-design` end to end inside the compute container.
-The resulting split baseline is consistent with the core-claim run:
-
-- Train `detection_rate_fpr_0.05`: `0.7826`
-- Test `detection_rate_fpr_0.05`: `0.7778`
-- Train/test AUC: `0.9607` / `0.9319`
-
-That held-out/test agreement is close enough to support the benchmark's
-anti-shortcut goal while still showing non-identical slices.
+The benchmark is still intentionally narrow: the scored reproduction covers one scaled Mistral detection-quality slice rather than the full paper's multi-model and robustness suite. That limits breadth, but it does not invalidate the current core-claim gym.
 
 - Milestone: core_claim
 - Ready for gym use: yes
 - Confidence: high
-- Key limitation: the completed reproduction is scaled to one Mistral-7B-Instruct core experiment, not the full multi-model, robustness, and downstream-task suite.
+- Key limitation: the scored benchmark is a single scaled Mistral core-claim experiment, not the full paper's broader evaluation matrix.
