@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "CPU post-hoc split evaluation: score gaussmark_200_tokens plus unwatermarked baseline on eval/train and eval/test, regenerate scoring/scores_{train,test}.json, and validate the post-design bundle."
+notes: "Retry CPU split evaluation after cleaning environment/container.def so %post contains apt-only setup; regenerate scoring/scores_{train,test}.json and validate the post-design bundle."
