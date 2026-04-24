@@ -16,6 +16,15 @@
 
 set -e
 
-# This submission only runs the split scorers and validator, which use the
-# Python standard library only. Keep setup empty so the scheduler does not
-# need to create or reuse any Python package overlay for this evaluation job.
+# Runtime stack for the GaussMark method and reusable evaluation scripts.
+# Keep versions moderately pinned so the environment is reproducible without
+# relying on whatever happens to be preinstalled on the host.
+uv pip install --system \
+    "numpy>=1.26,<3" \
+    "scipy>=1.12,<2" \
+    "scikit-learn>=1.4,<2" \
+    "torch>=2.5,<2.7" \
+    "transformers>=4.46,<5" \
+    "accelerate>=1.1,<2" \
+    "safetensors>=0.4.5,<1" \
+    "sentencepiece>=0.2,<1"

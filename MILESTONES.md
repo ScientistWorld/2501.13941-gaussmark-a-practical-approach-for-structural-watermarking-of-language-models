@@ -37,5 +37,10 @@
 - Tightened scoring so the unwatermarked false-positive rates are explicit constraint metrics on the marked-output result, not just a separate baseline row.
 - Confirmed `python3 validate.py --compare` passes and `eval/` still does not import from `method/`.
 
+### [2026-04-24 00:00] - core_claim
+- Re-audited the packaged workspace against the paper and confirmed the committed method still matches GaussMark's Gaussian parameter perturbation plus normalized gradient/key detector.
+- Found that `environment/setup.sh` was still empty and `action.yaml` incorrectly signaled `done`, which would break a fresh-clone rebuild despite the existing scored artifacts.
+- Updated the environment to install the required Python stack and prepared a CPU packaging smoke test job that reruns the reusable evaluator and validator from committed scripts.
+
 ## Current Limitation
 - Current completed milestone remains `core_claim`: the environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but completed scored results do not yet cover the paper's full multi-model, robustness, and downstream task suite.

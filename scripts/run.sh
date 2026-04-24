@@ -3,16 +3,12 @@ set -euo pipefail
 
 cd /home/user
 
-echo "=== GaussMark Split Evaluation Job ==="
+echo "=== GaussMark Packaging Smoke Test ==="
 date
 
-rm -f /home/user/scoring/scores_train.json /home/user/scoring/scores_test.json
-
-bash /home/user/scripts/evaluate_train.sh /home/user/checkpoints
-bash /home/user/scripts/evaluate_test.sh /home/user/checkpoints
-
+bash /home/user/scripts/evaluate.sh /home/user/checkpoints watermark_detection_mistral gaussmark_200_tokens
 python3 /home/user/validate.py --compare --post-design
 
 echo ""
-echo "=== Split Evaluation Complete ==="
+echo "=== Packaging Smoke Test Complete ==="
 date

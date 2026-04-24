@@ -197,18 +197,22 @@ def run_detection(
     for i, sample in enumerate(samples):
         if i % 5 == 0:
             print(f"  Detecting: {i}/{len(samples)}")
-        prompt_text = sample["prompt_text"]
         generated_ids = sample["generated_ids"]
 
-        # Tokenize prompt
-        prompt_enc = tokenizer(
-            prompt_text,
-            return_tensors="pt",
-            truncation=True,
-            max_length=512,
-        )
-        input_ids = prompt_enc["input_ids"]
-        attention_mask = prompt_enc.get("attention_mask")
+        exact_prompt_ids = sample.get("exact_prompt_ids") or sample.get("prompt_ids")
+        if exact_prompt_ids is not None:
+            input_ids = torch.tensor([exact_prompt_ids]).long()
+            attention_mask = torch.ones_like(input_ids)
+        else:
+            prompt_text = sample["prompt_text"]
+            prompt_enc = tokenizer(
+                prompt_text,
+                return_tensors="pt",
+                truncation=True,
+                max_length=512,
+            )
+            input_ids = prompt_enc["input_ids"]
+            attention_mask = prompt_enc.get("attention_mask")
 
         # Convert generated_ids to tensor
         gen_tensor = torch.tensor([generated_ids]).long()

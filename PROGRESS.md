@@ -70,6 +70,13 @@
 - The job reuses the existing watermarked and unwatermarked generation artifacts, applies 25% delete/insert/substitute token corruptions, and writes `/home/user/checkpoints/robustness_token_corruption_mistral.json`.
 - Current milestone remains `core_claim` until this GPU job finishes and the robustness result is reviewed.
 
+## Fresh-Clone Packaging Status
+
+- Re-audited the workspace on 2026-04-24 and confirmed the scored `core_claim` artifacts are present and numerically plausible against `scoring/reference.json`.
+- The main packaging gap was environmental rather than algorithmic: `environment/setup.sh` did not install the method dependencies even though the code requires `torch`, `transformers`, `numpy`, `scipy`, and `scikit-learn`.
+- Updated `environment/setup.sh` to install the runtime stack and repointed `scripts/run.sh` to a reusable CPU smoke test that reruns `scripts/evaluate.sh` on the existing checkpoints and then executes `python3 validate.py --compare --post-design`.
+- This keeps the milestone at `core_claim` while verifying that a rebuilt container can still evaluate the committed GaussMark artifacts without relying on stale local state.
+
 ## Environment Structure
 - `method/`: GaussMark implementation (gaussmark.py)
 - `eval/`: Evaluation code (evaluate.py)

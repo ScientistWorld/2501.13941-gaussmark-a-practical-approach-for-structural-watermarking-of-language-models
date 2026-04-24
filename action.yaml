@@ -1,7 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
+action: submit
 gpus: 0
+test: true
 milestone: core_claim
-notes: "Audited fresh-clone packaging: kept downloads on public URLs, removed legacy local path fallbacks, and narrowed .gitignore so tracked first-party data files are not blanket-ignored."
+notes: "CPU smoke test for fresh-clone packaging: rebuild setup overlay with required Python dependencies, rerun the reusable evaluator on existing GaussMark artifacts, and validate the scoring contract."
