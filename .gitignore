@@ -31,6 +31,9 @@ data/downloads/
 !data/
 !data/downloads/
 !data/downloads/.gitkeep
+data/c4_realnewslike/
+data/download*.txt
+data/test_*.txt
 
 # Container artifacts (multi-GB)
 environment/container.sif
@@ -188,10 +191,6 @@ Thumbs.db
 core.*
 # Auto-added by swarm
 environment/overlay.img
-data/*
-!data/.gitkeep
-!data/downloads/
-!data/downloads/.gitkeep
 jobs/
 tmp/
 protocol.md
