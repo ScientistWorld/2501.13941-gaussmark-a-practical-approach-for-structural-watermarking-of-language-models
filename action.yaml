@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Retry CPU split evaluation with a minimal stdlib-only environment: ubuntu:22.04 base, no Python packages in setup.sh, and local generated container artifacts removed from environment/."
+notes: "Retry CPU split evaluation after last job failed before run.sh: apptainer could not open /home/user/environment/container.sif because it was missing. Force scheduler rebuild from tracked ubuntu:22.04 container.def plus no-op stdlib-only setup.sh."
