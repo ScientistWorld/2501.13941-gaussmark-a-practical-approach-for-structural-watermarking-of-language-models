@@ -16,7 +16,7 @@
           "detection_rate_fpr_0.05": 0.0425531914893617,
           "detection_rate_fpr_0.01": 0.02127659574468085,
           "median_p_value": 0.5419018703002235,
-          "mean_p_value": 0.5521201564304972
+          "mean_p_value": 0.552120156430497
         }
       }
     }
