@@ -32,8 +32,8 @@ Check off items as you complete them. Order doesn't matter — work however make
 - [x] `environment/container.def` + `environment/setup.sh`
 
 ## Data
-- [x] Dataset acquired: C4 realnewslike at /home/user/data/c4_realnewslike/
-- [x] Pretrained model: Mistral-7B-Instruct-v0.3 at /home/user/models/mistralai/
+- [x] Dataset acquired: C4 realnewslike, with portable default under `data/downloads/c4_realnewslike/`
+- [x] Pretrained model: Mistral-7B-Instruct-v0.3, with portable default under `data/downloads/models/mistralai/`
 
 ## Milestones
 - [x] `none` — Just started
@@ -45,3 +45,4 @@ Check off items as you complete them. Order doesn't matter — work however make
 - Model deviation: Using Mistral-7B-Instruct-v0.3 (paper uses base model)
 - Sigma note: the paper reports Mistral variance sigma^2=1e-5; the current job uses standard deviation sigma=sqrt(1e-5)
 - Not reproduced: SuperGLUE/GSM-8K quality evaluation, Llama/Phi experiments, full-scale robustness
+- Current path helper also tolerates the older workspace-local copies in `/home/user/models/` and `/home/user/data/` so existing artifacts remain runnable in this checkout

@@ -42,5 +42,10 @@
 - Found that `environment/setup.sh` was still empty and `action.yaml` incorrectly signaled `done`, which would break a fresh-clone rebuild despite the existing scored artifacts.
 - Updated the environment to install the required Python stack and prepared a CPU packaging smoke test job that reruns the reusable evaluator and validator from committed scripts.
 
+### [2026-04-24 09:19] - core_claim
+- Fixed the remaining packaging inconsistency by making the path helper prefer portable `data/downloads/...` assets while falling back to the older workspace-local model and dataset copies when present.
+- Re-ran the reusable evaluator locally on the committed checkpoints and rewrote `scoring/scores.json` with the expected core-claim metrics.
+- Re-ran `python3 validate.py --compare --post-design` successfully and prepared a CPU submit so the workspace no longer ends in a permanent `done` state without a fresh validation job.
+
 ## Current Limitation
 - Current completed milestone remains `core_claim`: the environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but completed scored results do not yet cover the paper's full multi-model, robustness, and downstream task suite.

@@ -6,8 +6,8 @@
   - `GaussMark.Generate`: samples xi ~ N(0, sigma^2), perturbs one MLP layer (layer 20 up_proj), generates text
   - `GaussMark.Detect`: computes psi = <xi, grad> / (sigma * ||grad||), returns p-value using standard normal CDF
   - Statistical validity: psi ~ N(0,1) under H0; current unwatermarked baseline is 7/94 at p<0.05 and 1/94 at p<0.01, slightly high at 5% but plausible under small-sample binomial variation
-- **Model**: Mistral-7B-Instruct-v0.3 at /home/user/models/mistralai/Mistral-7B-Instruct-v0.3/
-- **C4 dataset**: /home/user/data/c4_realnewslike/examples.json (53906 samples)
+- **Model**: portable default is `data/downloads/models/mistralai/Mistral-7B-Instruct-v0.3/`; the current checkout also tolerates the older workspace copy at `/home/user/models/mistralai/Mistral-7B-Instruct-v0.3/`
+- **C4 dataset**: portable default is `data/downloads/c4_realnewslike/examples.json`; the current checkout also tolerates the older workspace copy at `/home/user/data/c4_realnewslike/examples.json` (53906 samples)
 - **Pipeline script**: method/run_pipeline.py
 - **Detection pipeline works**: Correct per-sample watermark keys regenerated during detection
 - **Reusable scoring works**: `scripts/evaluate.sh` reads the detection artifacts, writes `scoring/scores.json`, and validates import separation with `python validate.py --compare`.
@@ -64,16 +64,17 @@
 - Wrote detection metrics plus unwatermarked FPR and C4 cross-entropy quality ratio/delta to `scoring/scores.json`.
 - Added generation-time ratio as a lightweight latency constraint derived from the existing generation artifacts.
 
-## Pending Robustness Job
+## Pending Robustness Work
 
-- Prepared `scripts/run.sh` to run `python3 /home/user/method/run_robustness.py --fraction 0.25 --max-samples 40`.
-- The job reuses the existing watermarked and unwatermarked generation artifacts, applies 25% delete/insert/substitute token corruptions, and writes `/home/user/checkpoints/robustness_token_corruption_mistral.json`.
-- Current milestone remains `core_claim` until this GPU job finishes and the robustness result is reviewed.
+- `method/run_robustness.py` is implemented for token-level insert/delete/substitute corruption, but that result is not part of the current scored package.
+- The next packaged submit path is a CPU smoke test of the reusable evaluator and validator, not a fresh robustness run.
+- Current milestone remains `core_claim` until a reviewed robustness or broader quality result is actually scored.
 
 ## Fresh-Clone Packaging Status
 
 - Re-audited the workspace on 2026-04-24 and confirmed the scored `core_claim` artifacts are present and numerically plausible against `scoring/reference.json`.
 - The main packaging gap was environmental rather than algorithmic: `environment/setup.sh` did not install the method dependencies even though the code requires `torch`, `transformers`, `numpy`, `scipy`, and `scikit-learn`.
+- Tightened path resolution so the committed default still prefers `data/downloads/...`, while this checkout can fall back to the older workspace-local model and dataset copies if they already exist.
 - Updated `environment/setup.sh` to install the runtime stack and repointed `scripts/run.sh` to a reusable CPU smoke test that reruns `scripts/evaluate.sh` on the existing checkpoints and then executes `python3 validate.py --compare --post-design`.
 - This keeps the milestone at `core_claim` while verifying that a rebuilt container can still evaluate the committed GaussMark artifacts without relying on stale local state.
 
