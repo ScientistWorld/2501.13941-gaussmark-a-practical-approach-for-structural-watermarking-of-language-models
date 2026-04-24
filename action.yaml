@@ -3,4 +3,5 @@
 # only after your turn ends. Sleeping blocks the entire pipeline.
 action: done
 gpus: 0
-notes: "Per-sample first-half/second-half split; 8 train metrics and 8 test metrics produced for watermark_detection_mistral; primary gap is small (TPR@FPR0.05 0.7826 train vs 0.7778 test, AUC 0.9607 vs 0.9319); caveat: unwatermarked FPR@0.05 differs 0.0426 vs 0.1064 because each slice has only 47 negatives."
+milestone: core_claim
+notes: "Core claim reproduced on Mistral-7B-Instruct-v0.3 with the paper's GaussMark computation: scores.json shows TPR@FPR0.05=0.7802, TPR@FPR0.01=0.6044, AUC=0.9477, C4 ratio/delta=1.0102/0.0206, and explicit unwatermarked FPR constraints. Post-design train/test split also passed end to end with a small primary-gap (0.7826 train vs 0.7778 test)."

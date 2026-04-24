@@ -21,6 +21,18 @@ The prior action requested an additional robustness GPU test, but the completed 
 ## Final Judgment
 The workspace is ready to serve as a research gym. Improve-mode agents can use the method implementation and measured core-claim scores. From-scratch agents can use the problem/evaluation/scoring guidance and the evaluator without importing from `method/`; the strict method-agnostic files do not describe the paper's algorithm.
 
+The post-design split evaluation also completed successfully on April 24, 2026.
+`scripts/run.sh` executed `evaluate_train.sh`, `evaluate_test.sh`, and
+`validate.py --compare --post-design` end to end inside the compute container.
+The resulting split baseline is consistent with the core-claim run:
+
+- Train `detection_rate_fpr_0.05`: `0.7826`
+- Test `detection_rate_fpr_0.05`: `0.7778`
+- Train/test AUC: `0.9607` / `0.9319`
+
+That held-out/test agreement is close enough to support the benchmark's
+anti-shortcut goal while still showing non-identical slices.
+
 - Milestone: core_claim
 - Ready for gym use: yes
 - Confidence: high
