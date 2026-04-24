@@ -47,5 +47,10 @@
 - Re-ran the reusable evaluator locally on the committed checkpoints and rewrote `scoring/scores.json` with the expected core-claim metrics.
 - Re-ran `python3 validate.py --compare --post-design` successfully and prepared a CPU submit so the workspace no longer ends in a permanent `done` state without a fresh validation job.
 
+### [2026-04-24 09:22] - core_claim
+- Final verification confirmed the workspace is gym-ready at `core_claim`: the problem/evaluation files remain method-agnostic, the scoring rubric measures scientific quantities rather than paper-deviation metrics, and the evaluator stays independent from `method/`.
+- Re-checked `scripts/download.sh` portability and verified all external download URLs resolve successfully.
+- Recorded the final judgment in `VERIFICATION.md` and kept the milestone unchanged.
+
 ## Current Limitation
 - Current completed milestone remains `core_claim`: the environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but completed scored results do not yet cover the paper's full multi-model, robustness, and downstream task suite.
