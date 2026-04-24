@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
+action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Sharpen train/test split: remove global per-generation metrics (generation_time_ratio, c4_cross_entropy_*) that are identical across any data split; add slice metadata for auditable verification; auto-derive method names; fix unwatermarked slicing consistency; add DESIGN_NOTES.md."
+notes: "CPU post-hoc split evaluation: score gaussmark_200_tokens plus unwatermarked baseline on eval/train and eval/test, regenerate scoring/scores_{train,test}.json, and validate the post-design bundle."

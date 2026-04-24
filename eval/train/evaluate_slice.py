@@ -22,6 +22,25 @@ def load_p_values(path: str) -> tuple[list[float], dict[str, Any]]:
     return [float(p) for p in data.get("p_values", [])], data
 
 
+def reference_method_metrics(
+    scores_path: str,
+    experiment: str,
+    method_name: str,
+) -> dict[str, float]:
+    if not os.path.exists(scores_path):
+        return {}
+    with open(scores_path) as f:
+        data = json.load(f)
+    experiments = data.get("experiments", {})
+    results = experiments.get(experiment, {}).get("results", {})
+    method = results.get(method_name, {})
+    return {
+        key: float(value)
+        for key, value in method.items()
+        if isinstance(value, (int, float))
+    }
+
+
 def train_slice(p_values: list[float]) -> list[float]:
     """First half of samples (by index order)."""
     split_at = (len(p_values) + 1) // 2
@@ -70,6 +89,34 @@ def latest_watermarked_file(results_dir: str) -> str | None:
     return max(candidates, key=os.path.getmtime)
 
 
+def candidate_watermarked_files(results_dir: str) -> list[str]:
+    patterns = [
+        "marked*_detection_full.json",
+        "watermarked*_detection_full.json",
+        "*wm*_detection_full.json",
+        "*watermark*_detection_full.json",
+    ]
+    candidates: list[str] = []
+    for pattern in patterns:
+        candidates.extend(glob.glob(os.path.join(results_dir, pattern)))
+    deduped = []
+    seen: set[str] = set()
+    for path in sorted(candidates):
+        base = os.path.basename(path)
+        if (
+            not os.path.isfile(path)
+            or "unwatermarked" in base
+            or "baseline" in base
+            or "robustness" in base
+        ):
+            continue
+        if path in seen:
+            continue
+        seen.add(path)
+        deduped.append(path)
+    return deduped
+
+
 def derive_method_name(filename: str) -> str:
     """Derive a clean method name from a detection full filename.
 
@@ -92,6 +139,50 @@ def derive_method_name(filename: str) -> str:
     return name if name else fname.replace("_detection_full.json", "")
 
 
+def full_file_metrics(path: str) -> dict[str, float]:
+    p_values, data = load_p_values(path)
+    metrics = detection_metrics(p_values)
+    for key in ("auc", "c4_cross_entropy_ratio", "c4_cross_entropy_delta"):
+        if key in data and isinstance(data[key], (int, float)):
+            metrics[key] = float(data[key])
+    return metrics
+
+
+def resolve_watermarked_file(results_dir: str, experiment: str, method_name: str) -> str | None:
+    candidates = candidate_watermarked_files(results_dir)
+    if not candidates:
+        return None
+
+    exact_matches = [
+        path for path in candidates
+        if os.path.basename(path).replace("_detection_full.json", "") == method_name
+    ]
+    if len(exact_matches) == 1:
+        return exact_matches[0]
+
+    reference = reference_method_metrics(
+        "/home/user/scoring/scores.json", experiment, method_name
+    )
+    if not reference:
+        return latest_watermarked_file(results_dir)
+
+    def candidate_distance(path: str) -> tuple[float, int, float]:
+        metrics = full_file_metrics(path)
+        overlap = sorted(set(reference) & set(metrics))
+        if not overlap:
+            return (float("inf"), 0, -os.path.getmtime(path))
+
+        error = 0.0
+        for key in overlap:
+            ref_val = float(reference[key])
+            cand_val = float(metrics[key])
+            scale = max(abs(ref_val), 1e-6)
+            error += abs(cand_val - ref_val) / scale
+        return (error, -len(overlap), -os.path.getmtime(path))
+
+    return min(candidates, key=candidate_distance)
+
+
 def evaluate(
     results_dir: str,
     experiment: str,
@@ -103,20 +194,23 @@ def evaluate(
     scores: dict[str, Any] = {
         "experiments": {experiment: {"results": {}}},
         "_slice": slice_name,
+        "_audit": {experiment: {}},
     }
 
-    wm_path = watermarked_file or latest_watermarked_file(results_dir)
+    wm_path = watermarked_file or resolve_watermarked_file(results_dir, experiment, method_name)
     p_wm: list[float] = []
-    wm_data: dict[str, Any] = {}
     if wm_path:
-        all_p_wm, wm_data = load_p_values(wm_path)
+        all_p_wm, _ = load_p_values(wm_path)
         p_wm = train_slice(all_p_wm)
         if p_wm:
             wm_scores = detection_metrics(p_wm)
-            wm_scores["_slice"] = slice_name
-            wm_scores["_num_samples_total"] = len(all_p_wm)
-            wm_scores["_num_samples_used"] = len(p_wm)
             scores["experiments"][experiment]["results"][method_name] = wm_scores
+            scores["_audit"][experiment][method_name] = {
+                "slice": slice_name,
+                "file": os.path.basename(wm_path),
+                "num_samples_total": len(all_p_wm),
+                "num_samples_used": len(p_wm),
+            }
             print(f"Train: {len(p_wm)}/{len(all_p_wm)} p-values from {os.path.basename(wm_path)}")
     else:
         print("No watermarked detection result file found.")
@@ -131,12 +225,13 @@ def evaluate(
         p_uwm = train_slice(all_p_uwm)
         if p_uwm:
             uwm_scores = detection_metrics(p_uwm)
-            uwm_scores["_slice"] = slice_name
-            uwm_scores["_num_samples_total"] = len(all_p_uwm)
-            uwm_scores["_num_samples_used"] = len(p_uwm)
-            uwm_scores["c4_cross_entropy_ratio"] = 1.0
-            uwm_scores["c4_cross_entropy_delta"] = 0.0
             scores["experiments"][experiment]["results"]["unwatermarked"] = uwm_scores
+            scores["_audit"][experiment]["unwatermarked"] = {
+                "slice": slice_name,
+                "file": os.path.basename(uwm_path),
+                "num_samples_total": len(all_p_uwm),
+                "num_samples_used": len(p_uwm),
+            }
             if method_name in scores["experiments"][experiment]["results"]:
                 marked_scores = scores["experiments"][experiment]["results"][method_name]
                 marked_scores["unwatermarked_detection_rate_fpr_0.05"] = uwm_scores[
@@ -159,7 +254,7 @@ def evaluate(
     # generation_time_ratio and c4_cross_entropy_* are per-generation global
     # properties, not per-sample. They are identical across train and test splits
     # by construction and therefore provide zero anti-shortcut signal.
-    # We omit them from the train/test scoring to keep the split meaningful.
+    # We omit them from the train/test scoring entirely to keep the split meaningful.
     # The original evaluate.sh computes these for reference scoring.
 
     return scores

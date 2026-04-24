@@ -1,23 +1,18 @@
 #!/bin/bash
-# GaussMark reproduction pipeline job
-set -e
+set -euo pipefail
 
 cd /home/user
 
-echo "=== GaussMark GPU Job ==="
+echo "=== GaussMark Split Evaluation Job ==="
 date
 
-# Check GPU
-nvidia-smi
+rm -f /home/user/scoring/scores_train.json /home/user/scoring/scores_test.json
 
-# Reuse the completed core-claim generation artifacts and test the paper's
-# token-corruption robustness setting on a bounded sample.
-python3 /home/user/method/run_robustness.py --fraction 0.25 --max-samples 40
+bash /home/user/scripts/evaluate_train.sh /home/user/checkpoints
+bash /home/user/scripts/evaluate_test.sh /home/user/checkpoints
 
-# Keep the already-scored core-claim contract valid while the robustness artifact
-# remains a separate candidate for the next milestone.
-python3 /home/user/validate.py --compare
+python3 /home/user/validate.py --compare --post-design
 
 echo ""
-echo "=== GPU Job Complete ==="
+echo "=== Split Evaluation Complete ==="
 date
