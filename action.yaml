@@ -1,8 +1,6 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
+action: done
 gpus: 0
-test: false
-milestone: core_claim
-notes: "Retry CPU split evaluation after last job failed before run.sh: apptainer could not open /home/user/environment/container.sif because it was missing. Force scheduler rebuild from tracked ubuntu:22.04 container.def plus no-op stdlib-only setup.sh."
+notes: "Per-sample first-half/second-half split; 8 train metrics and 8 test metrics produced for watermark_detection_mistral; primary gap is small (TPR@FPR0.05 0.7826 train vs 0.7778 test, AUC 0.9607 vs 0.9319); caveat: unwatermarked FPR@0.05 differs 0.0426 vs 0.1064 because each slice has only 47 negatives."

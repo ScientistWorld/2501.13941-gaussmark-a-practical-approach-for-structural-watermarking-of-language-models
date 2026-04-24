@@ -12,9 +12,14 @@ The Stage 1 design was structurally sound — scripts were wired correctly, no c
 
 Both evaluators now **omit these metrics** from train/test scoring. The original `evaluate.sh` still computes them for the reference scores (`scores.json`).
 
-### 2. Added `_slice`, `_num_samples_total`, `_num_samples_used` to output
+### 2. Added `_slice` and `_audit` metadata to output
 
-Each scored method result now carries slice metadata (e.g., `_slice: "train"`) and sample counts (total vs. used). This makes it trivially auditable that train and test actually evaluated different sample subsets. It also surfaces whether a split left one slice too small (e.g., a 20-sample file → 10 train, 10 test, which may be noisy).
+The score files now carry top-level `_slice` metadata plus an `_audit` section
+per experiment/method with the source filename and total/used sample counts.
+The audit trail is kept outside metric rows so score consumers only see actual
+scientific metrics under `results.*`. This makes it trivially auditable that
+train and test evaluated different sample subsets without polluting the metric
+namespace.
 
 ### 3. Auto-derive method name from watermarked file
 
@@ -41,3 +46,18 @@ Both evaluators now apply the same slice function to the unwatermarked baseline.
 
 1. **Global-metric-identical across train/test**: `generation_time_ratio` and `c4_cross_entropy_*` are per-generation, not per-sample. They provide zero anti-shortcut signal when the split is by sample index.
 2. **Unwatermarked baseline slice inconsistency**: Test evaluator's AUC computation was comparing sliced watermarked p-values against unsliced unwatermarked p-values. Now both use the same slice function.
+
+## Stage 3 Runtime Result
+
+The final CPU scoring job completed successfully on April 24, 2026 and
+produced both `scoring/scores_train.json` and `scoring/scores_test.json`.
+
+- Train `detection_rate_fpr_0.05`: `0.7826`
+- Test `detection_rate_fpr_0.05`: `0.7778`
+- Train/test AUC: `0.9607` / `0.9319`
+- Train/test unwatermarked FPR@0.05: `0.0426` / `0.1064`
+
+This is the right shape for the gym: the held-out slice is not byte-identical
+to train, the primary metric is in the same range on both slices, and the
+split validator passed all checks. The unwatermarked FPR gap is noticeable but
+still plausible given only 47 unwatermarked examples per slice.
