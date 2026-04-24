@@ -3,4 +3,4 @@
 # only after your turn ends. Sleeping blocks the entire pipeline.
 action: done
 milestone: core_claim
-notes: "Final verification passed: evaluator made more portable, download URLs checked, and the core-claim gym is ready for use."
+notes: "Final verification passed: the workspace is gym-ready at core_claim with portable downloads, clean eval separation, and a valid scoring contract."
