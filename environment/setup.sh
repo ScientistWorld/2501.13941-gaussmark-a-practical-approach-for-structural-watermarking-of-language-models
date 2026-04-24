@@ -15,16 +15,7 @@
 # Do NOT create a venv (python -m venv, virtualenv, etc.).
 
 set -e
-# The scheduler's setup wrapper provides uv; keep this script minimal so
-# the overlay hash changes only when the actual Python environment changes.
 
-uv pip install --system \
-    torch \
-    transformers \
-    accelerate \
-    scipy \
-    numpy \
-    tqdm \
-    datasets \
-    huggingface_hub \
-    scikit-learn
+# This submission only runs the split scorers and validator, which use the
+# Python standard library only. Keep setup empty so the scheduler does not
+# need to create or reuse any Python package overlay for this evaluation job.

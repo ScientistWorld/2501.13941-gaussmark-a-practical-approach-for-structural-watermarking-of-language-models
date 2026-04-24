@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Retry CPU split evaluation after switching to ubuntu:22.04 and simplifying setup.sh to direct uv pip install only; force both a fresh container build and a fresh setup overlay instead of reusing the prior cached env path."
+notes: "Retry CPU split evaluation with a minimal stdlib-only environment: ubuntu:22.04 base, no Python packages in setup.sh, and local generated container artifacts removed from environment/."
