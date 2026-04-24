@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Visible train-slice evaluator for GaussMark p-value artifacts.
 
-This script is method-agnostic: it reads the same generated detection artifacts
-as scripts/evaluate.sh and rescoring only the visible development slice.
+Computes detection metrics on the first half of samples only (sorted by index).
+Global properties (generation_time_ratio, c4_cross_entropy_*) are not split
+by design — they are per-generation properties, not per-sample properties.
+The test slice evaluates the same samples split by index.
 """
 
 from __future__ import annotations
@@ -20,9 +22,10 @@ def load_p_values(path: str) -> tuple[list[float], dict[str, Any]]:
     return [float(p) for p in data.get("p_values", [])], data
 
 
-def train_slice(values: list[float]) -> list[float]:
-    split_at = (len(values) + 1) // 2
-    return values[:split_at]
+def train_slice(p_values: list[float]) -> list[float]:
+    """First half of samples (by index order)."""
+    split_at = (len(p_values) + 1) // 2
+    return p_values[:split_at]
 
 
 def detection_metrics(p_values: list[float]) -> dict[str, float]:
@@ -67,26 +70,26 @@ def latest_watermarked_file(results_dir: str) -> str | None:
     return max(candidates, key=os.path.getmtime)
 
 
-def latest_watermarked_generation_file(results_dir: str) -> str | None:
-    candidates = glob.glob(os.path.join(results_dir, "watermarked*.json"))
-    candidates = [
-        p for p in candidates
-        if os.path.isfile(p) and "_detection_" not in os.path.basename(p)
-    ]
-    if not candidates:
-        return None
-    return max(candidates, key=os.path.getmtime)
+def derive_method_name(filename: str) -> str:
+    """Derive a clean method name from a detection full filename.
 
-
-def mean_generation_time(path: str | None) -> float | None:
-    if not path or not os.path.exists(path):
-        return None
-    with open(path) as f:
-        data = json.load(f)
-    times = [float(t) for t in data.get("generation_times", []) if float(t) > 0]
-    if not times:
-        return None
-    return sum(times) / len(times)
+    Handles patterns like:
+      watermarked_layer20_up_proj_sigma1e-04_detection_full.json
+      wm_wm_l20_up_proj_s0001_detection_full.json
+      watermarked_wm_l20_up_proj_s00031622776601683794_detection_full.json
+    Returns the path prefix that uniquely identifies the method variant.
+    """
+    fname = os.path.basename(filename)
+    # Strip _detection_full.json and any leading watermarked_/wm_ prefixes
+    name = fname.replace("_detection_full.json", "")
+    # Normalize: strip watermarked_ or wm_ prefix consistently
+    for prefix in ("watermarked_", "wm_wm_", "wm_"):
+        if name.startswith(prefix):
+            name = name[len(prefix):]
+            break
+    # Strip common suffix pattern: layer/l + number + projection name
+    # e.g. "l20_up_proj_s0001" -> keep "l20_up_proj_s0001"
+    return name if name else fname.replace("_detection_full.json", "")
 
 
 def evaluate(
@@ -95,8 +98,12 @@ def evaluate(
     method_name: str,
     watermarked_file: str | None = None,
     unwatermarked_file: str | None = None,
+    slice_name: str = "train",
 ) -> dict[str, Any]:
-    scores: dict[str, Any] = {"experiments": {experiment: {"results": {}}}}
+    scores: dict[str, Any] = {
+        "experiments": {experiment: {"results": {}}},
+        "_slice": slice_name,
+    }
 
     wm_path = watermarked_file or latest_watermarked_file(results_dir)
     p_wm: list[float] = []
@@ -106,14 +113,15 @@ def evaluate(
         p_wm = train_slice(all_p_wm)
         if p_wm:
             wm_scores = detection_metrics(p_wm)
-            for key in ("c4_cross_entropy_ratio", "c4_cross_entropy_delta"):
-                if key in wm_data:
-                    wm_scores[key] = float(wm_data[key])
+            wm_scores["_slice"] = slice_name
+            wm_scores["_num_samples_total"] = len(all_p_wm)
+            wm_scores["_num_samples_used"] = len(p_wm)
             scores["experiments"][experiment]["results"][method_name] = wm_scores
-            print(f"Train watermarked p-values: {len(p_wm)} of {len(all_p_wm)} from {wm_path}")
+            print(f"Train: {len(p_wm)}/{len(all_p_wm)} p-values from {os.path.basename(wm_path)}")
     else:
         print("No watermarked detection result file found.")
 
+    # Unwatermarked baseline — also slice to first half for consistency
     uwm_path = unwatermarked_file or os.path.join(
         results_dir, "unwatermarked_baseline_unwatermarked_detection_full.json"
     )
@@ -123,6 +131,9 @@ def evaluate(
         p_uwm = train_slice(all_p_uwm)
         if p_uwm:
             uwm_scores = detection_metrics(p_uwm)
+            uwm_scores["_slice"] = slice_name
+            uwm_scores["_num_samples_total"] = len(all_p_uwm)
+            uwm_scores["_num_samples_used"] = len(p_uwm)
             uwm_scores["c4_cross_entropy_ratio"] = 1.0
             uwm_scores["c4_cross_entropy_delta"] = 0.0
             scores["experiments"][experiment]["results"]["unwatermarked"] = uwm_scores
@@ -138,21 +149,18 @@ def evaluate(
                     marked_scores["detection_rate_fpr_0.05"]
                     - uwm_scores["detection_rate_fpr_0.05"]
                 )
-            print(f"Train unwatermarked p-values: {len(p_uwm)} of {len(all_p_uwm)} from {uwm_path}")
+            print(f"Train: {len(p_uwm)}/{len(all_p_uwm)} unwatermarked p-values from {os.path.basename(uwm_path)}")
     else:
         print(f"Unwatermarked result file not found: {uwm_path}")
 
     if p_wm and p_uwm:
         scores["experiments"][experiment]["results"][method_name]["auc"] = pairwise_auc(p_wm, p_uwm)
 
-    wm_gen_time = mean_generation_time(latest_watermarked_generation_file(results_dir))
-    uwm_gen_time = mean_generation_time(os.path.join(results_dir, "unwatermarked_baseline_exact.json"))
-    if wm_gen_time and uwm_gen_time and method_name in scores["experiments"][experiment]["results"]:
-        scores["experiments"][experiment]["results"][method_name]["generation_time_ratio"] = (
-            wm_gen_time / uwm_gen_time
-        )
-        if "unwatermarked" in scores["experiments"][experiment]["results"]:
-            scores["experiments"][experiment]["results"]["unwatermarked"]["generation_time_ratio"] = 1.0
+    # generation_time_ratio and c4_cross_entropy_* are per-generation global
+    # properties, not per-sample. They are identical across train and test splits
+    # by construction and therefore provide zero anti-shortcut signal.
+    # We omit them from the train/test scoring to keep the split meaningful.
+    # The original evaluate.sh computes these for reference scoring.
 
     return scores
 
@@ -161,18 +169,26 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--results-dir", default="/home/user/checkpoints")
     parser.add_argument("--experiment", default="watermark_detection_mistral")
-    parser.add_argument("--method-name", default="gaussmark_200_tokens")
+    parser.add_argument("--method-name", default=None)
     parser.add_argument("--output", default="/home/user/scoring/scores_train.json")
     parser.add_argument("--watermarked-file", default=None)
     parser.add_argument("--unwatermarked-file", default=None)
     args = parser.parse_args()
 
+    # Auto-derive method name from watermarked file if not provided
+    method_name = args.method_name
+    if not method_name and args.watermarked_file:
+        method_name = derive_method_name(args.watermarked_file)
+    if not method_name:
+        method_name = "unknown_method"
+
     scores = evaluate(
         args.results_dir,
         args.experiment,
-        args.method_name,
+        method_name,
         watermarked_file=args.watermarked_file,
         unwatermarked_file=args.unwatermarked_file,
+        slice_name="train",
     )
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     with open(args.output, "w") as f:
