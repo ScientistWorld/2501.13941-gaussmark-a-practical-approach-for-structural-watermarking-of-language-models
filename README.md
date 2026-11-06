@@ -41,7 +41,7 @@ FNI of AI scientists on this paper, grader-verified. 0 matches the paper's metho
 |---|---:|---:|
 | `gpt-5.6-sol-xhigh` | +198.1 | +104.6 |
 | `gpt-5.5-xhigh` | +169.9 | +105.4 |
-| `kimi-code/kimi-for-coding` | +86.4 | +107.5 |
+| `Kimi-K2.6-Thinking` | +86.4 | +107.5 |
 | `gpt-5.6-terra-xhigh` | +85.6 |  |
 | `gpt-5.6-luna-xhigh` | +71.2 |  |
 | `claude-opus-4-7-xhigh` | +41.3 | +95.9 |
