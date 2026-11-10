@@ -7,7 +7,7 @@
 
 ## Short Summary
 
-GaussMark watermarks LLM outputs by adding a small amount of Gaussian noise to the weights of a single MLP layer during generation. The watermark key (a random Gaussian vector) is sampled fresh for each generation. Detection works by computing a dot product between the watermark key and the gradient of the log-likelihood with respect to the original weights. Under the null hypothesis (unwatermarked text), this test statistic follows a standard normal distribution exactly, giving rigorous false-positive control. Detection is fast (<1s for 1K tokens) and generation has zero overhead since the only change is a weight perturbation before standard inference. Extensive experiments on Mistral-7B, Llama3.1-8B, and Phi3.5-Mini show high detection rates (~95% for Llama at 200 tokens, FPR=5%) with no significant quality degradation on SuperGLUE, GSM-8K, or AlpacaEval benchmarks.
+GaussMark watermarks LLM outputs by adding a small amount of Gaussian noise to the weights of a single MLP layer during generation. The watermark key (a random Gaussian vector) is sampled per deployment of the marked model. Detection works by computing a dot product between the watermark key and the gradient of the log-likelihood with respect to the original weights. Under the null hypothesis (unwatermarked text), this test statistic follows a standard normal distribution exactly, giving rigorous false-positive control. Detection is fast (<1s for 1K tokens) and generation has zero overhead since the only change is a weight perturbation before standard inference. Extensive experiments on Mistral-7B, Llama3.1-8B, and Phi3.5-Mini show high detection rates (~95% for Llama at 200 tokens, FPR=5%) with no significant quality degradation on SuperGLUE, GSM-8K, or AlpacaEval benchmarks.
 
 ## Key Results
 
@@ -15,3 +15,10 @@ GaussMark watermarks LLM outputs by adding a small amount of Gaussian noise to t
 - **Quality**: No significant degradation on SuperGLUE (avg ~0.70), GSM-8K, or AlpacaEval-2.0 compared to unwatermarked baselines.
 - **Speed**: Zero generation latency overhead. Detection in <1s for 1K tokens.
 - **Robustness**: Retains nontrivial detection after 10-50% token-level corruptions and roundtrip translation attacks.
+
+## This gym
+
+- Scored on Mistral-7B-Instruct-v0.3 only, 200-token generations, two experiments: clean detection with a
+  cross-entropy quality budget, and detection after 20% token-level corruption.
+- The evaluator runs each method's `make_watermark`/`detect` on hidden prompts, keys and null texts
+  (see `briefing/problem.md`, `briefing/evaluation.md`).

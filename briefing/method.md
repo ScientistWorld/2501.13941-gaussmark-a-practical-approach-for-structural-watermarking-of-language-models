@@ -44,3 +44,18 @@ Only ONE MLP layer's weights are perturbed. For Mistral-7B: layer 20, `up_proj` 
 - Instead of perturbing all directions of a weight matrix, only perturb the **bottom k principal components**
 - This allows MORE noise (stronger watermark) while preserving model quality
 - Used in some experiments for better quality-watermark tradeoffs
+
+## Reference implementation in this gym
+
+- `method/gaussmark.py` is the evaluator plugin: `make_watermark` returns the
+  Gaussian key xi (std sqrt(1e-5)) for `model.layers.20.mlp.up_proj.weight`,
+  drawn from the evaluator's key seed; `detect` computes psi with the gradient
+  of the summed log-likelihood of the text at the original weights and returns
+  1 - Phi(psi). Options in `config.json`: `layer`, `weight`, `variance`,
+  `drop_top_pcs` (rank-reduced variant; paper Table 7 uses layer 30 and 1024),
+  `min_token_prob`.
+- `python3 method/export_watermarker.py --name <name> --config '<json>'`
+  installs it under `checkpoints/watermarkers/<name>/`.
+- One key per group of 50 prompts (one marked deployment per key), as in the
+  paper's per-seed experiments; the evaluator decodes, so generation cost is
+  identical to the unmarked model by construction.

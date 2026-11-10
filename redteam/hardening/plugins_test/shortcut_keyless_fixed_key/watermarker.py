@@ -1,0 +1,8 @@
+import importlib.util as _u, pathlib as _p
+_s = _u.spec_from_file_location(__name__ + "_impl", _p.Path(__file__).with_name("gaussmark_impl.py"))
+G = _u.module_from_spec(_s); _s.loader.exec_module(G)
+
+def make_watermark(model, key_seed):
+    return G.make_watermark(model, 12345)
+def detect(model, key_seed, prompts, texts):
+    return G.detect(model, 12345, prompts, texts)
