@@ -202,7 +202,7 @@
       }
     },
     "watermark_robustness_mistral": {
-      "description": "Detection after the paper's token-level corruptions (Sec. 4.3): the evaluator edits 20% of the tokens of every marked and every unwatermarked text with random substitutions, deletions or insertions (one attack per text, balanced). Same model, prompts, keys and gates as watermark_detection_mistral. Added as the headroom experiment: the paper's method loses much of its power here.",
+      "description": "Detection after the paper's token-level corruptions (Sec. 4.3): the evaluator edits 20% of the tokens of every marked and every unwatermarked text with random substitutions, deletions or insertions (one attack per text, balanced). Same model, prompts, keys and gates as watermark_detection_mistral. Added as the headroom experiment: the paper's method loses much of its power here. Baseline row: the paper reports no unwatermarked baseline under corruption; its auc/median_p_value are the theoretical null values.",
       "weight": 0.35,
       "primary_metric": "detection_rate_fpr_0.05",
       "metrics": {
@@ -239,7 +239,6 @@
         },
         "unwatermarked": {
           "type": "baseline",
-          "detection_rate_fpr_0.05": 0.05,
           "auc": 0.5,
           "median_p_value": 0.5
         }

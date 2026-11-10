@@ -45,4 +45,4 @@ Check off items as you complete them. Order doesn't matter — work however make
 - Model deviation: Using Mistral-7B-Instruct-v0.3 (paper uses base model)
 - Sigma note: the paper reports Mistral variance sigma^2=1e-5; the current job uses standard deviation sigma=sqrt(1e-5)
 - Not reproduced: SuperGLUE/GSM-8K quality evaluation, Llama/Phi experiments, full-scale robustness
-- Current path helper also tolerates the older workspace-local copies in `/home/user/models/` and `/home/user/data/` so existing artifacts remain runnable in this checkout
+- Model and C4 live under `data/downloads/` (see `scripts/download.sh`); the hidden test source shard under `eval/test/raw/`

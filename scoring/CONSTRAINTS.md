@@ -1,48 +1,46 @@
 # Scientist Constraints
 
-These constraints define what a scientist must hold fixed when trying to improve on this paper's results. Improvement must come from genuine methodology — not from scaling compute, switching models, or circumventing the evaluation protocol.
+Improvement must come from the watermark (what is changed in the model per
+key) and the detector — not from changing the setting or the measurement.
 
----
+## Fixed by the evaluator (cannot be changed by a method)
+- **Model:** `mistralai/Mistral-7B-Instruct-v0.3`, bf16. A watermark may only
+  add finite, key-dependent deltas to existing parameters; module structure,
+  hooks, buffers and the base weights must be left untouched (checked after
+  every call; any change fails the run).
+- **Prompts, keys, null texts, corruptions:** C4 realnewslike prompts of
+  `<s>` + 200 tokens; key seeds; unwatermarked-model, human and wrong-key null
+  texts; 20% token edits — all owned by `eval/`. The hidden slice's inputs live
+  only in `eval/test/`.
+- **Decoding:** temperature 1, top-p 0.9, exactly 200 new tokens, special
+  tokens disabled, one sample per prompt, evaluator-fixed sampling noise. A
+  method cannot see prompts at generation time, resample, or select among
+  candidates.
+- **Thresholds and budgets:** nominal levels p < 0.05 and p < 0.01; quality
+  budget C4 cross-entropy ratio <= 1.015; validity gate one-sided binomial
+  p < 0.001 per null family; 3 h per method.
+- **Test size:** 400 hidden documents, 8 keys of 50 documents.
 
-## Model
-- **Required:** Mistral-7B-Instruct-v0.3 from HuggingFace (`mistralai/Mistral-7B-Instruct-v0.3`)
-- **Why fixed:** Switching to a different model family, size, tokenizer, or instruction-tuning variant changes the difficulty and makes scores non-comparable.
-- **Deviation in our reproduction:** We use the Instruct variant; the paper uses base Mistral-7B.
+## Interface
+- `checkpoints/watermarkers/<name>/watermarker.py` with
+  `make_watermark(model, key_seed) -> {param_name: delta}` and
+  `detect(model, key_seed, prompts, texts) -> p-values in [0, 1]`
+  (see `briefing/problem.md`). Every directory there is scored.
+- `make_watermark` must be a deterministic function of `key_seed` and the
+  original weights; `detect` gets the original weights.
 
-## Data
-- **Prompts:** C4 realnewslike dataset, train split, first available examples, truncated to ≤200 tokens per prompt; the current scaled reproduction evaluates 100 prompts
-- **Prompt source:** `/home/user/data/downloads/c4_realnewslike/examples.json`
-- **No external datasets:** Scientists may not use other prompt sources for the primary detection experiment
+## Prohibited
+1. Reading or using anything under `eval/` (hidden data, seeds, evaluator
+   state), inspecting the caller's stack/frames, or patching torch,
+   transformers or the evaluator at runtime.
+2. Returning p-values that are not genuine p-values for "this text was
+   generated under this key" (e.g. using information other than the prompt,
+   the text, the key and the original model).
+3. Editing `eval/`, `scripts/evaluate*.sh`, thresholds or metric definitions.
+4. Switching the model, prompt source or decoding settings.
 
-## Generation
-- **Required length:** 200 new tokens per prompt for the primary experiment.
-- **Required sampling:** temperature=1.0 and top-p=0.9, unless a separately named diagnostic experiment documents a different setting.
-- **No paid APIs:** All text must be generated locally from the fixed open model.
-
-## Output Contract
-- **Required artifacts:** Each method must produce marked-output results and an unmarked comparison in the format accepted by `scripts/evaluate.sh`.
-- **Required statistics:** The evaluator must receive per-sample p-values or equivalent detector scores that can be converted into thresholded false-positive-rate metrics.
-- **Required timing:** Generation timing should be measured in the same run for marked and unmarked outputs when reporting `generation_time_ratio`.
-
-## Evaluation Protocol
-- **Required thresholds:** Report detection rates at FPR=0.05 and FPR=0.01
-- **Required null check:** Report the unwatermarked false-positive rates; improvements that inflate the unmarked detection rate are invalid.
-- **Required quality check:** Report C4 cross-entropy ratio/delta or a directly comparable held-out language-model quality metric.
-- **Prohibited:** Changing `scripts/evaluate.sh` or `eval/` to favor a specific method.
-- **Prohibited:** Choosing hyperparameters after inspecting the held-out detection labels, then reporting that run as the primary result.
-
-## Prohibited Actions
-1. Switching base model (Llama, Phi, Gemma, etc.) for the primary experiment
-2. Training or fine-tuning the base model for the primary comparison unless reported as a separate non-comparable experiment
-3. Using external labels, hidden dataset metadata, or memorized prompts to classify outputs
-4. Reporting only marked-output detection without the unmarked false-positive constraint
-5. Modifying the evaluator, thresholds, or null calibration post-hoc to improve the score
-6. Fitting hyperparameters on the test set
-
-## Compliance Checklist
-- [x] Model is Mistral-7B-Instruct-v0.3
-- [x] No fine-tuning or training performed
-- [x] Evaluation uses FPR thresholds 0.05 and 0.01
-- [x] Unwatermarked false-positive rates are reported
-- [x] C4 cross-entropy quality metrics are reported
-- [x] Generation-time ratio is reported
+## Compliance checklist
+- [x] Same model and tokenizer; watermark expressed as parameter deltas
+- [x] Detector returns one valid p-value per text
+- [x] No access to `eval/` from the method
+- [x] Quality within the 1.015 cross-entropy budget

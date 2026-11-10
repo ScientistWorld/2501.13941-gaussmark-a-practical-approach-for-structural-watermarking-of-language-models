@@ -54,3 +54,11 @@
 
 ## Current Limitation
 - Current completed milestone remains `core_claim`: the environment validates the central detection/quality/latency trade-off on the scaled Mistral-7B-Instruct experiment, but completed scored results do not yet cover the paper's full multi-model, robustness, and downstream task suite.
+
+### [2026-11-10] - core_claim (hardening, final iteration)
+- Rebuilt the evaluation so the evaluator runs each method's watermark/detector plugin on hidden prompts,
+  keys and null texts, recomputes every metric, and fails runs on invalid output, model tampering,
+  quality budget (C4 CE ratio > 1.015) or excess false positives.
+- Reference on 400 hidden documents: TPR .82/.63 at p<.05/.01, AUC .961, CE ratio 1.0108 (paper 1.0097);
+  baseline at chance. Added the token-corruption robustness experiment (reference TPR .2875).
+- Details and shortcut results in `HARDENING.md`.

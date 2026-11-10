@@ -36,3 +36,7 @@ The benchmark is intentionally narrow: the scored reproduction covers one scaled
 - Ready for gym use: yes
 - Confidence: high
 - Key limitation: the scored benchmark is a single scaled Mistral core-claim experiment, not the full paper's broader evaluation matrix.
+
+## Superseded (2026-11-10)
+The evaluation design verified above was replaced in the hardening iteration; see `HARDENING.md`
+and `DESIGN_NOTES.md` for the current gym and its verification (job de3a73e8-6a2).
