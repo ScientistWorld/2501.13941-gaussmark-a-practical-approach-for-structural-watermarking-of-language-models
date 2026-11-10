@@ -1,42 +1,211 @@
 /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
   warnings.warn(
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'LlamaTokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+[+] Loading C4 prompts...
+[+] Loaded 100 prompts from examples.json
+Tokenizer matches all 100 exact saved reference prompt IDs.
 [+] Loading model from /home/user/models/mistralai/Mistral-7B-Instruct-v0.3...
 `torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:01<00:03,  1.96s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:03<00:01,  1.98s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.89s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.91s/it]
-Traceback (most recent call last):
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2359, in _from_pretrained
-    tokenizer = cls(*init_inputs, **init_kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama_fast.py", line 154, in __init__
-    super().__init__(
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_fast.py", line 133, in __init__
-    slow_tokenizer = self.slow_tokenizer_class(*args, **kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama.py", line 171, in __init__
-    self.sp_model = self.get_spm_processor(kwargs.pop("from_slow", False))
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama.py", line 203, in get_spm_processor
-    model_pb2 = import_protobuf(f"The new behaviour of {self.__class__.__name__} (with `self.legacy = False`)")
-  File "/usr/local/lib/python3.10/dist-packages/transformers/convert_slow_tokenizer.py", line 39, in import_protobuf
-    from sentencepiece import sentencepiece_model_pb2
-  File "/usr/local/lib/python3.10/dist-packages/sentencepiece/sentencepiece_model_pb2.py", line 7, in <module>
-    from google.protobuf import descriptor as _descriptor
-ModuleNotFoundError: No module named 'google'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/user/redteam/gpu_checks.py", line 241, in <module>
-    model, tokenizer = pipeline.load_model_and_tokenizer(pipeline.MODEL_PATH)
-  File "/home/user/method/run_pipeline.py", line 110, in load_model_and_tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/auto/tokenization_auto.py", line 1156, in from_pretrained
-    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2113, in from_pretrained
-    return cls._from_pretrained(
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2360, in _from_pretrained
-    except import_protobuf_decode_error():
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 88, in import_protobuf_decode_error
-    raise ImportError(PROTOBUF_IMPORT_ERROR.format(error_message))
-ImportError: 
- requires the protobuf library but it was not found in your environment. Check out the instructions on the
-installation page of its repo: https://github.com/protocolbuffers/protobuf/tree/master/python#installation and follow the ones
-that match your environment. Please note that you may need to restart your runtime after installation.
-
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:03<00:06,  3.29s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:05<00:02,  2.75s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:07<00:00,  2.50s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:07<00:00,  2.62s/it]
+reference_seed_1042 marked 1 p= 0.0014570257848195434
+reference_seed_1042 marked 2 p= 1.2352506760127113e-05
+reference_seed_1042 marked 3 p= 3.478815037705196e-05
+reference_seed_1042 marked 4 p= 3.580890529708558e-05
+reference_seed_1042 marked 5 p= None
+reference_seed_1042 marked 6 p= 0.0002662200382372859
+reference_seed_1042 marked 7 p= 0.0002654716538446067
+reference_seed_1042 marked 8 p= 0.6025630865234134
+reference_seed_1042 marked 9 p= 0.5939950963815345
+reference_seed_1042 marked 10 p= 2.1891151269826103e-05
+reference_seed_1042 marked 11 p= 0.00029268409155369657
+reference_seed_1042 marked 12 p= 0.002104911528552633
+reference_seed_1042 marked 13 p= 0.0005261628497396087
+reference_seed_1042 marked 14 p= 1.4528714585182456e-05
+reference_seed_1042 marked 15 p= 0.007741370166508443
+reference_seed_1042 marked 16 p= 0.0037868186216788446
+reference_seed_1042 marked 17 p= 0.010419420798012835
+reference_seed_1042 marked 18 p= 0.13275009808756488
+reference_seed_1042 marked 19 p= 0.020478203023002295
+reference_seed_1042 marked 20 p= 0.0005403220514752505
+reference_seed_1042 marked 21 p= None
+reference_seed_1042 marked 22 p= 0.0013101010882747843
+reference_seed_1042 marked 23 p= 0.15813823879065692
+reference_seed_1042 marked 24 p= 1.609083573983483e-05
+reference_seed_1042 marked 25 p= 0.15123776094376473
+reference_seed_1042 marked 26 p= 0.0073585368884933056
+reference_seed_1042 marked 27 p= 0.0029008556369397587
+reference_seed_1042 marked 28 p= 0.025894093734336376
+reference_seed_1042 marked 29 p= 0.00795572398405986
+reference_seed_1042 marked 30 p= 0.000533781613273776
+reference_seed_1042 marked 31 p= 0.007284406818094502
+reference_seed_1042 marked 32 p= None
+reference_seed_1042 marked 33 p= None
+reference_seed_1042 marked 34 p= 1.4154719300885077e-05
+reference_seed_1042 marked 35 p= 0.004847635117137594
+reference_seed_1042 marked 36 p= 0.7301484810250549
+reference_seed_1042 marked 37 p= 0.0017227195150469887
+reference_seed_1042 marked 38 p= 0.03413763641667844
+reference_seed_1042 marked 39 p= 0.0890670041216961
+reference_seed_1042 marked 40 p= 0.0007385220995713704
+reference_seed_1042 marked 41 p= 0.0025221516380095066
+reference_seed_1042 marked 42 p= 0.30818768439026345
+reference_seed_1042 marked 43 p= 0.006404322153366726
+reference_seed_1042 marked 44 p= 0.0828618348172081
+reference_seed_1042 marked 45 p= 0.0006733746561163878
+reference_seed_1042 marked 46 p= 0.00010454006968418916
+reference_seed_1042 marked 47 p= 0.00035610525629370393
+reference_seed_1042 marked 48 p= 0.056146707718814026
+reference_seed_1042 marked 49 p= 2.6699318568801367e-05
+reference_seed_1042 marked 50 p= 0.021353650893957687
+reference_seed_1042 marked 51 p= 3.298222743852719e-05
+reference_seed_1042 marked 52 p= 0.011265087537135954
+reference_seed_1042 marked 53 p= 1.7973855737096756e-10
+reference_seed_1042 marked 54 p= 0.0013388858339271614
+reference_seed_1042 marked 55 p= 0.007806449601513443
+reference_seed_1042 marked 56 p= 0.07282125982267806
+reference_seed_1042 marked 57 p= 0.00013369082909497898
+reference_seed_1042 marked 58 p= 3.94870971546224e-05
+reference_seed_1042 marked 59 p= 0.12723031059392464
+reference_seed_1042 marked 60 p= 0.171147927415785
+reference_seed_1042 marked 61 p= 0.12914099112157384
+reference_seed_1042 marked 62 p= 0.001079424654247485
+reference_seed_1042 marked 63 p= 0.08497961258208298
+reference_seed_1042 marked 64 p= 0.005756540754557116
+reference_seed_1042 marked 65 p= 9.507405973607774e-11
+reference_seed_1042 marked 66 p= 0.004504012739412699
+reference_seed_1042 marked 67 p= 8.441329569119915e-06
+reference_seed_1042 marked 68 p= 0.12994189721598026
+reference_seed_1042 marked 69 p= 0.039290591525897756
+reference_seed_1042 marked 70 p= 2.4384074071015505e-07
+reference_seed_1042 marked 71 p= 0.0015403474457802435
+reference_seed_1042 marked 72 p= None
+reference_seed_1042 marked 73 p= 0.013224806075735618
+reference_seed_1042 marked 74 p= 0.004091694736890528
+reference_seed_1042 marked 75 p= 0.002186196440922994
+reference_seed_1042 marked 76 p= 3.4642934169104578e-06
+reference_seed_1042 marked 77 p= 3.4562384332303964e-07
+reference_seed_1042 marked 78 p= 0.0009975116069113055
+reference_seed_1042 marked 79 p= 0.0004067298166138267
+reference_seed_1042 marked 80 p= 7.797923929908634e-07
+reference_seed_1042 marked 81 p= 0.0050212598561856225
+reference_seed_1042 marked 82 p= 0.00023910059442566745
+reference_seed_1042 marked 83 p= 4.637072040236667e-06
+reference_seed_1042 marked 84 p= 0.15225886009762757
+reference_seed_1042 marked 85 p= 0.05969858022873853
+reference_seed_1042 marked 86 p= 0.000704411072896316
+reference_seed_1042 marked 87 p= 0.001353783094526717
+reference_seed_1042 marked 88 p= 0.008668438057453542
+reference_seed_1042 marked 89 p= 0.00014164616049794354
+reference_seed_1042 marked 90 p= 0.006147581838126692
+reference_seed_1042 marked 91 p= 0.04312200488811313
+reference_seed_1042 marked 92 p= 0.00400144359284782
+reference_seed_1042 marked 93 p= 7.075962023761484e-06
+reference_seed_1042 marked 94 p= 0.0035813008015574965
+reference_seed_1042 marked 95 p= 0.006992716789403719
+reference_seed_1042 marked 96 p= 0.0002585766783408383
+reference_seed_1042 marked 97 p= 0.004182334549222233
+reference_seed_1042 marked 98 p= 0.0008196338210286758
+reference_seed_1042 marked 99 p= 0.03299446699345221
+reference_seed_1042 marked 100 p= 0.01655900159191548
+reference_seed_1042 null 1
+reference_seed_1042 null 2
+reference_seed_1042 null 3
+reference_seed_1042 null 4
+reference_seed_1042 null 5
+reference_seed_1042 null 6
+reference_seed_1042 null 7
+reference_seed_1042 null 8
+reference_seed_1042 null 9
+reference_seed_1042 null 10
+reference_seed_1042 null 11
+reference_seed_1042 null 12
+reference_seed_1042 null 13
+reference_seed_1042 null 14
+reference_seed_1042 null 15
+reference_seed_1042 null 16
+reference_seed_1042 null 17
+reference_seed_1042 null 18
+reference_seed_1042 null 19
+reference_seed_1042 null 20
+reference_seed_1042 null 21
+reference_seed_1042 null 22
+reference_seed_1042 null 23
+reference_seed_1042 null 24
+reference_seed_1042 null 25
+reference_seed_1042 null 26
+reference_seed_1042 null 27
+reference_seed_1042 null 28
+reference_seed_1042 null 29
+reference_seed_1042 null 30
+reference_seed_1042 null 31
+reference_seed_1042 null 32
+reference_seed_1042 null 33
+reference_seed_1042 null 34
+reference_seed_1042 null 35
+reference_seed_1042 null 36
+reference_seed_1042 null 37
+reference_seed_1042 null 38
+reference_seed_1042 null 39
+reference_seed_1042 null 40
+reference_seed_1042 null 41
+reference_seed_1042 null 42
+reference_seed_1042 null 43
+reference_seed_1042 null 44
+reference_seed_1042 null 45
+reference_seed_1042 null 46
+reference_seed_1042 null 47
+reference_seed_1042 null 48
+reference_seed_1042 null 49
+reference_seed_1042 null 50
+reference_seed_1042 null 51
+reference_seed_1042 null 52
+reference_seed_1042 null 53
+reference_seed_1042 null 54
+reference_seed_1042 null 55
+reference_seed_1042 null 56
+reference_seed_1042 null 57
+reference_seed_1042 null 58
+reference_seed_1042 null 59
+reference_seed_1042 null 60
+reference_seed_1042 null 61
+reference_seed_1042 null 62
+reference_seed_1042 null 63
+reference_seed_1042 null 64
+reference_seed_1042 null 65
+reference_seed_1042 null 66
+reference_seed_1042 null 67
+reference_seed_1042 null 68
+reference_seed_1042 null 69
+reference_seed_1042 null 70
+reference_seed_1042 null 71
+reference_seed_1042 null 72
+reference_seed_1042 null 73
+reference_seed_1042 null 74
+reference_seed_1042 null 75
+reference_seed_1042 null 76
+reference_seed_1042 null 77
+reference_seed_1042 null 78
+reference_seed_1042 null 79
+reference_seed_1042 null 80
+reference_seed_1042 null 81
+reference_seed_1042 null 82
+reference_seed_1042 null 83
+reference_seed_1042 null 84
+reference_seed_1042 null 85
+reference_seed_1042 null 86
+reference_seed_1042 null 87
+reference_seed_1042 null 88
+reference_seed_1042 null 89
+reference_seed_1042 null 90
+reference_seed_1042 null 91
+reference_seed_1042 null 92
+reference_seed_1042 null 93
+reference_seed_1042 null 94
+reference_seed_1042 null 95
+reference_seed_1042 null 96
+reference_seed_1042 null 97
+reference_seed_1042 null 98
+reference_seed_1042 null 99
+reference_seed_1042 null 100

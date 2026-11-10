@@ -1,42 +1,211 @@
 /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
   warnings.warn(
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'LlamaTokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+[+] Loading C4 prompts...
+[+] Loaded 100 prompts from examples.json
+Tokenizer matches all 100 exact saved reference prompt IDs.
 [+] Loading model from /home/user/models/mistralai/Mistral-7B-Instruct-v0.3...
 `torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:01<00:03,  1.98s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:03<00:01,  1.99s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.91s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.93s/it]
-Traceback (most recent call last):
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2359, in _from_pretrained
-    tokenizer = cls(*init_inputs, **init_kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama_fast.py", line 154, in __init__
-    super().__init__(
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_fast.py", line 133, in __init__
-    slow_tokenizer = self.slow_tokenizer_class(*args, **kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama.py", line 171, in __init__
-    self.sp_model = self.get_spm_processor(kwargs.pop("from_slow", False))
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama.py", line 203, in get_spm_processor
-    model_pb2 = import_protobuf(f"The new behaviour of {self.__class__.__name__} (with `self.legacy = False`)")
-  File "/usr/local/lib/python3.10/dist-packages/transformers/convert_slow_tokenizer.py", line 39, in import_protobuf
-    from sentencepiece import sentencepiece_model_pb2
-  File "/usr/local/lib/python3.10/dist-packages/sentencepiece/sentencepiece_model_pb2.py", line 7, in <module>
-    from google.protobuf import descriptor as _descriptor
-ModuleNotFoundError: No module named 'google'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/user/redteam/gpu_checks.py", line 241, in <module>
-    model, tokenizer = pipeline.load_model_and_tokenizer(pipeline.MODEL_PATH)
-  File "/home/user/method/run_pipeline.py", line 110, in load_model_and_tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/auto/tokenization_auto.py", line 1156, in from_pretrained
-    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2113, in from_pretrained
-    return cls._from_pretrained(
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2360, in _from_pretrained
-    except import_protobuf_decode_error():
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 88, in import_protobuf_decode_error
-    raise ImportError(PROTOBUF_IMPORT_ERROR.format(error_message))
-ImportError: 
- requires the protobuf library but it was not found in your environment. Check out the instructions on the
-installation page of its repo: https://github.com/protocolbuffers/protobuf/tree/master/python#installation and follow the ones
-that match your environment. Please note that you may need to restart your runtime after installation.
-
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:01<00:03,  1.98s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:04<00:02,  2.01s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.93s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.95s/it]
+honest_efficiency_fix marked 1 p= 0.023642038586075498
+honest_efficiency_fix marked 2 p= 0.010908762335823052
+honest_efficiency_fix marked 3 p= 0.006712970639138893
+honest_efficiency_fix marked 4 p= 0.011064398501649086
+honest_efficiency_fix marked 5 p= None
+honest_efficiency_fix marked 6 p= 0.0002496234311046841
+honest_efficiency_fix marked 7 p= 0.0009135932437686067
+honest_efficiency_fix marked 8 p= 0.1482840018443834
+honest_efficiency_fix marked 9 p= 0.0011180679797128112
+honest_efficiency_fix marked 10 p= 0.0001447283118473086
+honest_efficiency_fix marked 11 p= 0.1126739570183719
+honest_efficiency_fix marked 12 p= 0.0009576069418607558
+honest_efficiency_fix marked 13 p= 0.002192025970546907
+honest_efficiency_fix marked 14 p= 0.23257378007771257
+honest_efficiency_fix marked 15 p= 0.00178699650028602
+honest_efficiency_fix marked 16 p= 0.0008629974536137341
+honest_efficiency_fix marked 17 p= None
+honest_efficiency_fix marked 18 p= 0.012049887507043278
+honest_efficiency_fix marked 19 p= 0.005129033173733033
+honest_efficiency_fix marked 20 p= 0.03930832245170268
+honest_efficiency_fix marked 21 p= None
+honest_efficiency_fix marked 22 p= 4.098230077953513e-05
+honest_efficiency_fix marked 23 p= 0.000162787210824189
+honest_efficiency_fix marked 24 p= 0.14254654380344356
+honest_efficiency_fix marked 25 p= 0.018541845603927354
+honest_efficiency_fix marked 26 p= 0.003464169274886908
+honest_efficiency_fix marked 27 p= 0.0017692111714249226
+honest_efficiency_fix marked 28 p= 4.3169741115178795e-09
+honest_efficiency_fix marked 29 p= 0.17719783920326115
+honest_efficiency_fix marked 30 p= 0.000642366981387199
+honest_efficiency_fix marked 31 p= 0.12558866583562966
+honest_efficiency_fix marked 32 p= None
+honest_efficiency_fix marked 33 p= None
+honest_efficiency_fix marked 34 p= 0.006465670420410685
+honest_efficiency_fix marked 35 p= 4.4397974831578146e-05
+honest_efficiency_fix marked 36 p= 0.0014361170395106315
+honest_efficiency_fix marked 37 p= 0.002868618415621582
+honest_efficiency_fix marked 38 p= 0.040438542682249334
+honest_efficiency_fix marked 39 p= 0.06360031405982525
+honest_efficiency_fix marked 40 p= 1.3337618010034191e-08
+honest_efficiency_fix marked 41 p= 0.00020934486113721729
+honest_efficiency_fix marked 42 p= 0.09857196958815206
+honest_efficiency_fix marked 43 p= None
+honest_efficiency_fix marked 44 p= 7.855908157428093e-05
+honest_efficiency_fix marked 45 p= 0.001915860122004176
+honest_efficiency_fix marked 46 p= 0.05029567323173645
+honest_efficiency_fix marked 47 p= 6.247669253389709e-06
+honest_efficiency_fix marked 48 p= 0.0001933917670106089
+honest_efficiency_fix marked 49 p= 6.794564910705958e-13
+honest_efficiency_fix marked 50 p= 0.5138078145994915
+honest_efficiency_fix marked 51 p= 0.0001456769588475959
+honest_efficiency_fix marked 52 p= 0.18021704061678245
+honest_efficiency_fix marked 53 p= 0.0016907569586054327
+honest_efficiency_fix marked 54 p= 0.02026220018194458
+honest_efficiency_fix marked 55 p= 0.00026587812045220094
+honest_efficiency_fix marked 56 p= 0.21289916264525421
+honest_efficiency_fix marked 57 p= 0.006085289427586349
+honest_efficiency_fix marked 58 p= 0.001955000315048694
+honest_efficiency_fix marked 59 p= None
+honest_efficiency_fix marked 60 p= 0.21263064613589688
+honest_efficiency_fix marked 61 p= 0.021638628607206667
+honest_efficiency_fix marked 62 p= 0.009182686583643962
+honest_efficiency_fix marked 63 p= 0.04838156680824324
+honest_efficiency_fix marked 64 p= None
+honest_efficiency_fix marked 65 p= 8.808029613449619e-07
+honest_efficiency_fix marked 66 p= 7.833043365690351e-05
+honest_efficiency_fix marked 67 p= 0.011723807669175357
+honest_efficiency_fix marked 68 p= 3.856736517315884e-05
+honest_efficiency_fix marked 69 p= 0.0025353995017903808
+honest_efficiency_fix marked 70 p= 0.3388584732277109
+honest_efficiency_fix marked 71 p= 0.0013579747545341414
+honest_efficiency_fix marked 72 p= None
+honest_efficiency_fix marked 73 p= 0.2021583971359926
+honest_efficiency_fix marked 74 p= 2.5240882741917048e-05
+honest_efficiency_fix marked 75 p= 0.2008321057582605
+honest_efficiency_fix marked 76 p= 0.0030947378881901466
+honest_efficiency_fix marked 77 p= 0.00031959580959128875
+honest_efficiency_fix marked 78 p= 0.006589466111782349
+honest_efficiency_fix marked 79 p= 0.11336252448471273
+honest_efficiency_fix marked 80 p= 0.061709224814619046
+honest_efficiency_fix marked 81 p= 0.4752956192299558
+honest_efficiency_fix marked 82 p= 1.6576549648261718e-05
+honest_efficiency_fix marked 83 p= 0.38092363736092816
+honest_efficiency_fix marked 84 p= 0.03972715785091241
+honest_efficiency_fix marked 85 p= 0.013892953106269368
+honest_efficiency_fix marked 86 p= 0.0003402478463145897
+honest_efficiency_fix marked 87 p= 0.01059620383044646
+honest_efficiency_fix marked 88 p= 0.0449161169601372
+honest_efficiency_fix marked 89 p= 0.024770507905669592
+honest_efficiency_fix marked 90 p= 4.122474994661118e-05
+honest_efficiency_fix marked 91 p= 5.176871131773453e-07
+honest_efficiency_fix marked 92 p= 0.006128005225548572
+honest_efficiency_fix marked 93 p= 6.12374616903999e-07
+honest_efficiency_fix marked 94 p= 0.003585718339706556
+honest_efficiency_fix marked 95 p= 0.04757567583773736
+honest_efficiency_fix marked 96 p= 0.0005018992159316893
+honest_efficiency_fix marked 97 p= 0.07523475752399089
+honest_efficiency_fix marked 98 p= 0.00019280165006796413
+honest_efficiency_fix marked 99 p= 6.823909148856444e-07
+honest_efficiency_fix marked 100 p= 4.47688850435668e-08
+honest_efficiency_fix null 1
+honest_efficiency_fix null 2
+honest_efficiency_fix null 3
+honest_efficiency_fix null 4
+honest_efficiency_fix null 5
+honest_efficiency_fix null 6
+honest_efficiency_fix null 7
+honest_efficiency_fix null 8
+honest_efficiency_fix null 9
+honest_efficiency_fix null 10
+honest_efficiency_fix null 11
+honest_efficiency_fix null 12
+honest_efficiency_fix null 13
+honest_efficiency_fix null 14
+honest_efficiency_fix null 15
+honest_efficiency_fix null 16
+honest_efficiency_fix null 17
+honest_efficiency_fix null 18
+honest_efficiency_fix null 19
+honest_efficiency_fix null 20
+honest_efficiency_fix null 21
+honest_efficiency_fix null 22
+honest_efficiency_fix null 23
+honest_efficiency_fix null 24
+honest_efficiency_fix null 25
+honest_efficiency_fix null 26
+honest_efficiency_fix null 27
+honest_efficiency_fix null 28
+honest_efficiency_fix null 29
+honest_efficiency_fix null 30
+honest_efficiency_fix null 31
+honest_efficiency_fix null 32
+honest_efficiency_fix null 33
+honest_efficiency_fix null 34
+honest_efficiency_fix null 35
+honest_efficiency_fix null 36
+honest_efficiency_fix null 37
+honest_efficiency_fix null 38
+honest_efficiency_fix null 39
+honest_efficiency_fix null 40
+honest_efficiency_fix null 41
+honest_efficiency_fix null 42
+honest_efficiency_fix null 43
+honest_efficiency_fix null 44
+honest_efficiency_fix null 45
+honest_efficiency_fix null 46
+honest_efficiency_fix null 47
+honest_efficiency_fix null 48
+honest_efficiency_fix null 49
+honest_efficiency_fix null 50
+honest_efficiency_fix null 51
+honest_efficiency_fix null 52
+honest_efficiency_fix null 53
+honest_efficiency_fix null 54
+honest_efficiency_fix null 55
+honest_efficiency_fix null 56
+honest_efficiency_fix null 57
+honest_efficiency_fix null 58
+honest_efficiency_fix null 59
+honest_efficiency_fix null 60
+honest_efficiency_fix null 61
+honest_efficiency_fix null 62
+honest_efficiency_fix null 63
+honest_efficiency_fix null 64
+honest_efficiency_fix null 65
+honest_efficiency_fix null 66
+honest_efficiency_fix null 67
+honest_efficiency_fix null 68
+honest_efficiency_fix null 69
+honest_efficiency_fix null 70
+honest_efficiency_fix null 71
+honest_efficiency_fix null 72
+honest_efficiency_fix null 73
+honest_efficiency_fix null 74
+honest_efficiency_fix null 75
+honest_efficiency_fix null 76
+honest_efficiency_fix null 77
+honest_efficiency_fix null 78
+honest_efficiency_fix null 79
+honest_efficiency_fix null 80
+honest_efficiency_fix null 81
+honest_efficiency_fix null 82
+honest_efficiency_fix null 83
+honest_efficiency_fix null 84
+honest_efficiency_fix null 85
+honest_efficiency_fix null 86
+honest_efficiency_fix null 87
+honest_efficiency_fix null 88
+honest_efficiency_fix null 89
+honest_efficiency_fix null 90
+honest_efficiency_fix null 91
+honest_efficiency_fix null 92
+honest_efficiency_fix null 93
+honest_efficiency_fix null 94
+honest_efficiency_fix null 95
+honest_efficiency_fix null 96
+honest_efficiency_fix null 97
+honest_efficiency_fix null 98
+honest_efficiency_fix null 99
+honest_efficiency_fix null 100

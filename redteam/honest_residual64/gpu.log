@@ -1,42 +1,211 @@
 /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
   warnings.warn(
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'LlamaTokenizer'. 
+The class this function is called from is 'PreTrainedTokenizerFast'.
+[+] Loading C4 prompts...
+[+] Loaded 100 prompts from examples.json
+Tokenizer matches all 100 exact saved reference prompt IDs.
 [+] Loading model from /home/user/models/mistralai/Mistral-7B-Instruct-v0.3...
 `torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:01<00:03,  1.98s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:03<00:01,  1.99s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.91s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.93s/it]
-Traceback (most recent call last):
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2359, in _from_pretrained
-    tokenizer = cls(*init_inputs, **init_kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama_fast.py", line 154, in __init__
-    super().__init__(
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_fast.py", line 133, in __init__
-    slow_tokenizer = self.slow_tokenizer_class(*args, **kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama.py", line 171, in __init__
-    self.sp_model = self.get_spm_processor(kwargs.pop("from_slow", False))
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/llama/tokenization_llama.py", line 203, in get_spm_processor
-    model_pb2 = import_protobuf(f"The new behaviour of {self.__class__.__name__} (with `self.legacy = False`)")
-  File "/usr/local/lib/python3.10/dist-packages/transformers/convert_slow_tokenizer.py", line 39, in import_protobuf
-    from sentencepiece import sentencepiece_model_pb2
-  File "/usr/local/lib/python3.10/dist-packages/sentencepiece/sentencepiece_model_pb2.py", line 7, in <module>
-    from google.protobuf import descriptor as _descriptor
-ModuleNotFoundError: No module named 'google'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/user/redteam/gpu_checks.py", line 241, in <module>
-    model, tokenizer = pipeline.load_model_and_tokenizer(pipeline.MODEL_PATH)
-  File "/home/user/method/run_pipeline.py", line 110, in load_model_and_tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/models/auto/tokenization_auto.py", line 1156, in from_pretrained
-    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2113, in from_pretrained
-    return cls._from_pretrained(
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 2360, in _from_pretrained
-    except import_protobuf_decode_error():
-  File "/usr/local/lib/python3.10/dist-packages/transformers/tokenization_utils_base.py", line 88, in import_protobuf_decode_error
-    raise ImportError(PROTOBUF_IMPORT_ERROR.format(error_message))
-ImportError: 
- requires the protobuf library but it was not found in your environment. Check out the instructions on the
-installation page of its repo: https://github.com/protocolbuffers/protobuf/tree/master/python#installation and follow the ones
-that match your environment. Please note that you may need to restart your runtime after installation.
-
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:02<00:04,  2.02s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:04<00:02,  2.03s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.94s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:05<00:00,  1.96s/it]
+honest_residual64 marked 1 p= 9.836086549457075e-06
+honest_residual64 marked 2 p= 7.268498939932013e-05
+honest_residual64 marked 3 p= 0.01360830845231258
+honest_residual64 marked 4 p= 1.3057668706215525e-07
+honest_residual64 marked 5 p= None
+honest_residual64 marked 6 p= None
+honest_residual64 marked 7 p= 4.189443478894071e-06
+honest_residual64 marked 8 p= 0.00024418975197230806
+honest_residual64 marked 9 p= 6.254110168047771e-06
+honest_residual64 marked 10 p= 0.0015388462956608423
+honest_residual64 marked 11 p= 0.0047617451856653125
+honest_residual64 marked 12 p= 0.00024072673240631626
+honest_residual64 marked 13 p= 7.298831533264418e-10
+honest_residual64 marked 14 p= 0.0014413102557855853
+honest_residual64 marked 15 p= 6.061921045600547e-05
+honest_residual64 marked 16 p= 2.132531794787895e-06
+honest_residual64 marked 17 p= 2.0481085884952344e-05
+honest_residual64 marked 18 p= 0.016361818725267856
+honest_residual64 marked 19 p= 5.915019217465037e-10
+honest_residual64 marked 20 p= 6.999982349999272e-05
+honest_residual64 marked 21 p= 6.649233352232941e-06
+honest_residual64 marked 22 p= 8.550144492478235e-10
+honest_residual64 marked 23 p= 9.124677008269158e-05
+honest_residual64 marked 24 p= 0.0403640287541416
+honest_residual64 marked 25 p= 5.457106685809025e-05
+honest_residual64 marked 26 p= 0.0009320336643610167
+honest_residual64 marked 27 p= 9.8428976473453e-05
+honest_residual64 marked 28 p= 0.025243646681259165
+honest_residual64 marked 29 p= 2.4078729525219095e-06
+honest_residual64 marked 30 p= 1.1736009092644664e-06
+honest_residual64 marked 31 p= 0.00023851212592331225
+honest_residual64 marked 32 p= None
+honest_residual64 marked 33 p= None
+honest_residual64 marked 34 p= 0.00015940739930616675
+honest_residual64 marked 35 p= 0.0011128634331480224
+honest_residual64 marked 36 p= 0.00018155961162049923
+honest_residual64 marked 37 p= 0.0015408660099936729
+honest_residual64 marked 38 p= 0.0010260774363936218
+honest_residual64 marked 39 p= 3.472748878868415e-05
+honest_residual64 marked 40 p= 8.984620667977716e-08
+honest_residual64 marked 41 p= 4.512593810798591e-08
+honest_residual64 marked 42 p= 5.395819659316435e-05
+honest_residual64 marked 43 p= None
+honest_residual64 marked 44 p= 0.000437132080312488
+honest_residual64 marked 45 p= 4.574409102822242e-06
+honest_residual64 marked 46 p= 0.027339248279107414
+honest_residual64 marked 47 p= 0.0024875254082242773
+honest_residual64 marked 48 p= 0.04739232832127514
+honest_residual64 marked 49 p= 7.519856045651926e-20
+honest_residual64 marked 50 p= 0.07194843214210396
+honest_residual64 marked 51 p= 5.731470367866062e-05
+honest_residual64 marked 52 p= 3.101210347882349e-05
+honest_residual64 marked 53 p= 2.798567318344946e-06
+honest_residual64 marked 54 p= 0.0006360035421827897
+honest_residual64 marked 55 p= 6.375493514520516e-09
+honest_residual64 marked 56 p= 0.00037153785758058577
+honest_residual64 marked 57 p= 2.1954128504272074e-06
+honest_residual64 marked 58 p= 0.000993017222850431
+honest_residual64 marked 59 p= None
+honest_residual64 marked 60 p= 0.02017069229529349
+honest_residual64 marked 61 p= 0.007423862127399763
+honest_residual64 marked 62 p= 3.311287563732903e-05
+honest_residual64 marked 63 p= 0.08837100125277292
+honest_residual64 marked 64 p= None
+honest_residual64 marked 65 p= 3.591528107820264e-05
+honest_residual64 marked 66 p= 1.08667315168797e-06
+honest_residual64 marked 67 p= 1.3745018587132383e-06
+honest_residual64 marked 68 p= 4.744581615925834e-08
+honest_residual64 marked 69 p= 4.711147703008013e-06
+honest_residual64 marked 70 p= 0.0031436859849090053
+honest_residual64 marked 71 p= 1.3053586408955588e-07
+honest_residual64 marked 72 p= None
+honest_residual64 marked 73 p= 0.0004353941473798776
+honest_residual64 marked 74 p= 7.650671908417647e-05
+honest_residual64 marked 75 p= 0.005102749779030842
+honest_residual64 marked 76 p= 5.234801336607153e-11
+honest_residual64 marked 77 p= 2.3339541036875242e-05
+honest_residual64 marked 78 p= 0.11713023429791769
+honest_residual64 marked 79 p= 0.09394026703679192
+honest_residual64 marked 80 p= None
+honest_residual64 marked 81 p= 0.00016927932364102987
+honest_residual64 marked 82 p= 7.485171728635427e-05
+honest_residual64 marked 83 p= 0.0055956810472614195
+honest_residual64 marked 84 p= 0.0006361528109762433
+honest_residual64 marked 85 p= 0.015058585804996211
+honest_residual64 marked 86 p= 0.00010272805002484157
+honest_residual64 marked 87 p= 2.4444072594833064e-06
+honest_residual64 marked 88 p= 0.002806187470490921
+honest_residual64 marked 89 p= 0.0005836497478892514
+honest_residual64 marked 90 p= 2.564310871354359e-09
+honest_residual64 marked 91 p= 0.004756915178605642
+honest_residual64 marked 92 p= 4.340346271247389e-05
+honest_residual64 marked 93 p= 1.1614302216230432e-05
+honest_residual64 marked 94 p= 2.1539088111653443e-05
+honest_residual64 marked 95 p= 0.0007042860446163765
+honest_residual64 marked 96 p= 1.2124429337429395e-14
+honest_residual64 marked 97 p= 1.2347180805900885e-05
+honest_residual64 marked 98 p= 0.00041828401346465734
+honest_residual64 marked 99 p= 0.002850727025144935
+honest_residual64 marked 100 p= 0.0006582046257196703
+honest_residual64 null 1
+honest_residual64 null 2
+honest_residual64 null 3
+honest_residual64 null 4
+honest_residual64 null 5
+honest_residual64 null 6
+honest_residual64 null 7
+honest_residual64 null 8
+honest_residual64 null 9
+honest_residual64 null 10
+honest_residual64 null 11
+honest_residual64 null 12
+honest_residual64 null 13
+honest_residual64 null 14
+honest_residual64 null 15
+honest_residual64 null 16
+honest_residual64 null 17
+honest_residual64 null 18
+honest_residual64 null 19
+honest_residual64 null 20
+honest_residual64 null 21
+honest_residual64 null 22
+honest_residual64 null 23
+honest_residual64 null 24
+honest_residual64 null 25
+honest_residual64 null 26
+honest_residual64 null 27
+honest_residual64 null 28
+honest_residual64 null 29
+honest_residual64 null 30
+honest_residual64 null 31
+honest_residual64 null 32
+honest_residual64 null 33
+honest_residual64 null 34
+honest_residual64 null 35
+honest_residual64 null 36
+honest_residual64 null 37
+honest_residual64 null 38
+honest_residual64 null 39
+honest_residual64 null 40
+honest_residual64 null 41
+honest_residual64 null 42
+honest_residual64 null 43
+honest_residual64 null 44
+honest_residual64 null 45
+honest_residual64 null 46
+honest_residual64 null 47
+honest_residual64 null 48
+honest_residual64 null 49
+honest_residual64 null 50
+honest_residual64 null 51
+honest_residual64 null 52
+honest_residual64 null 53
+honest_residual64 null 54
+honest_residual64 null 55
+honest_residual64 null 56
+honest_residual64 null 57
+honest_residual64 null 58
+honest_residual64 null 59
+honest_residual64 null 60
+honest_residual64 null 61
+honest_residual64 null 62
+honest_residual64 null 63
+honest_residual64 null 64
+honest_residual64 null 65
+honest_residual64 null 66
+honest_residual64 null 67
+honest_residual64 null 68
+honest_residual64 null 69
+honest_residual64 null 70
+honest_residual64 null 71
+honest_residual64 null 72
+honest_residual64 null 73
+honest_residual64 null 74
+honest_residual64 null 75
+honest_residual64 null 76
+honest_residual64 null 77
+honest_residual64 null 78
+honest_residual64 null 79
+honest_residual64 null 80
+honest_residual64 null 81
+honest_residual64 null 82
+honest_residual64 null 83
+honest_residual64 null 84
+honest_residual64 null 85
+honest_residual64 null 86
+honest_residual64 null 87
+honest_residual64 null 88
+honest_residual64 null 89
+honest_residual64 null 90
+honest_residual64 null 91
+honest_residual64 null 92
+honest_residual64 null 93
+honest_residual64 null 94
+honest_residual64 null 95
+honest_residual64 null 96
+honest_residual64 null 97
+honest_residual64 null 98
+honest_residual64 null 99
+honest_residual64 null 100

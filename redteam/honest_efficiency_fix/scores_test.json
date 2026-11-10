@@ -1,0 +1,41 @@
+{
+  "experiments": {
+    "watermark_detection_mistral": {
+      "results": {
+        "gaussmark_200_tokens": {
+          "detection_rate_fpr_0.05": 0.7777777777777778,
+          "detection_rate_fpr_0.01": 0.5555555555555556,
+          "median_p_value": 0.006128005225548572,
+          "mean_p_value": 0.05780927784065592,
+          "unwatermarked_detection_rate_fpr_0.05": 0.10638297872340426,
+          "unwatermarked_detection_rate_fpr_0.01": 0.0,
+          "detection_margin_fpr_0.05": 0.6713947990543735,
+          "auc": 0.9304964539007092
+        },
+        "unwatermarked": {
+          "detection_rate_fpr_0.05": 0.10638297872340426,
+          "detection_rate_fpr_0.01": 0.0,
+          "median_p_value": 0.4213069295488163,
+          "mean_p_value": 0.4772572725168071
+        }
+      }
+    }
+  },
+  "_slice": "test",
+  "_audit": {
+    "watermark_detection_mistral": {
+      "gaussmark_200_tokens": {
+        "slice": "test",
+        "file": "watermarked_shortcut_detection_full.json",
+        "num_samples_total": 91,
+        "num_samples_used": 45
+      },
+      "unwatermarked": {
+        "slice": "test",
+        "file": "unwatermarked_baseline_unwatermarked_detection_full.json",
+        "num_samples_total": 94,
+        "num_samples_used": 47
+      }
+    }
+  }
+}
