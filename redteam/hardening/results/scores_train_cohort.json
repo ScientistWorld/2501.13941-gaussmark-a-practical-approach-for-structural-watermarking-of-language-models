@@ -1,0 +1,375 @@
+{
+  "experiments": {
+    "watermark_detection_mistral": {
+      "results": {
+        "better_robust_detector": {
+          "detection_rate_fpr_0.05": 0.87,
+          "detection_rate_fpr_0.01": 0.68,
+          "auc": 0.97595,
+          "median_p_value": 0.0026859240936407437,
+          "c4_cross_entropy_ratio": 1.0112688080742642,
+          "false_positive_rate_0.05": 0.051666666666666666,
+          "false_positive_rate_0.01": 0.0033333333333333335
+        },
+        "variant_sigma2_1.4e-5": {
+          "detection_rate_fpr_0.05": 0.0,
+          "detection_rate_fpr_0.01": 0.0,
+          "auc": 0.0,
+          "median_p_value": 1.0,
+          "c4_cross_entropy_ratio": 1.015,
+          "false_positive_rate_0.05": 1.0,
+          "false_positive_rate_0.01": 1.0
+        },
+        "weaker_sigma2_2.5e-6": {
+          "detection_rate_fpr_0.05": 0.485,
+          "detection_rate_fpr_0.01": 0.245,
+          "auc": 0.8589416666666667,
+          "median_p_value": 0.052748327926278024,
+          "c4_cross_entropy_ratio": 1.0027564351387606,
+          "false_positive_rate_0.05": 0.06,
+          "false_positive_rate_0.01": 0.005
+        }
+      }
+    },
+    "watermark_robustness_mistral": {
+      "results": {
+        "better_robust_detector": {
+          "detection_rate_fpr_0.05": 0.455,
+          "detection_rate_fpr_0.01": 0.21,
+          "auc": 0.829025,
+          "median_p_value": 0.07923177217444238,
+          "false_positive_rate_0.05": 0.05
+        },
+        "variant_sigma2_1.4e-5": {
+          "detection_rate_fpr_0.05": 0.0,
+          "detection_rate_fpr_0.01": 0.0,
+          "auc": 0.0,
+          "median_p_value": 1.0,
+          "false_positive_rate_0.05": 1.0
+        },
+        "weaker_sigma2_2.5e-6": {
+          "detection_rate_fpr_0.05": 0.105,
+          "detection_rate_fpr_0.01": 0.02,
+          "auc": 0.645675,
+          "median_p_value": 0.31536505872484066,
+          "false_positive_rate_0.05": 0.075
+        }
+      }
+    }
+  },
+  "_slice": "train",
+  "_status": {
+    "better_robust_detector": {
+      "plugin_digest": "a5e70caeca99c1b82763e0a14e9ff55b7cf6103c9f8307863ba980f5782ed155",
+      "gates": {
+        "quality": {
+          "c4_cross_entropy_ratio": 1.0112688080742642,
+          "budget": 1.015,
+          "ce_original": 1.9260564931869506,
+          "ce_watermarked": 1.9477608541488647
+        },
+        "null_main": {
+          "null_unwatermarked@0.05": {
+            "rejections": 11,
+            "n": 200,
+            "rate": 0.055,
+            "binomial_tail_p": 0.416932817918805
+          },
+          "null_unwatermarked@0.01": {
+            "rejections": 2,
+            "n": 200,
+            "rate": 0.01,
+            "binomial_tail_p": 0.5953543153279486
+          },
+          "null_human@0.05": {
+            "rejections": 11,
+            "n": 200,
+            "rate": 0.055,
+            "binomial_tail_p": 0.416932817918805
+          },
+          "null_human@0.01": {
+            "rejections": 0,
+            "n": 200,
+            "rate": 0.0,
+            "binomial_tail_p": 1.0
+          },
+          "null_cross_key@0.05": {
+            "rejections": 9,
+            "n": 200,
+            "rate": 0.045,
+            "binomial_tail_p": 0.6729755365864855
+          },
+          "null_cross_key@0.01": {
+            "rejections": 0,
+            "n": 200,
+            "rate": 0.0,
+            "binomial_tail_p": 1.0
+          },
+          "pooled@0.05": {
+            "rejections": 31,
+            "n": 600,
+            "rate": 0.051666666666666666,
+            "binomial_tail_p": 0.451632561409756
+          },
+          "pooled@0.01": {
+            "rejections": 2,
+            "n": 600,
+            "rate": 0.0033333333333333335,
+            "binomial_tail_p": 0.9830191768218126
+          }
+        },
+        "null_robust": {
+          "null_corrupted@0.05": {
+            "rejections": 10,
+            "n": 200,
+            "rate": 0.05,
+            "binomial_tail_p": 0.5452901913191357
+          },
+          "null_corrupted@0.01": {
+            "rejections": 3,
+            "n": 200,
+            "rate": 0.015,
+            "binomial_tail_p": 0.3233213054643244
+          }
+        }
+      },
+      "counts": {
+        "marked": 200,
+        "marked_corrupted": 200,
+        "null_unwatermarked": 200,
+        "null_human": 200,
+        "null_cross_key": 200,
+        "null_corrupted": 200
+      },
+      "measured": {
+        "watermark_detection_mistral": {
+          "detection_rate_fpr_0.05": 0.87,
+          "detection_rate_fpr_0.01": 0.68,
+          "auc": 0.97595,
+          "median_p_value": 0.0026859240936407437,
+          "c4_cross_entropy_ratio": 1.0112688080742642,
+          "false_positive_rate_0.05": 0.051666666666666666,
+          "false_positive_rate_0.01": 0.0033333333333333335
+        },
+        "watermark_robustness_mistral": {
+          "detection_rate_fpr_0.05": 0.455,
+          "detection_rate_fpr_0.01": 0.21,
+          "auc": 0.829025,
+          "median_p_value": 0.07923177217444238,
+          "false_positive_rate_0.05": 0.05
+        }
+      },
+      "status": "ok",
+      "elapsed_s": 195.7
+    },
+    "variant_sigma2_1.4e-5": {
+      "plugin_digest": "37c05010b71fad388bf5f8e56ba89a92ceb5c36bb292340f322d533f824bb9b2",
+      "gates": {
+        "quality": {
+          "c4_cross_entropy_ratio": 1.0161329452252565,
+          "budget": 1.015,
+          "ce_original": 1.9260564931869506,
+          "ce_watermarked": 1.9571294570922853
+        },
+        "null_main": {
+          "null_unwatermarked@0.05": {
+            "rejections": 10,
+            "n": 200,
+            "rate": 0.05,
+            "binomial_tail_p": 0.5452901913191357
+          },
+          "null_unwatermarked@0.01": {
+            "rejections": 2,
+            "n": 200,
+            "rate": 0.01,
+            "binomial_tail_p": 0.5953543153279486
+          },
+          "null_human@0.05": {
+            "rejections": 10,
+            "n": 200,
+            "rate": 0.05,
+            "binomial_tail_p": 0.5452901913191357
+          },
+          "null_human@0.01": {
+            "rejections": 0,
+            "n": 200,
+            "rate": 0.0,
+            "binomial_tail_p": 1.0
+          },
+          "null_cross_key@0.05": {
+            "rejections": 7,
+            "n": 200,
+            "rate": 0.035,
+            "binomial_tail_p": 0.8762569739798421
+          },
+          "null_cross_key@0.01": {
+            "rejections": 2,
+            "n": 200,
+            "rate": 0.01,
+            "binomial_tail_p": 0.5953543153279486
+          },
+          "pooled@0.05": {
+            "rejections": 27,
+            "n": 600,
+            "rate": 0.045,
+            "binomial_tail_p": 0.7387349761703249
+          },
+          "pooled@0.01": {
+            "rejections": 4,
+            "n": 600,
+            "rate": 0.006666666666666667,
+            "binomial_tail_p": 0.8501387444892698
+          }
+        },
+        "null_robust": {
+          "null_corrupted@0.05": {
+            "rejections": 15,
+            "n": 200,
+            "rate": 0.075,
+            "binomial_tail_p": 0.07813441567325172
+          },
+          "null_corrupted@0.01": {
+            "rejections": 3,
+            "n": 200,
+            "rate": 0.015,
+            "binomial_tail_p": 0.3233213054643244
+          }
+        }
+      },
+      "counts": {
+        "marked": 200,
+        "marked_corrupted": 200,
+        "null_unwatermarked": 200,
+        "null_human": 200,
+        "null_cross_key": 200,
+        "null_corrupted": 200
+      },
+      "measured": {
+        "watermark_detection_mistral": {
+          "detection_rate_fpr_0.05": 0.945,
+          "detection_rate_fpr_0.01": 0.835,
+          "auc": 0.987925,
+          "median_p_value": 0.0006284818898763507,
+          "c4_cross_entropy_ratio": 1.0161329452252565,
+          "false_positive_rate_0.05": 0.045,
+          "false_positive_rate_0.01": 0.006666666666666667
+        },
+        "watermark_robustness_mistral": {
+          "detection_rate_fpr_0.05": 0.385,
+          "detection_rate_fpr_0.01": 0.185,
+          "auc": 0.838325,
+          "median_p_value": 0.0792659668784254,
+          "false_positive_rate_0.05": 0.075
+        }
+      },
+      "status": "failed",
+      "reason": [
+        "quality budget exceeded: C4 cross-entropy ratio 1.01613 > 1.015"
+      ],
+      "elapsed_s": 229.8
+    },
+    "weaker_sigma2_2.5e-6": {
+      "plugin_digest": "3a1000f040bc2b4f06e2be8b8b49d6c15bf908bfee05c28a7b60fbf046e60bbd",
+      "gates": {
+        "quality": {
+          "c4_cross_entropy_ratio": 1.0027564351387606,
+          "budget": 1.015,
+          "ce_original": 1.9260564931869506,
+          "ce_watermarked": 1.9313655429840089
+        },
+        "null_main": {
+          "null_unwatermarked@0.05": {
+            "rejections": 10,
+            "n": 200,
+            "rate": 0.05,
+            "binomial_tail_p": 0.5452901913191357
+          },
+          "null_unwatermarked@0.01": {
+            "rejections": 2,
+            "n": 200,
+            "rate": 0.01,
+            "binomial_tail_p": 0.5953543153279486
+          },
+          "null_human@0.05": {
+            "rejections": 10,
+            "n": 200,
+            "rate": 0.05,
+            "binomial_tail_p": 0.5452901913191357
+          },
+          "null_human@0.01": {
+            "rejections": 0,
+            "n": 200,
+            "rate": 0.0,
+            "binomial_tail_p": 1.0
+          },
+          "null_cross_key@0.05": {
+            "rejections": 16,
+            "n": 200,
+            "rate": 0.08,
+            "binomial_tail_p": 0.0443556291670583
+          },
+          "null_cross_key@0.01": {
+            "rejections": 1,
+            "n": 200,
+            "rate": 0.005,
+            "binomial_tail_p": 0.8660203251419931
+          },
+          "pooled@0.05": {
+            "rejections": 36,
+            "n": 600,
+            "rate": 0.06,
+            "binomial_tail_p": 0.1515465238442321
+          },
+          "pooled@0.01": {
+            "rejections": 3,
+            "n": 600,
+            "rate": 0.005,
+            "binomial_tail_p": 0.9389236590533692
+          }
+        },
+        "null_robust": {
+          "null_corrupted@0.05": {
+            "rejections": 15,
+            "n": 200,
+            "rate": 0.075,
+            "binomial_tail_p": 0.07813441567325172
+          },
+          "null_corrupted@0.01": {
+            "rejections": 3,
+            "n": 200,
+            "rate": 0.015,
+            "binomial_tail_p": 0.3233213054643244
+          }
+        }
+      },
+      "counts": {
+        "marked": 200,
+        "marked_corrupted": 200,
+        "null_unwatermarked": 200,
+        "null_human": 200,
+        "null_cross_key": 200,
+        "null_corrupted": 200
+      },
+      "measured": {
+        "watermark_detection_mistral": {
+          "detection_rate_fpr_0.05": 0.485,
+          "detection_rate_fpr_0.01": 0.245,
+          "auc": 0.8589416666666667,
+          "median_p_value": 0.052748327926278024,
+          "c4_cross_entropy_ratio": 1.0027564351387606,
+          "false_positive_rate_0.05": 0.06,
+          "false_positive_rate_0.01": 0.005
+        },
+        "watermark_robustness_mistral": {
+          "detection_rate_fpr_0.05": 0.105,
+          "detection_rate_fpr_0.01": 0.02,
+          "auc": 0.645675,
+          "median_p_value": 0.31536505872484066,
+          "false_positive_rate_0.05": 0.075
+        }
+      },
+      "status": "ok",
+      "elapsed_s": 229.0
+    }
+  }
+}

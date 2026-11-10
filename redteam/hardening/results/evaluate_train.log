@@ -1,0 +1,13 @@
+[eval:train] 2 method(s) on disk in /home/user/checkpoints/watermarkers: ['gaussmark_200_tokens', 'unwatermarked']
+/usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+[eval:train] loading model from /home/user/data/downloads/models/mistralai/Mistral-7B-Instruct-v0.3
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:04<00:09,  4.97s/it]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:10<00:05,  5.01s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:14<00:00,  4.80s/it]Loading checkpoint shards: 100%|██████████| 3/3 [00:14<00:00,  4.85s/it]
+[eval:train] model loaded in 15.3s on cuda:0
+[eval:train] shared null texts and original C4 cross-entropy 1.92606 ready in 57.2s
+[eval:train] gaussmark_200_tokens: evaluating
+[eval:train] gaussmark_200_tokens: ok in 231.2s  {"watermark_detection_mistral": {"detection_rate_fpr_0.05": 0.875, "detection_rate_fpr_0.01": 0.685, "auc": 0.9768583333333334, "median_p_value": 0.0025947458949095526, "c4_cross_entropy_ratio": 1.0112688080742642, "false_positive_rate_0.05": 0.04833333333333333, "false_positive_rate_0.01": 0.0033333333333333335}, "watermark_robustness_mistral": {"detection_rate_fpr_0.05": 0.31, "detection_rate_fpr_0.01": 0.12, "auc": 0.791975, "median_p_value": 0.11905425476585393, "false_positive_rate_0.05": 0.075}}
+[eval:train] unwatermarked: evaluating
+[eval:train] unwatermarked: ok in 231.2s  {"watermark_detection_mistral": {"detection_rate_fpr_0.05": 0.045, "detection_rate_fpr_0.01": 0.0, "auc": 0.503175, "median_p_value": 0.4885056753222028, "c4_cross_entropy_ratio": 1.0, "false_positive_rate_0.05": 0.04833333333333333, "false_positive_rate_0.01": 0.005}, "watermark_robustness_mistral": {"detection_rate_fpr_0.05": 0.025, "detection_rate_fpr_0.01": 0.005, "auc": 0.49545, "median_p_value": 0.5620037863851508, "false_positive_rate_0.05": 0.075}}
+[eval:train] wrote /home/user/scoring/scores_train.json

@@ -227,3 +227,6 @@ wheels/
 python_wheels/
 *.bundle
 *.bundle.lock
+
+# Auto-added by swarm
+data/downloads/

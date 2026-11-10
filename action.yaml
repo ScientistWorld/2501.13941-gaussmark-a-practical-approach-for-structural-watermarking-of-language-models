@@ -1,8 +1,8 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: pending
-gpus: 0
+action: submit
+gpus: 1
 test: false
 milestone: core_claim
-notes: ""
+notes: "Hardening verification: build train/hidden-test sets, score reference+baseline on train and hidden test (plugin evaluator with gates), then 16 variants/shortcuts on the hidden test and 3 on train, cohort rank + paired bootstrap."

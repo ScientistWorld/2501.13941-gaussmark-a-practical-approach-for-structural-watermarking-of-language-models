@@ -3,39 +3,251 @@
     "watermark_detection_mistral": {
       "results": {
         "gaussmark_200_tokens": {
-          "detection_rate_fpr_0.05": 0.7777777777777778,
-          "detection_rate_fpr_0.01": 0.5777777777777777,
-          "median_p_value": 0.0065138443774771515,
-          "mean_p_value": 0.057610503625537206,
-          "unwatermarked_detection_rate_fpr_0.05": 0.10638297872340426,
-          "unwatermarked_detection_rate_fpr_0.01": 0.0,
-          "detection_margin_fpr_0.05": 0.6713947990543735,
-          "auc": 0.9319148936170213
+          "detection_rate_fpr_0.05": 0.82,
+          "detection_rate_fpr_0.01": 0.63,
+          "auc": 0.96081875,
+          "median_p_value": 0.0027500690202050685,
+          "c4_cross_entropy_ratio": 1.0107885170832793,
+          "false_positive_rate_0.05": 0.056666666666666664,
+          "false_positive_rate_0.01": 0.0125
         },
         "unwatermarked": {
-          "detection_rate_fpr_0.05": 0.10638297872340426,
-          "detection_rate_fpr_0.01": 0.0,
-          "median_p_value": 0.4166739784064679,
-          "mean_p_value": 0.47687826420927026
+          "detection_rate_fpr_0.05": 0.0525,
+          "detection_rate_fpr_0.01": 0.0175,
+          "auc": 0.5042895833333333,
+          "median_p_value": 0.47856658264488716,
+          "c4_cross_entropy_ratio": 1.0,
+          "false_positive_rate_0.05": 0.05583333333333333,
+          "false_positive_rate_0.01": 0.013333333333333334
+        }
+      }
+    },
+    "watermark_robustness_mistral": {
+      "results": {
+        "gaussmark_200_tokens": {
+          "detection_rate_fpr_0.05": 0.2875,
+          "detection_rate_fpr_0.01": 0.1025,
+          "auc": 0.774425,
+          "median_p_value": 0.15228664359478636,
+          "false_positive_rate_0.05": 0.0375
+        },
+        "unwatermarked": {
+          "detection_rate_fpr_0.05": 0.06,
+          "detection_rate_fpr_0.01": 0.01,
+          "auc": 0.5316875,
+          "median_p_value": 0.44912004061703636,
+          "false_positive_rate_0.05": 0.0375
         }
       }
     }
   },
   "_slice": "test",
-  "_audit": {
-    "watermark_detection_mistral": {
-      "gaussmark_200_tokens": {
-        "slice": "test",
-        "file": "wm_wm_l20_up_proj_s00031622776601683794_detection_full.json",
-        "num_samples_total": 91,
-        "num_samples_used": 45
+  "_status": {
+    "gaussmark_200_tokens": {
+      "plugin_digest": "cd10ebe26b210ea616a7749f6fa712e8c06203b226cc7f597f4f526cb62c584e",
+      "gates": {
+        "quality": {
+          "c4_cross_entropy_ratio": 1.0107885170832793,
+          "budget": 1.015,
+          "ce_original": 1.949147393989563,
+          "ce_watermarked": 1.9701758039474486
+        },
+        "null_main": {
+          "null_unwatermarked@0.05": {
+            "rejections": 15,
+            "n": 400,
+            "rate": 0.0375,
+            "binomial_tail_p": 0.9010205427813297
+          },
+          "null_unwatermarked@0.01": {
+            "rejections": 3,
+            "n": 400,
+            "rate": 0.0075,
+            "binomial_tail_p": 0.763368081452133
+          },
+          "null_human@0.05": {
+            "rejections": 28,
+            "n": 400,
+            "rate": 0.07,
+            "binomial_tail_p": 0.0479923524034735
+          },
+          "null_human@0.01": {
+            "rejections": 8,
+            "n": 400,
+            "rate": 0.02,
+            "binomial_tail_p": 0.050237415782027485
+          },
+          "null_cross_key@0.05": {
+            "rejections": 25,
+            "n": 400,
+            "rate": 0.0625,
+            "binomial_tail_p": 0.15102194003741687
+          },
+          "null_cross_key@0.01": {
+            "rejections": 4,
+            "n": 400,
+            "rate": 0.01,
+            "binomial_tail_p": 0.567512043867553
+          },
+          "pooled@0.05": {
+            "rejections": 68,
+            "n": 1200,
+            "rate": 0.056666666666666664,
+            "binomial_tail_p": 0.16005624609572836
+          },
+          "pooled@0.01": {
+            "rejections": 15,
+            "n": 1200,
+            "rate": 0.0125,
+            "binomial_tail_p": 0.22706348555877015
+          }
+        },
+        "null_robust": {
+          "null_corrupted@0.05": {
+            "rejections": 15,
+            "n": 400,
+            "rate": 0.0375,
+            "binomial_tail_p": 0.9010205427813297
+          },
+          "null_corrupted@0.01": {
+            "rejections": 4,
+            "n": 400,
+            "rate": 0.01,
+            "binomial_tail_p": 0.567512043867553
+          }
+        }
       },
-      "unwatermarked": {
-        "slice": "test",
-        "file": "unwatermarked_baseline_unwatermarked_detection_full.json",
-        "num_samples_total": 94,
-        "num_samples_used": 47
-      }
+      "counts": {
+        "marked": 400,
+        "marked_corrupted": 400,
+        "null_unwatermarked": 400,
+        "null_human": 400,
+        "null_cross_key": 400,
+        "null_corrupted": 400
+      },
+      "measured": {
+        "watermark_detection_mistral": {
+          "detection_rate_fpr_0.05": 0.82,
+          "detection_rate_fpr_0.01": 0.63,
+          "auc": 0.96081875,
+          "median_p_value": 0.0027500690202050685,
+          "c4_cross_entropy_ratio": 1.0107885170832793,
+          "false_positive_rate_0.05": 0.056666666666666664,
+          "false_positive_rate_0.01": 0.0125
+        },
+        "watermark_robustness_mistral": {
+          "detection_rate_fpr_0.05": 0.2875,
+          "detection_rate_fpr_0.01": 0.1025,
+          "auc": 0.774425,
+          "median_p_value": 0.15228664359478636,
+          "false_positive_rate_0.05": 0.0375
+        }
+      },
+      "status": "ok",
+      "elapsed_s": 409.2
+    },
+    "unwatermarked": {
+      "plugin_digest": "094de76546f7225d838b811a87291108b8e93813edebbb7ac6804503c4464f41",
+      "gates": {
+        "quality": {
+          "c4_cross_entropy_ratio": 1.0,
+          "budget": 1.015,
+          "ce_original": 1.949147393989563,
+          "ce_watermarked": 1.949147393989563
+        },
+        "null_main": {
+          "null_unwatermarked@0.05": {
+            "rejections": 15,
+            "n": 400,
+            "rate": 0.0375,
+            "binomial_tail_p": 0.9010205427813297
+          },
+          "null_unwatermarked@0.01": {
+            "rejections": 3,
+            "n": 400,
+            "rate": 0.0075,
+            "binomial_tail_p": 0.763368081452133
+          },
+          "null_human@0.05": {
+            "rejections": 28,
+            "n": 400,
+            "rate": 0.07,
+            "binomial_tail_p": 0.0479923524034735
+          },
+          "null_human@0.01": {
+            "rejections": 8,
+            "n": 400,
+            "rate": 0.02,
+            "binomial_tail_p": 0.050237415782027485
+          },
+          "null_cross_key@0.05": {
+            "rejections": 24,
+            "n": 400,
+            "rate": 0.06,
+            "binomial_tail_p": 0.207305245244834
+          },
+          "null_cross_key@0.01": {
+            "rejections": 5,
+            "n": 400,
+            "rate": 0.0125,
+            "binomial_tail_p": 0.37116142032940774
+          },
+          "pooled@0.05": {
+            "rejections": 67,
+            "n": 1200,
+            "rate": 0.05583333333333333,
+            "binomial_tail_p": 0.19314169789780009
+          },
+          "pooled@0.01": {
+            "rejections": 16,
+            "n": 1200,
+            "rate": 0.013333333333333334,
+            "binomial_tail_p": 0.15449134692847138
+          }
+        },
+        "null_robust": {
+          "null_corrupted@0.05": {
+            "rejections": 15,
+            "n": 400,
+            "rate": 0.0375,
+            "binomial_tail_p": 0.9010205427813297
+          },
+          "null_corrupted@0.01": {
+            "rejections": 4,
+            "n": 400,
+            "rate": 0.01,
+            "binomial_tail_p": 0.567512043867553
+          }
+        }
+      },
+      "counts": {
+        "marked": 400,
+        "marked_corrupted": 400,
+        "null_unwatermarked": 400,
+        "null_human": 400,
+        "null_cross_key": 400,
+        "null_corrupted": 400
+      },
+      "measured": {
+        "watermark_detection_mistral": {
+          "detection_rate_fpr_0.05": 0.0525,
+          "detection_rate_fpr_0.01": 0.0175,
+          "auc": 0.5042895833333333,
+          "median_p_value": 0.47856658264488716,
+          "c4_cross_entropy_ratio": 1.0,
+          "false_positive_rate_0.05": 0.05583333333333333,
+          "false_positive_rate_0.01": 0.013333333333333334
+        },
+        "watermark_robustness_mistral": {
+          "detection_rate_fpr_0.05": 0.06,
+          "detection_rate_fpr_0.01": 0.01,
+          "auc": 0.5316875,
+          "median_p_value": 0.44912004061703636,
+          "false_positive_rate_0.05": 0.0375
+        }
+      },
+      "status": "ok",
+      "elapsed_s": 463.2
     }
   }
 }

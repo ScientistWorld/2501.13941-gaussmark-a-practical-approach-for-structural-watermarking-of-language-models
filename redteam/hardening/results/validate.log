@@ -1,0 +1,48 @@
+── Scoring ──
+  reference.json — OK (2 experiments, 4 methods)
+  scores.json — OK (3 experiments, 4 methods)
+
+=== watermark_detection_mistral (weight: 0.65) ===
+    Detection of marked Mistral-7B-Instruct-v0.3 text (200 new tokens, temperature 1, top-p 0.9) on 400 held-out C4 prompts under 8 secret keys, at the paper's nominal p-value thresholds, without degrading the model: C4 cross-entropy of the marked model relative to the original on held-out human text (paper Table 3). Gates (run scored as failed, worst value everywhere): impossible/missing p-values, model tampering, C4 cross-entropy ratio > 1.015, or a false-positive count significantly above the nominal level (one-sided binomial p < 1e-3) on unwatermarked-model text, human text, or marked text tested with the wrong key.
+
+    Method                    Source    detection_rate_fpr_0.05 *detection_rate_fpr_0.01            auc median_p_valuec4_cross_entropy_ratiofalse_positive_rate_0.05false_positive_rate_0.01
+    ------------------------- ----------─────────────────────────────────────────────────────────────────────────────────────────────────────────
+    gaussmark_200_tokens [proposed] paper               0.620          0.400          0.850          0.090          1.010          0.050          0.010
+                              repro               0.875          0.685          0.977          0.003          1.011          0.048          0.003
+
+    unwatermarked [baseline]  paper               0.050          0.010          0.500          0.500          1.000              —              —
+                              repro               0.045          0.000          0.503          0.489          1.000          0.048          0.005
+
+
+=== watermark_robustness_mistral (weight: 0.35) ===
+    Detection after the paper's token-level corruptions (Sec. 4.3): the evaluator edits 20% of the tokens of every marked and every unwatermarked text with random substitutions, deletions or insertions (one attack per text, balanced). Same model, prompts, keys and gates as watermark_detection_mistral. Added as the headroom experiment: the paper's method loses much of its power here.
+
+    Method                    Source    detection_rate_fpr_0.05 *detection_rate_fpr_0.01            auc median_p_valuefalse_positive_rate_0.05
+    ------------------------- ----------───────────────────────────────────────────────────────────────────────────
+    gaussmark_200_tokens [proposed] paper               0.570              —              —              —          0.050
+                              repro               0.310          0.120          0.792          0.119          0.075
+
+    unwatermarked [baseline]  paper               0.050              —          0.500          0.500              —
+                              repro               0.025          0.005          0.495          0.562          0.075
+
+  scores_train.json — OK (3 experiments, 4 methods)
+  scores_test.json — OK (3 experiments, 4 methods)
+  split-mode artifacts — OK (all 6 present)
+  scores ↔ paper consistency — 2 error(s):
+    ✗ scores.json: experiments.watermark_robustness_mistral.unwatermarked: primary metric 'detection_rate_fpr_0.05' — paper reports 0.05 but scores.json has 0.025 (2.00x off in magnitude). This gap is too large to accept — one of the two sides is wrong. Either the value in scores.json is wrong (broken training, wrong data split, missing preprocessing, wrong unit, etc.) OR the paper-reported value in reference.json is wrong (reference.json was written by an earlier agent and is not verified). Fix whichever is off — edit either scores.json (re-run the method) or reference.json (correct the transcribed value). Re-read the paper if you are sure your reproduction is good. Do not claim the milestone until this experiment's numbers are consistent.
+    ✗ scores_train.json: experiments.watermark_robustness_mistral.unwatermarked: primary metric 'detection_rate_fpr_0.05' — paper reports 0.05 but scores_train.json has 0.025 (2.00x off in magnitude). This gap is too large to accept — one of the two sides is wrong. Either the value in scores_train.json is wrong (broken training, wrong data split, missing preprocessing, wrong unit, etc.) OR the paper-reported value in reference.json is wrong (reference.json was written by an earlier agent and is not verified). Fix whichever is off — edit either scores_train.json (re-run the method) or reference.json (correct the transcribed value). Re-read the paper if you are sure your reproduction is good. Do not claim the milestone until this experiment's numbers are consistent.
+
+── Structure ──
+  import separation — OK (eval/ and data/ do not import from method/)
+  eval reads method outputs — OK (no regen-without-read pattern)
+  gitignored imports — OK (all eval/method/baseline imports resolve to tracked files)
+  eval/train ↔ eval/test independence — OK
+  shared/ references — OK (no shared/ paths in committed code)
+  evaluate_{train,test}.sh rewiring — OK
+  evaluate_{train,test}.sh method defaults — OK (no hardcoded method name)
+  scores_train.json ↔ scores_test.json method keys — OK
+  scores_train.json ↔ scores_test.json value differentiation — OK
+  primary metric train/test differentiation — OK
+  primary metric discriminates methods on train — OK
+
+FAILED — fix the errors above.
