@@ -17,3 +17,9 @@ the displayed cohort rank is an illustrative fully specified comparison.
 `original/` preserves pre-audit files solely for restoration and rank analysis;
 shortcut methods do not consult its hidden-test scores or reference configuration.
 `reference_source/` holds the explicitly permitted reference output reuse.
+
+The first executed job completed the passive-output checks but its model runs
+failed in the supplied tokenizer loader because protobuf is absent. The failure
+logs are preserved in `runtime_failure_d0132c8b-98b/`. The resumed model runner
+loads the existing fast tokenizer JSON and requires all 100 prompt token sequences
+to match the reference before inference. It changes no installed packages.

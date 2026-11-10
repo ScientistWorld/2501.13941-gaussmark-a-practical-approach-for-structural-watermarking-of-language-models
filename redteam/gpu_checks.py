@@ -17,6 +17,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from scipy.stats import norm
+from transformers import AutoConfig, AutoModelForCausalLM, PreTrainedTokenizerFast
 
 sys.path.insert(0, '/home/user/method')
 from gaussmark import GaussMark
@@ -26,6 +27,48 @@ from common import (AUDIT, SOURCE, WM_FILE, UW_FILE, read, write, evaluate_trial
 SIGMA = math.sqrt(1e-5)
 CASES = ['reference_seed_42', 'reference_seed_1042', 'reference_seed_2042',
          'honest_efficiency_fix', 'honest_residual64', 'shortcut_bruteforce_rejection']
+
+
+def load_tokenizer_and_prompts():
+    # Transformers 4.57 tries to reconstruct LlamaTokenizerFast from the slow
+    # tokenizer when add_prefix_space=True. That path requires protobuf, absent
+    # in the gym container. Load the already supplied fast tokenizer graph,
+    # including its normalization, pre-tokenizer and BOS post-processor, directly.
+    # This changes neither evaluator code nor its Python environment.
+    model_path = Path(pipeline.MODEL_PATH)
+    tokenizer = PreTrainedTokenizerFast.from_pretrained(
+        model_path, tokenizer_file=str(model_path/'tokenizer.json'),
+        local_files_only=True)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    prompts = pipeline.load_c4_prompts(100, tokenizer)
+    saved = read(SOURCE/'watermarked_wm_l20_up_proj_s00031622776601683794.json')['samples']
+    mismatches = [i for i, (prompt, sample) in enumerate(zip(prompts, saved))
+                  if tokenizer(prompt)['input_ids'] != sample['prompt_ids']]
+    proof = {'loader': 'PreTrainedTokenizerFast with supplied tokenizer.json',
+             'prompt_count': len(prompts), 'reference_prompt_count': len(saved),
+             'mismatched_prompt_indices': mismatches,
+             'bos_token_id': tokenizer.bos_token_id, 'eos_token_id': tokenizer.eos_token_id,
+             'pad_token_id': tokenizer.pad_token_id}
+    write(AUDIT/'tokenizer_validation.json', proof)
+    if len(prompts) != 100 or len(saved) != 100 or mismatches:
+        raise RuntimeError(f'Tokenizer does not match saved reference prompts: {proof}')
+    print('Tokenizer matches all 100 exact saved reference prompt IDs.', flush=True)
+    return tokenizer, prompts
+
+
+def load_model(tokenizer):
+    # Same model, configuration, precision, device and padding as the reference.
+    print(f'[+] Loading model from {pipeline.MODEL_PATH}...', flush=True)
+    config = AutoConfig.from_pretrained(pipeline.MODEL_PATH, local_files_only=True)
+    model = AutoModelForCausalLM.from_pretrained(
+        pipeline.MODEL_PATH, config=config, torch_dtype=torch.bfloat16,
+        device_map='cuda', local_files_only=True)
+    if getattr(model.config, 'pad_token_id', None) is None:
+        model.config.pad_token_id = tokenizer.pad_token_id or tokenizer.eos_token_id
+    model.eval()
+    model.tokenizer = tokenizer
+    return model
 
 
 class ResidualGaussMark(GaussMark):
@@ -237,10 +280,12 @@ def execute(name, model, tokenizer, prompts):
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('case', choices=CASES+['all'])
+    p.add_argument('--tokenizer-only', action='store_true')
     args = p.parse_args()
-    model, tokenizer = pipeline.load_model_and_tokenizer(pipeline.MODEL_PATH)
-    model.tokenizer = tokenizer
-    prompts = pipeline.load_c4_prompts(100, tokenizer)
+    tokenizer, prompts = load_tokenizer_and_prompts()
+    if args.tokenizer_only:
+        raise SystemExit(0)
+    model = load_model(tokenizer)
     errors = {}
     for case in CASES if args.case == 'all' else [args.case]:
         try:

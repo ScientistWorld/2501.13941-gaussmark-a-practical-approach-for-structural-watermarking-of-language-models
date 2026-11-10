@@ -2,6 +2,7 @@
 set -euo pipefail
 cd /home/user
 python3 redteam/artifact_shortcuts.py all > redteam/artifact_bundle.log 2>&1
+python3 redteam/gpu_checks.py reference_seed_42 --tokenizer-only > redteam/tokenizer_validation.log 2>&1
 gpu_status=0
 # End each model process before scoring its passive artifacts. Save a completed
 # test result after every case so a scheduler timeout does not erase progress.

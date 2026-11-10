@@ -1,4 +1,4 @@
 action: submit
 gpus: 1
 test: false
-notes: "Resume cancelled audit: passive artifact shortcuts and completeness checks, three full reference seed runs, genuine efficiency and projected-noise variants, rejection-sampling brute force; save hidden-test scores after every case."
+notes: "Resume model audit after tokenizer dependency failure: load supplied tokenizer.json, verify all 100 exact reference prompt IDs, run three reference seeds, genuine efficiency/projected-noise variants and brute-force rejection; preserve unchanged hidden-test scores per case."
