@@ -26,7 +26,7 @@ from common import (AUDIT, SOURCE, WM_FILE, UW_FILE, read, write, evaluate_trial
 
 SIGMA = math.sqrt(1e-5)
 CASES = ['reference_seed_42', 'reference_seed_1042', 'reference_seed_2042',
-         'honest_efficiency_fix', 'honest_residual64', 'shortcut_bruteforce_rejection']
+         'honest_efficiency_fix', 'shortcut_quality_tradeoff', 'shortcut_bruteforce_rejection']
 
 
 def load_tokenizer_and_prompts():
@@ -187,7 +187,7 @@ def execute(name, model, tokenizer, prompts):
     outdir = AUDIT / name
     outdir.mkdir(parents=True, exist_ok=True)
     fixed = name == 'honest_efficiency_fix'
-    residual = name == 'honest_residual64'
+    residual = name == 'shortcut_quality_tradeoff'
     brute = name == 'shortcut_bruteforce_rejection'
     cached_generation = fixed or brute
     seedbase = int(name.rsplit('_', 1)[1]) if name.startswith('reference_seed_') else 42

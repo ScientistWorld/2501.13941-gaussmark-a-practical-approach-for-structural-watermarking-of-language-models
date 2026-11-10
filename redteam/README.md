@@ -6,8 +6,10 @@ or any evaluator process. The model process exits before GPU outputs are scored.
 
 `common.py` installs artifacts into the default checkpoints/ location and the
 declared row into scoring/scores.json, then restores all original files. Original
-reference artifacts are reused where the request allows it; the from-scratch
-fabrication shortcut uses no reference data at all. Neither uses test labels.
+reference artifacts are reused where the request allows it. The fabrication
+shortcut constructs constant p-values independent of reference measurements;
+its common wrapper also loads the reference artifacts before replacing them.
+Neither uses test labels.
 
 The rank is cohort dependent. `summarize.py` uses absolute coefficients, declared
 directions, and population standard deviations across the recorded audit cohort.
@@ -23,3 +25,7 @@ failed in the supplied tokenizer loader because protobuf is absent. The failure
 logs are preserved in `runtime_failure_d0132c8b-98b/`. The resumed model runner
 loads the existing fast tokenizer JSON and requires all 100 prompt token sequences
 to match the reference before inference. It changes no installed packages.
+
+The final findings are in [REDTEAM.md](../REDTEAM.md). The projected-noise run is
+classified as `shortcut_quality_tradeoff` because its measured quality worsened;
+its unedited raw model logs retain the earlier `honest_residual64` identifier.

@@ -1,4 +1,5 @@
-action: submit
-gpus: 1
+action: done
+gpus: 0
 test: false
-notes: "Resume model audit after tokenizer dependency failure: load supplied tokenizer.json, verify all 100 exact reference prompt IDs, run three reference seeds, genuine efficiency/projected-noise variants and brute-force rejection; preserve unchanged hidden-test scores per case."
+milestone: core_claim
+notes: "Audit complete: 23 cases and three reference seeds; scoring rewards fabricated measurements and omits quality/search cost. Findings in REDTEAM.md; writable gym inputs restored."

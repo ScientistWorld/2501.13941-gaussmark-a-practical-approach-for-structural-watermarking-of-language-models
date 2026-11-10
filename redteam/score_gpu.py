@@ -3,7 +3,7 @@ import argparse
 from common import AUDIT, read, evaluate_trial
 
 CASES = ['reference_seed_42', 'reference_seed_1042', 'reference_seed_2042',
-         'honest_efficiency_fix', 'honest_residual64', 'shortcut_bruteforce_rejection']
+         'honest_efficiency_fix', 'shortcut_quality_tradeoff', 'shortcut_bruteforce_rejection']
 p = argparse.ArgumentParser()
 p.add_argument('case', choices=CASES+['all'])
 args = p.parse_args()

@@ -12,8 +12,8 @@
   "normalization": "population std of all finite audited attempts plus original test reference; absent metrics skipped",
   "metric_scales": {
     "detection_rate_fpr_0.05": 0.288125953031979,
-    "detection_rate_fpr_0.01": 0.30922937775497467,
-    "median_p_value": 208298.9091087941,
+    "detection_rate_fpr_0.01": 0.3092293777549746,
+    "median_p_value": 208298.90910879412,
     "mean_p_value": 208298.91595653573,
     "auc": 0.2618816346327714,
     "detection_margin_fpr_0.05": 0.3456588571803294,
@@ -33,51 +33,16 @@
         "detection_margin_fpr_0.05": 0.6713947990543735,
         "auc": 0.9304964539007092
       },
-      "rank_delta_finite_terms": -0.02237142005548765,
+      "rank_delta_finite_terms": -0.022371420055487652,
       "contributions": {
         "detection_rate_fpr_0.05": 0.0,
-        "detection_rate_fpr_0.01": -0.021558969316133787,
-        "median_p_value": 1.8523340020329e-10,
+        "detection_rate_fpr_0.01": -0.02155896931613379,
+        "median_p_value": 1.8523340020328996e-10,
         "mean_p_value": -7.157054114009051e-11,
         "auc": -0.0008124508530167225,
         "detection_margin_fpr_0.05": 0.0,
         "unwatermarked_detection_rate_fpr_0.05": -0.0,
         "unwatermarked_detection_rate_fpr_0.01": -0.0
-      },
-      "nonfinite": [],
-      "missing": [
-        "c4_cross_entropy_ratio",
-        "c4_cross_entropy_delta",
-        "generation_time_ratio"
-      ],
-      "status": {
-        "train": 0,
-        "test": 0
-      },
-      "test_success": true,
-      "score_file_may_be_stale": false
-    },
-    "honest_residual64": {
-      "metrics": {
-        "detection_rate_fpr_0.05": 0.9333333333333333,
-        "detection_rate_fpr_0.01": 0.8888888888888888,
-        "median_p_value": 0.00010272805002484157,
-        "mean_p_value": 0.008276390369830555,
-        "unwatermarked_detection_rate_fpr_0.05": 0.06382978723404255,
-        "unwatermarked_detection_rate_fpr_0.01": 0.02127659574468085,
-        "detection_margin_fpr_0.05": 0.8695035460992908,
-        "auc": 0.9872340425531915
-      },
-      "rank_delta_finite_terms": 0.7975667759300004,
-      "contributions": {
-        "detection_rate_fpr_0.05": 0.2699436720618682,
-        "detection_rate_fpr_0.01": 0.3018255704258741,
-        "median_p_value": 3.077844408730819e-09,
-        "mean_p_value": 1.7763215315772762e-08,
-        "auc": 0.03168558326765212,
-        "detection_margin_fpr_0.05": 0.1146267442188322,
-        "unwatermarked_detection_rate_fpr_0.05": 0.10448348460796092,
-        "unwatermarked_detection_rate_fpr_0.01": -0.02499829949324702
       },
       "nonfinite": [],
       "missing": [
@@ -138,11 +103,11 @@
         "detection_margin_fpr_0.05": 0.7210915818686401,
         "auc": 0.9662349676225717
       },
-      "rank_delta_finite_terms": 0.27426893401192876,
+      "rank_delta_finite_terms": 0.2742689340119287,
       "contributions": {
         "detection_rate_fpr_0.05": 0.09025472318177957,
-        "detection_rate_fpr_0.01": 0.1412800542418986,
-        "median_p_value": 1.4078535449208684e-09,
+        "detection_rate_fpr_0.01": 0.14128005424189863,
+        "median_p_value": 1.4078535449208682e-09,
         "mean_p_value": 1.1975924474054613e-08,
         "auc": 0.019657778247991517,
         "detection_margin_fpr_0.05": 0.02875481520691362,
@@ -176,8 +141,8 @@
       "rank_delta_finite_terms": 0.35005044945010527,
       "contributions": {
         "detection_rate_fpr_0.05": 0.07712676344624797,
-        "detection_rate_fpr_0.01": 0.10779484658066937,
-        "median_p_value": 2.6654812930171545e-09,
+        "detection_rate_fpr_0.01": 0.10779484658066939,
+        "median_p_value": 2.665481293017154e-09,
         "mean_p_value": 9.921793133068596e-09,
         "auc": 0.01891505948912263,
         "detection_margin_fpr_0.05": 0.04869584837936068,
@@ -211,8 +176,8 @@
       "rank_delta_finite_terms": 0.5094427750613764,
       "contributions": {
         "detection_rate_fpr_0.05": 0.19281690861562,
-        "detection_rate_fpr_0.01": 0.10779484658066937,
-        "median_p_value": 2.1345225543097208e-09,
+        "detection_rate_fpr_0.01": 0.10779484658066939,
+        "median_p_value": 2.1345225543097204e-09,
         "mean_p_value": 7.79566656185666e-09,
         "auc": 0.01543656620731773,
         "detection_margin_fpr_0.05": 0.08891095911961922,
@@ -243,11 +208,11 @@
         "detection_margin_fpr_0.05": 0.0,
         "auc": 0.5
       },
-      "rank_delta_finite_terms": -3.2096827778924855,
+      "rank_delta_finite_terms": -3.209682777892486,
       "contributions": {
         "detection_rate_fpr_0.05": 0.38563381723124024,
-        "detection_rate_fpr_0.01": 0.40962041700654345,
-        "median_p_value": 3.127162021801557e-09,
+        "detection_rate_fpr_0.01": 0.40962041700654356,
+        "median_p_value": 3.127162021801556e-09,
         "mean_p_value": 2.0743208153886305e-08,
         "auc": -0.24739128474359168,
         "detection_margin_fpr_0.05": -0.38847249830725933,
@@ -278,11 +243,11 @@
         "detection_margin_fpr_0.05": 0.8732088580112896,
         "auc": 0.9848024316109423
       },
-      "rank_delta_finite_terms": 0.8871033141804864,
+      "rank_delta_finite_terms": 0.8871033141804865,
       "contributions": {
         "detection_rate_fpr_0.05": 0.3502184666691875,
-        "detection_rate_fpr_0.01": 0.3898213635529511,
-        "median_p_value": 2.572402641747721e-09,
+        "detection_rate_fpr_0.01": 0.3898213635529512,
+        "median_p_value": 2.5724026417477207e-09,
         "mean_p_value": 1.4181120037519936e-08,
         "auc": 0.03029281037676633,
         "detection_margin_fpr_0.05": 0.11677065682805875,
@@ -316,8 +281,8 @@
       "rank_delta_finite_terms": -2.3615037596694934,
       "contributions": {
         "detection_rate_fpr_0.05": -1.1651064265284279,
-        "detection_rate_fpr_0.01": -0.5605332022194804,
-        "median_p_value": -1.9690940091038355e-07,
+        "detection_rate_fpr_0.01": -0.5605332022194806,
+        "median_p_value": -1.9690940091038352e-07,
         "mean_p_value": -1.5096133313694923e-07,
         "auc": -0.24739128474359168,
         "detection_margin_fpr_0.05": -0.38847249830725933,
@@ -408,11 +373,11 @@
         "detection_margin_fpr_0.05": 1.0,
         "auc": 1.0
       },
-      "rank_delta_finite_terms": 1.2855932769978906,
+      "rank_delta_finite_terms": 1.2855932769978908,
       "contributions": {
         "detection_rate_fpr_0.05": 0.38563381723124024,
-        "detection_rate_fpr_0.01": 0.40962041700654345,
-        "median_p_value": 3.127162021801557e-09,
+        "detection_rate_fpr_0.01": 0.40962041700654356,
+        "median_p_value": 3.127162021801556e-09,
         "mean_p_value": 2.0743208153886305e-08,
         "auc": 0.03899764094480262,
         "detection_margin_fpr_0.05": 0.19013266642503188,
@@ -481,8 +446,8 @@
       "rank_delta_finite_terms": 2.1257320865727576,
       "contributions": {
         "detection_rate_fpr_0.05": 0.38563381723124024,
-        "detection_rate_fpr_0.01": 0.40962041700654345,
-        "median_p_value": 0.4800793296481195,
+        "detection_rate_fpr_0.01": 0.40962041700654356,
+        "median_p_value": 0.48007932964811945,
         "mean_p_value": 0.3600595037971177,
         "auc": 0.03899764094480262,
         "detection_margin_fpr_0.05": 0.19013266642503188,
@@ -544,7 +509,7 @@
         "detection_margin_fpr_0.05": 0.7777777777777778,
         "auc": 1.0
       },
-      "rank_delta_finite_terms": 0.3617600933936721,
+      "rank_delta_finite_terms": 0.36176009339367204,
       "contributions": {
         "detection_rate_fpr_0.05": 0.0,
         "detection_rate_fpr_0.01": 0.0,
@@ -579,7 +544,7 @@
         "detection_margin_fpr_0.05": 0.7777777777777778,
         "auc": 0.0
       },
-      "rank_delta_finite_terms": -0.21101775798311656,
+      "rank_delta_finite_terms": -0.21101775798311653,
       "contributions": {
         "detection_rate_fpr_0.05": 0.0,
         "detection_rate_fpr_0.01": 0.0,
@@ -638,6 +603,41 @@
       "test_success": false,
       "score_file_may_be_stale": true
     },
+    "shortcut_quality_tradeoff": {
+      "metrics": {
+        "detection_rate_fpr_0.05": 0.9333333333333333,
+        "detection_rate_fpr_0.01": 0.8888888888888888,
+        "median_p_value": 0.00010272805002484157,
+        "mean_p_value": 0.008276390369830555,
+        "unwatermarked_detection_rate_fpr_0.05": 0.06382978723404255,
+        "unwatermarked_detection_rate_fpr_0.01": 0.02127659574468085,
+        "detection_margin_fpr_0.05": 0.8695035460992908,
+        "auc": 0.9872340425531915
+      },
+      "rank_delta_finite_terms": 0.7975667759300002,
+      "contributions": {
+        "detection_rate_fpr_0.05": 0.2699436720618682,
+        "detection_rate_fpr_0.01": 0.30182557042587416,
+        "median_p_value": 3.0778444087308185e-09,
+        "mean_p_value": 1.7763215315772762e-08,
+        "auc": 0.03168558326765212,
+        "detection_margin_fpr_0.05": 0.1146267442188322,
+        "unwatermarked_detection_rate_fpr_0.05": 0.10448348460796092,
+        "unwatermarked_detection_rate_fpr_0.01": -0.02499829949324702
+      },
+      "nonfinite": [],
+      "missing": [
+        "c4_cross_entropy_ratio",
+        "c4_cross_entropy_delta",
+        "generation_time_ratio"
+      ],
+      "status": {
+        "train": 0,
+        "test": 0
+      },
+      "test_success": true,
+      "score_file_may_be_stale": false
+    },
     "shortcut_reorder_test": {
       "metrics": {
         "detection_rate_fpr_0.05": 1.0,
@@ -649,11 +649,11 @@
         "detection_margin_fpr_0.05": 1.0,
         "auc": 1.0
       },
-      "rank_delta_finite_terms": 1.2855932766221834,
+      "rank_delta_finite_terms": 1.2855932766221836,
       "contributions": {
         "detection_rate_fpr_0.05": 0.38563381723124024,
-        "detection_rate_fpr_0.01": 0.40962041700654345,
-        "median_p_value": 3.0168030580681496e-09,
+        "detection_rate_fpr_0.01": 0.40962041700654356,
+        "median_p_value": 3.016803058068149e-09,
         "mean_p_value": 2.0477859937521253e-08,
         "auc": 0.03899764094480262,
         "detection_margin_fpr_0.05": 0.19013266642503188,
@@ -684,11 +684,11 @@
         "detection_margin_fpr_0.05": 1.0,
         "auc": 1.0
       },
-      "rank_delta_finite_terms": 1.2855932769978906,
+      "rank_delta_finite_terms": 1.2855932769978908,
       "contributions": {
         "detection_rate_fpr_0.05": 0.38563381723124024,
-        "detection_rate_fpr_0.01": 0.40962041700654345,
-        "median_p_value": 3.1271620213386505e-09,
+        "detection_rate_fpr_0.01": 0.40962041700654356,
+        "median_p_value": 3.12716202133865e-09,
         "mean_p_value": 2.0743208153539124e-08,
         "auc": 0.03899764094480262,
         "detection_margin_fpr_0.05": 0.19013266642503188,
@@ -722,8 +722,8 @@
       "rank_delta_finite_terms": -2.6137628641052997,
       "contributions": {
         "detection_rate_fpr_0.05": -1.349718360309341,
-        "detection_rate_fpr_0.01": -0.5605332022194804,
-        "median_p_value": -2.3691250123867717e-07,
+        "detection_rate_fpr_0.01": -0.5605332022194806,
+        "median_p_value": -2.3691250123867714e-07,
         "mean_p_value": -1.5928653337306845e-07,
         "auc": -0.2534846661412171,
         "detection_margin_fpr_0.05": -0.4500262392362265,
@@ -792,8 +792,8 @@
       "rank_delta_finite_terms": -2.3615037596694934,
       "contributions": {
         "detection_rate_fpr_0.05": -1.1651064265284279,
-        "detection_rate_fpr_0.01": -0.5605332022194804,
-        "median_p_value": -1.9690940091038355e-07,
+        "detection_rate_fpr_0.01": -0.5605332022194806,
+        "median_p_value": -1.9690940091038352e-07,
         "mean_p_value": -1.5096133313694923e-07,
         "auc": -0.24739128474359168,
         "detection_margin_fpr_0.05": -0.38847249830725933,
@@ -825,7 +825,7 @@
         "min": 0.8222222222222222,
         "max": 0.8888888888888888,
         "range": 0.06666666666666665,
-        "population_std": 0.02980432379866605
+        "population_std": 0.029804323798666047
       },
       "detection_rate_fpr_0.01": {
         "min": 0.6888888888888889,
@@ -871,9 +871,9 @@
       }
     },
     "rank": {
-      "min": 0.27426893401192876,
+      "min": 0.2742689340119287,
       "max": 0.5094427750613764,
-      "range": 0.2351738410494476
+      "range": 0.23517384104944766
     }
   }
 }
