@@ -1,0 +1,16 @@
+Running train-slice evaluation for experiment: watermark_detection_mistral
+Results directory: /home/user/checkpoints
+Found 1 benchmark method(s) to process
+  Processing benchmark method: gaussmark_200_tokens
+{
+  "experiments": {
+    "watermark_detection_mistral": {
+      "results": {}
+    }
+  },
+  "_slice": "train",
+  "_audit": {
+    "watermark_detection_mistral": {}
+  }
+}
+Train scores written to /tmp/tmp.NOAB4JybFQ

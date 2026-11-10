@@ -1,0 +1,6 @@
+{
+  "kind": "shortcut",
+  "case": "shortcut_reorder_test",
+  "uses_hidden_answers": false,
+  "reference_artifact_reuse": true
+}

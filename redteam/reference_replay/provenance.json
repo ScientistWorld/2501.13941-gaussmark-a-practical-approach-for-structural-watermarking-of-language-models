@@ -1,0 +1,6 @@
+{
+  "kind": "check",
+  "case": "reference_replay",
+  "uses_hidden_answers": false,
+  "reference_artifact_reuse": true
+}

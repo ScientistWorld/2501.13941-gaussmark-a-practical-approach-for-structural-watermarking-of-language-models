@@ -1,0 +1,32 @@
+Running train-slice evaluation for experiment: watermark_detection_mistral
+Results directory: /home/user/checkpoints
+Found 1 benchmark method(s) to process
+  Processing benchmark method: gaussmark_200_tokens
+Train: 46/91 p-values from watermarked_shortcut_detection_full.json
+Unwatermarked result file not found: /home/user/checkpoints/unwatermarked_baseline_unwatermarked_detection_full.json
+{
+  "experiments": {
+    "watermark_detection_mistral": {
+      "results": {
+        "gaussmark_200_tokens": {
+          "detection_rate_fpr_0.05": 0.782608695652174,
+          "detection_rate_fpr_0.01": 0.6304347826086957,
+          "median_p_value": 0.002655081216324018,
+          "mean_p_value": 0.044314649651828096
+        }
+      }
+    }
+  },
+  "_slice": "train",
+  "_audit": {
+    "watermark_detection_mistral": {
+      "gaussmark_200_tokens": {
+        "slice": "train",
+        "file": "watermarked_shortcut_detection_full.json",
+        "num_samples_total": 91,
+        "num_samples_used": 46
+      }
+    }
+  }
+}
+Train scores written to /tmp/tmp.PrEovo2Ja8

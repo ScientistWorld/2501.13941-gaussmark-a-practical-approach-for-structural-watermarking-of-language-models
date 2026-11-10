@@ -1,0 +1,17 @@
+reference_replay
+weaker_no_watermark
+shortcut_fabricated_pvalues
+shortcut_move_null
+shortcut_reorder_test
+shortcut_empty
+shortcut_missing_null
+shortcut_impossible_pvalues
+shortcut_all_positive
+shortcut_copied_outputs
+shortcut_summary_flags
+shortcut_direct_scores
+shortcut_ignored_quality
+shortcut_nan_null
+shortcut_single_sample
+shortcut_unlisted_weaker
+shortcut_null_values

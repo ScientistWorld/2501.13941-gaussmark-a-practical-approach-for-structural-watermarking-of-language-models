@@ -1,0 +1,16 @@
+Running test-slice evaluation for experiment: watermark_detection_mistral
+Results directory: /home/user/checkpoints
+Found 1 benchmark method(s) to process
+  Processing benchmark method: gaussmark_200_tokens
+Traceback (most recent call last):
+  File "/home/user/eval/test/evaluate_slice.py", line 292, in <module>
+    main()
+  File "/home/user/eval/test/evaluate_slice.py", line 276, in main
+    scores = evaluate(
+  File "/home/user/eval/test/evaluate_slice.py", line 199, in evaluate
+    all_p_wm, _ = load_p_values(wm_path)
+  File "/home/user/eval/test/evaluate_slice.py", line 22, in load_p_values
+    return [float(p) for p in data.get("p_values", [])], data
+  File "/home/user/eval/test/evaluate_slice.py", line 22, in <listcomp>
+    return [float(p) for p in data.get("p_values", [])], data
+TypeError: float() argument must be a string or a real number, not 'NoneType'
