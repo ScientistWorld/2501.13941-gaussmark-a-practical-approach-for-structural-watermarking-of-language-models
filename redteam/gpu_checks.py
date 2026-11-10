@@ -146,6 +146,7 @@ def execute(name, model, tokenizer, prompts):
     fixed = name == 'honest_efficiency_fix'
     residual = name == 'honest_residual64'
     brute = name == 'shortcut_bruteforce_rejection'
+    cached_generation = fixed or brute
     seedbase = int(name.rsplit('_', 1)[1]) if name.startswith('reference_seed_') else 42
     # Reset original flags. The published implementation leaves non-target
     # parameters trainable, retaining unneeded activation/gradient graphs.
@@ -164,7 +165,7 @@ def execute(name, model, tokenizer, prompts):
         'model': pipeline.MODEL_PATH, 'prompt_count': 100,
         'generation': {'max_new_tokens': 200, 'temperature': 1.0, 'top_p': 0.9}}
     for i in range(len(state['marked']), 100):
-        if seedbase == 42 and not residual:
+        if cached_generation:
             sample = original_marked[i].copy()
             key = wm.regenerate_watermark_key(42+i)
         else:
@@ -196,7 +197,7 @@ def execute(name, model, tokenizer, prompts):
         print(name, 'marked', i+1, 'p=', None if result is None else result['p_value'], flush=True)
         del key
     for i in range(len(state['null']), 100):
-        sample = original_null[i].copy() if seedbase == 42 else generate_null(
+        sample = original_null[i].copy() if fixed or residual or brute else generate_null(
             wm, tokenizer, prompt_ids[i], seedbase+i)
         key = wm.regenerate_watermark_key(seedbase+i)
         start = time.perf_counter()
@@ -212,6 +213,12 @@ def execute(name, model, tokenizer, prompts):
     state['generation_time_ratio'] = (sum(s['total_generation_seconds'] for s in state['marked']) /
                                       sum(s['sample']['gen_time'] for s in state['null']))
     state['peak_allocated_bytes'] = max(s['peak_allocated_bytes'] for s in state['marked'])
+    state['torch_version'] = torch.__version__
+    state['gpu'] = torch.cuda.get_device_name()
+    state['cached_generation_reused'] = cached_generation
+    state['timing_note'] = ('Cached first-trial generation times come from the reference run; '
+        'new generation timings exclude CPU key construction. Detection timings are newly '
+        'measured on the same audit GPU. Brute-force detector time is extra generation work.')
     save_progress(statepath, state)
     artifacts = {
         WM_FILE: {'p_values': [s['result']['p_value'] for s in state['marked'] if s['result'] is not None],

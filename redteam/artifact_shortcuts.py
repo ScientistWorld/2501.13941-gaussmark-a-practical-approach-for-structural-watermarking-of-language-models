@@ -21,6 +21,7 @@ CASES = [
     'shortcut_copied_outputs', 'shortcut_summary_flags',
     'shortcut_direct_scores', 'shortcut_ignored_quality',
     'shortcut_nan_null', 'shortcut_single_sample',
+    'shortcut_unlisted_weaker', 'shortcut_null_values',
 ]
 
 
@@ -28,6 +29,7 @@ def run(name):
     artifacts = reference_artifacts()
     wm, uw = artifacts[WM_FILE], artifacts[UW_FILE]
     planted = None
+    declarations = None
     if name == 'reference_replay':
         pass
     elif name == 'weaker_no_watermark':
@@ -85,9 +87,24 @@ def run(name):
         best = min(wm['p_values'])
         artifacts[WM_FILE] = {'p_values': [best, best]}
         artifacts[UW_FILE] = {'p_values': [1.0, 1.0]}
+    elif name == 'shortcut_unlisted_weaker':
+        # Keep a failed method on disk but declare only the measured reference.
+        # Full-array metrics select the intended artifact using the public
+        # train resolver; neither this declaration nor this method reads test.
+        ps = sorted(wm['p_values'])
+        n = len(ps)
+        declarations = {'experiments': {EXPERIMENT: {'results': {METHOD: {
+            'detection_rate_fpr_0.05': sum(p < .05 for p in ps)/n,
+            'median_p_value': ps[n//2] if n % 2 else (ps[n//2-1]+ps[n//2])/2,
+        }}}}}
+        artifacts['watermarked_unlisted_weaker_detection_full.json'] = {'p_values': [1.0]*100}
+    elif name == 'shortcut_null_values':
+        artifacts = {WM_FILE: {'p_values': [None]*100}, UW_FILE: {'p_values': [None]*100}}
     else:
         raise ValueError(name)
-    evaluate_trial(name, artifacts, planted_scores=planted)
+    evaluate_trial(name, artifacts, declarations=declarations, planted_scores=planted)
+    if declarations is not None:
+        write(AUDIT / name / 'declarations.json', declarations)
     write(AUDIT / name / 'provenance.json', {'kind': 'shortcut' if name.startswith('shortcut_') else 'check',
         'case': name, 'uses_hidden_answers': False,
         'reference_artifact_reuse': name != 'shortcut_fabricated_pvalues'})
